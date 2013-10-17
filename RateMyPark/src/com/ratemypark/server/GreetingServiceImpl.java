@@ -16,7 +16,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		if (!FieldVerifier.isValidName(input)) {
 			// If the input is not valid, throw an IllegalArgumentException back to
 			// the client.
-			// Test
+			// Test 2
 			throw new IllegalArgumentException(
 					"Name must be at least 4 characters long");
 		}
