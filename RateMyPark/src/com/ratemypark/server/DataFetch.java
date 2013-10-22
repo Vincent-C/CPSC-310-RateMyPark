@@ -15,7 +15,11 @@ public class DataFetch {
 		BufferedReader rd;
 		String line;
 		String result = "";
+		
 		try {
+			// Retrieved data from ftp://webftp.vancouver.ca/opendata/xml/parks_facilities.xml and placed onto
+			// Vincent's private webserver in order to use HTTP Get
+			// Refer to https://piazza.com/class/hkubwxvsg8u5?cid=98 for clarification
 			url = new URL("http://www.vcheng.org/parks_facilities.xml");
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
@@ -28,11 +32,8 @@ public class DataFetch {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 		return result;
 	}
 	
-	public static void main() {
-		DataFetch df = new DataFetch();
-		System.out.println(df.getHTML());
-	}
 }
