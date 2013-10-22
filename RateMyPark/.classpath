@@ -6,6 +6,7 @@
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="D:/Users/William/Documents/My Received Files/Courses - UBC/Year 3/CPSC 310/eclise-keplar/eclipse/google-api-services-coordinate-v1-rev35-java-1.17.0-rc/coordinate/google-api-services-coordinate-v1-rev35-1.17.0-rc.jar"/>
+	<classpathentry kind="lib" path="lib/google-api-services-coordinate-v1-rev35-1.17.0-rc-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/google-api-services-coordinate-v1-rev35-1.17.0-rc.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
