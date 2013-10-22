@@ -10,3 +10,4 @@
 	<classpathentry kind="lib" path="lib/google-api-services-coordinate-v1-rev35-1.17.0-rc.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
+
