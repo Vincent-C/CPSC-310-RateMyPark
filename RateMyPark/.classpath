@@ -8,6 +8,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/google-api-services-coordinate-v1-rev35-1.17.0-rc-javadoc.jar"/>
 	<classpathentry kind="lib" path="lib/google-api-services-coordinate-v1-rev35-1.17.0-rc.jar"/>
+	<classpathentry kind="lib" path="lib/commons-net-3.3.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
-
