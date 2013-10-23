@@ -6,7 +6,7 @@
          xmlns="http://java.sun.com/xml/ns/javaee">
 
   <!-- Servlets -->
-   <servlet>
+  <servlet>
     <servlet-name>loginServiceImpl</servlet-name>
     <servlet-class>com.ratemypark.server.LoginServiceImpl</servlet-class>
   </servlet>
@@ -14,6 +14,16 @@
   <servlet-mapping>
     <servlet-name>loginServiceImpl</servlet-name>
     <url-pattern>/ratemypark/login</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>newAccountServiceImpl</servlet-name>
+    <servlet-class>com.ratemypark.server.NewAccountServiceImpl</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>newAccountServiceImpl</servlet-name>
+    <url-pattern>/ratemypark/new-account</url-pattern>
   </servlet-mapping>
   
   <!-- Default page to serve -->

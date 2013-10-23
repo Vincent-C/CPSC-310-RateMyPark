@@ -15,6 +15,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -31,12 +32,6 @@ public class RateMyPark implements EntryPoint {
 			+ "attempting to contact the server. Please check your network "
 			+ "connection and try again.";
 
-	/**
-	 * Create a remote service proxy to talk to the server-side Greeting
-	 * service.
-	 */
-	//private final GreetingServiceAsync greetingService = GWT.create(GreetingService.class);
-
 	private static class LoginDialog extends DialogBox {
 
 		public LoginDialog() {
@@ -45,7 +40,7 @@ public class RateMyPark implements EntryPoint {
 			setAnimationEnabled(true);
 			VerticalPanel dialogVPanel = new VerticalPanel();
 			
-			// Username field setup[
+			// Username field setup
 			dialogVPanel.addStyleName("dialogVPanel");
 			dialogVPanel.add(new HTML("<b>Username:</b>"));
 			final TextBox usernameField = new TextBox();
@@ -53,7 +48,7 @@ public class RateMyPark implements EntryPoint {
 
 			// Password field setup
 			dialogVPanel.add(new HTML("<b>Password:</b>"));
-			final TextBox passwordField = new TextBox();
+			final PasswordTextBox passwordField = new PasswordTextBox();
 			dialogVPanel.add(passwordField);
 			
 			// Login button setup
@@ -61,14 +56,15 @@ public class RateMyPark implements EntryPoint {
 			login.getElement().setId("loginButton");
 			dialogVPanel.add(login);
 			login.addClickHandler(new ClickHandler() {
+				
+				/**
+				 * Create a remote service proxy to talk to the server-side login service.
+				 */
 				private final LoginServiceAsync loginSvc = GWT.create(LoginService.class);
 				
 				public void onClick(ClickEvent event) {
 					String username = usernameField.getText();
 					String password = passwordField.getText();
-					
-					// TODO
-					System.out.println("Username: " + username + " Password: " + password);
 					
 					loginSvc.verifyLogin(username, password,
 					new AsyncCallback<Boolean>() {
@@ -99,6 +95,69 @@ public class RateMyPark implements EntryPoint {
 			setWidget(dialogVPanel);
 		}
 	}
+	
+	private static class NewAccountDialog extends DialogBox {
+
+		public NewAccountDialog() {
+			// Set the dialog box's caption
+			setText("New Account");
+			setAnimationEnabled(true);
+			VerticalPanel dialogVPanel = new VerticalPanel();
+			
+			// Username field setup
+			dialogVPanel.addStyleName("dialogVPanel");
+			dialogVPanel.add(new HTML("<b>Enter your username:</b>"));
+			final TextBox usernameField = new TextBox();
+			dialogVPanel.add(usernameField);
+
+			// Password field setup
+			dialogVPanel.add(new HTML("<b>Enter a password:</b>"));
+			final PasswordTextBox passwordField = new PasswordTextBox();
+			dialogVPanel.add(passwordField);
+			
+			// New Account button setup
+			final Button createAccount = new Button("CreateAccount");
+			createAccount.getElement().setId("createAccountButton");
+			dialogVPanel.add(createAccount);
+			createAccount.addClickHandler(new ClickHandler() {
+				
+				/**
+				 * Create a remote service proxy to talk to the server-side account creation service.
+				 */
+				private final NewAccountServiceAsync newAccountSvc = GWT.create(NewAccountService.class);
+				
+				public void onClick(ClickEvent event) {
+					String username = usernameField.getText();
+					String password = passwordField.getText();
+					
+					newAccountSvc.createNewAccount(username, password,
+					new AsyncCallback<Boolean>() {
+						public void onFailure(Throwable caught) {
+							System.out.println("FAIL");
+						}
+
+						public void onSuccess(Boolean result) {
+							System.out.println("SUCCESS");
+							Window.alert("NEW ACCOUNT CREATED");
+							NewAccountDialog.this.hide();
+						}
+					});
+				}
+			});
+
+			// Close button setup
+			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
+			final Button closeButton = new Button("Close");
+			closeButton.getElement().setId("closeButton");
+			dialogVPanel.add(closeButton);
+			closeButton.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					NewAccountDialog.this.hide();
+				}
+			});
+			setWidget(dialogVPanel);
+		}
+	}
 
 	/**
 	 * This is the entry point method.
@@ -111,9 +170,7 @@ public class RateMyPark implements EntryPoint {
 		loginButton.addStyleName("loginButton");
 		newAccountButton.addStyleName("newAccountButton");
 
-		// Add the nameField and sendButton to the RootPanel
-		// Use RootPanel.get() to get the entire body element
-		// RootPanel.get("nameFieldContainer").add(nameField);
+		// Add the loginButton and newAccountButton to the RootPanel
 		RootPanel.get("loginButtonContainer").add(loginButton);
 		RootPanel.get("newAccountButtonContainer").add(newAccountButton);
 	
@@ -123,66 +180,13 @@ public class RateMyPark implements EntryPoint {
 				loginDialog.show();
 			}
 		});
-
-//		// Create a handler for the sendButton and nameField
-//		class MyHandler implements ClickHandler, KeyUpHandler {
-//			/**
-//			 * Fired when the user clicks on the sendButton.
-//			 */
-//			public void onClick(ClickEvent event) {
-//				sendNameToServer();
-//			}
-//
-//			/**
-//			 * Fired when the user types in the nameField.
-//			 */
-//			public void onKeyUp(KeyUpEvent event) {
-//				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-//					sendNameToServer();
-//				}
-//			}
-//
-//			/**
-//			 * Send the name from the nameField to the server and wait for a
-//			 * response.
-//			 */
-//			private void sendNameToServer() {
-//				// First, we validate the input.
-//				errorLabel.setText("");
-//				String textToServer = nameField.getText();
-//				if (!FieldVerifier.isValidName(textToServer)) {
-//					errorLabel.setText("Please enter at least four characters");
-//					return;
-//				}
-//
-//				// Then, we send the input to the server.
-//				loginButton.setEnabled(false);
-//				textToServerLabel.setText(textToServer);
-//				serverResponseLabel.setText("");
-//				greetingService.greetServer(textToServer,
-//						new AsyncCallback<String>() {
-//							public void onFailure(Throwable caught) {
-//								// Show the RPC error message to the user
-//								dialogBox
-//										.setText("Remote Procedure Call - Failure");
-//								serverResponseLabel
-//										.addStyleName("serverResponseLabelError");
-//								serverResponseLabel.setHTML(SERVER_ERROR);
-//								dialogBox.center();
-//								closeButton.setFocus(true);
-//							}
-//
-//							public void onSuccess(String result) {
-//								dialogBox.setText("Remote Procedure Call");
-//								serverResponseLabel
-//										.removeStyleName("serverResponseLabelError");
-//								serverResponseLabel.setHTML(result);
-//								dialogBox.center();
-//								closeButton.setFocus(true);
-//							}
-//						});
-//			}
-//		}
+		
+		newAccountButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				NewAccountDialog newAccontDialog = new NewAccountDialog();
+				newAccontDialog.show();
+			}
+		});
 
 	}
 }
