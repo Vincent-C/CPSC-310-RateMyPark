@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.ratemypark.server.Park;
-import com.google.api.services.coordinate.Coordinate;
 
 public class DisplayData implements EntryPoint {
 
