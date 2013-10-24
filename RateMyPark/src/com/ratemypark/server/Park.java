@@ -6,7 +6,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-import com.google.api.services.coordinate.Coordinate;
+//import com.google.api.services.coordinate.Coordinate;
 
 
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
