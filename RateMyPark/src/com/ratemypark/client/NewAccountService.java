@@ -8,5 +8,5 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  */
 @RemoteServiceRelativePath("new-account")
 public interface NewAccountService extends RemoteService {
-  Boolean createNewAccount(String username, String password);
+  void createNewAccount(String username, String password) throws UserNameExistsException, IllegalArgumentException;
 }

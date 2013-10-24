@@ -1,5 +1,6 @@
 package com.ratemypark.client;
 
+
 import com.ratemypark.shared.BCrypt;
 import com.ratemypark.shared.FieldVerifier;
 import com.google.gwt.core.client.EntryPoint;
@@ -131,12 +132,13 @@ public class RateMyPark implements EntryPoint {
 					String password = passwordField.getText();
 					
 					newAccountSvc.createNewAccount(username, password,
-					new AsyncCallback<Boolean>() {
+					new AsyncCallback<Void>() {
 						public void onFailure(Throwable caught) {
-							System.out.println("FAIL");
+							System.out.println("Error occured: " + caught.getMessage());
+							handleError(caught);
 						}
 
-						public void onSuccess(Boolean result) {
+						public void onSuccess(Void result) {
 							System.out.println("SUCCESS");
 							Window.alert("NEW ACCOUNT CREATED");
 							NewAccountDialog.this.hide();
@@ -156,6 +158,12 @@ public class RateMyPark implements EntryPoint {
 				}
 			});
 			setWidget(dialogVPanel);
+			
+		}	  
+		private void handleError(Throwable error) {
+		    Window.alert(error.getMessage());
+		    if (error instanceof UserNameExistsException) {
+		    }
 		}
 	}
 
