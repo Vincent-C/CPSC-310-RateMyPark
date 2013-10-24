@@ -9,7 +9,7 @@ import javax.jdo.Query;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.ratemypark.client.NewAccountService;
-import com.ratemypark.client.UserNameExistsException;
+import com.ratemypark.exception.UserNameException;
 import com.ratemypark.shared.BCrypt;
 
 public class NewAccountServiceImpl extends RemoteServiceServlet implements
@@ -18,7 +18,7 @@ public class NewAccountServiceImpl extends RemoteServiceServlet implements
 	private static final PersistenceManagerFactory PMF = JDOHelper.getPersistenceManagerFactory("transactions-optional");
 
 	@Override
-	public void createNewAccount(String username, String password) throws UserNameExistsException,IllegalArgumentException {
+	public void createNewAccount(String username, String password) throws UserNameException,IllegalArgumentException {
 		String userlower = username.toLowerCase();		
 		checkNameExists(userlower);
 		PersistenceManager pm = getPersistenceManager();		
@@ -28,13 +28,10 @@ public class NewAccountServiceImpl extends RemoteServiceServlet implements
 		}finally{
 			pm.close();
 		}
-		// TODO
-		// Need to create new user account with username and password
-		Boolean valid = BCrypt.checkpw(password, hash);
 		return;
 	}
 	
-	private void checkNameExists(String checkuser) throws UserNameExistsException{
+	private void checkNameExists(String checkuser) throws UserNameException{
 		PersistenceManager pm = getPersistenceManager();
 		try{
 			Query q = pm.newQuery(Account.class);
@@ -42,7 +39,7 @@ public class NewAccountServiceImpl extends RemoteServiceServlet implements
 			q.declareParameters("String userParam");
 			List<Account> results = (List<Account>) q.execute(checkuser);
 			if(!results.isEmpty()){
-				throw new UserNameExistsException("Username " + checkuser + " already exists");
+				throw new UserNameException("Username " + checkuser + " already exists");
 			}
 		}finally{
 			pm.close();

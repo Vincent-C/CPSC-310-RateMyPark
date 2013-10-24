@@ -1,6 +1,8 @@
 package com.ratemypark.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.ratemypark.exception.BadPasswordException;
+import com.ratemypark.exception.UserNameException;
 
 /**
  * The async counterpart of <code>LoginService</code>.

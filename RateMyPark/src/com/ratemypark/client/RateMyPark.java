@@ -1,6 +1,8 @@
 package com.ratemypark.client;
 
 
+import com.ratemypark.exception.BadPasswordException;
+import com.ratemypark.exception.UserNameException;
 import com.ratemypark.shared.BCrypt;
 import com.ratemypark.shared.FieldVerifier;
 import com.google.gwt.core.client.EntryPoint;
@@ -70,11 +72,12 @@ public class RateMyPark implements EntryPoint {
 					loginSvc.verifyLogin(username, password,
 					new AsyncCallback<Boolean>() {
 						public void onFailure(Throwable caught) {
-							System.out.println("FAIL");
+							handleError(caught);
+							System.out.println("LOGIN FAIL username " + caught.getMessage());
 						}
 
 						public void onSuccess(Boolean result) {
-							System.out.println("SUCCESS");
+							System.out.println("LOGIN SUCCESS");
 							Window.alert("Logged in");
 							LoginDialog.this.hide();
 						}
@@ -94,6 +97,14 @@ public class RateMyPark implements EntryPoint {
 			});
 			
 			setWidget(dialogVPanel);
+		}
+		private void handleError(Throwable error) {
+		    Window.alert(error.getMessage());
+		    if (error instanceof UserNameException) {
+		    	
+		    }else if(error instanceof BadPasswordException){
+		    	
+		    }
 		}
 	}
 	
@@ -162,7 +173,7 @@ public class RateMyPark implements EntryPoint {
 		}	  
 		private void handleError(Throwable error) {
 		    Window.alert(error.getMessage());
-		    if (error instanceof UserNameExistsException) {
+		    if (error instanceof UserNameException) {
 		    }
 		}
 	}

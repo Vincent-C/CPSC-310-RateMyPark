@@ -36,7 +36,7 @@ public class Account {
 	public String getUsername() {
 		return this.username;
 	}
-	
+		
 	public String getPasswordHash(){
 		return this.passwordHash;
 	}
