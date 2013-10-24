@@ -81,7 +81,7 @@ public class Park {
 	public String getNsStreet() {
 		return this.nsStreet;
 	}
-	public Coordinate getGoogleMapDest() {
+	public Coordinate getCoordinate() {
 		return this.coordinate;
 	}
 	public Double getHectare() {
