@@ -1,0 +1,49 @@
+package com.ratemypark.client;
+
+import java.util.ArrayList;
+
+import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.user.client.ui.FlexTable;
+import com.ratemypark.server.Park;
+import com.google.api.services.coordinate.Coordinate;
+
+public class DisplayData implements EntryPoint {
+
+	private ArrayList<Park> ParkList;
+
+	@Override
+	public void onModuleLoad() {
+		final FlexTable Table = new FlexTable();
+		Table.setBorderWidth(12);
+		Table.setText(0, 0, "");
+		Table.setText(0, 1, "Park ID");
+		Table.setText(0, 2, "Park Name");
+		Table.setText(0, 3, "Official");
+		Table.setText(0, 4, "Street Number");
+		Table.setText(0, 5, "Street Name");
+		Table.setText(0, 6, "East-West Street Name");
+		Table.setText(0, 7, "North-South Street Name");
+		Table.setText(0, 8, "Coordinates");
+		Table.setText(0, 9, "Size in Hectares");
+		Table.setText(0, 10, "Neighbourhood Name");
+		Table.setText(0, 11, "Neighbourhood URL");
+		for (Park p: ParkList) {
+			int index = 1;
+			Table.insertRow(index);
+			Table.setText(index, 1, String.valueOf(p.getPid()));
+			Table.setText(index, 2, p.getPname());
+			Table.setText(index, 3, isOfficialString(p));
+			Table.setText(index, 4, String.valueOf(p.getStreetNumber()));
+			Table.setText(index, 5, p.getStreetName());
+			Table.setText(index, 6, p.getEwStreet());
+			Table.setText(index, 7, p.getNsStreet());
+		}
+	}
+
+	private String isOfficialString(Park p) {
+		if (p.isOfficial())
+			return "Yes";
+		else
+			return "No";
+	}
+}
