@@ -11,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -139,11 +140,102 @@ public class DomXMLParser {
 	}
 
 	public static void main(String[] args) {
-		DomXMLParser parser = new DomXMLParser();
+		/*DomXMLParser parser = new DomXMLParser();
 		//parser.parse();
 		for (Park park : parser.parse()) {
 			System.out.println("park: ");
 			System.out.println(park.getPname());
+		}*/
+
+		try {
+
+			DataFetch fetch = new DataFetch();
+			String xmlString = fetch.getHTML();
+			DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			Document doc = dBuilder.parse(new InputSource(new StringReader(xmlString)));
+
+			doc.getDocumentElement().normalize();
+
+			DomXMLParser parser = new DomXMLParser();
+			ArrayList<Park> myParkList = new ArrayList<Park>();
+
+			
+			//System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+
+			NodeList nodeList = doc.getElementsByTagName("Park");
+
+			for (int i = 0; i < nodeList.getLength(); i++) {
+
+				Node node = nodeList.item(i);
+
+				System.out.println("\nCurrent Element :" + node.getNodeName());
+
+				if (node.getNodeType() == Node.ELEMENT_NODE) {
+
+					Element element = (Element) node;
+
+					System.out.println("id : " + element.getAttribute("ID"));
+					System.out.println("official : " + element.getElementsByTagName("Official").item(0).getTextContent());
+					System.out.println("street # : " + element.getElementsByTagName("StreetNumber").item(0).getTextContent());
+					
+					Long pid = Long.parseLong(element.getAttribute("ID"));
+					
+					String pname = element.getElementsByTagName("Name").item(0).getTextContent();
+					
+					boolean official = false;
+					if (element.getElementsByTagName("Official").item(0).getTextContent().equals("1")) {
+						official = true;
+					}
+					
+					Integer streetNumber = Integer.valueOf(element.getElementsByTagName("StreetNumber").item(0).getTextContent());
+					
+					String streetName = element.getElementsByTagName("StreetName").item(0).getTextContent();
+					
+					String ewStreet = element.getElementsByTagName("EWStreet").item(0).getTextContent();
+					
+					String nsStreet = element.getElementsByTagName("NSStreet").item(0).getTextContent();
+
+					String coords = element.getElementsByTagName("GoogleMapDest").item(0).getTextContent();
+					String[] coordsArray = coords.split(",");
+					Coordinate coordinate = new Coordinate(Double.parseDouble(coordsArray[0]), Double.parseDouble(coordsArray[1]));
+					
+					Double hectare = Double.parseDouble(element.getElementsByTagName("Hectare").item(0).getTextContent());
+					
+					String neighbourhoodName = element.getElementsByTagName("NeighbourhoodName").item(0).getTextContent();
+					
+					String neighbourhoodURL = element.getElementsByTagName("NeighbourhoodURL").item(0).getTextContent();
+				
+
+
+					System.out.println(pid);
+					System.out.println(pname);
+					System.out.println(official);
+					System.out.println(streetNumber);
+					System.out.println(streetName);
+					System.out.println(ewStreet);
+					System.out.println(nsStreet);
+					System.out.println(coordinate);
+					System.out.println(hectare);
+					System.out.println(neighbourhoodName);
+					System.out.println(neighbourhoodURL);
+
+					
+					Park park = new Park(pid, pname, official, streetNumber, streetName, ewStreet, nsStreet, coordinate, hectare, neighbourhoodName, neighbourhoodURL);
+					System.out.println(park.getPname());
+					myParkList.add(park);
+					
+				}
+			}
+			
+			for (Park park : myParkList) {
+				System.out.println(myParkList.size());
+				System.out.println("park: ");
+				System.out.println(park.getPname());
+			}
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
