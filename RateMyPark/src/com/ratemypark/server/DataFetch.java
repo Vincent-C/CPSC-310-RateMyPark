@@ -20,7 +20,7 @@ public class DataFetch {
 			// Retrieved data from ftp://webftp.vancouver.ca/opendata/xml/parks_facilities.xml and placed onto
 			// Vincent's private webserver in order to use HTTP Get
 			// Refer to https://piazza.com/class/hkubwxvsg8u5?cid=98 for clarification
-			url = new URL("http://www.vcheng.org/parks_facilities.xml");
+			url = new URL("http://www.ugrad.cs.ubc.ca/~b2c8/cs310/parks_facilities.xml");
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
 			rd = new BufferedReader(
