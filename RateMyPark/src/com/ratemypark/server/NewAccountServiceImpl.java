@@ -6,6 +6,8 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.ratemypark.client.NewAccountService;
@@ -18,30 +20,39 @@ public class NewAccountServiceImpl extends RemoteServiceServlet implements
 	private static final PersistenceManagerFactory PMF = JDOHelper.getPersistenceManagerFactory("transactions-optional");
 
 	@Override
-	public void createNewAccount(String username, String password) throws UserNameException,IllegalArgumentException {
+	public String createNewAccount(String username, String password) throws UserNameException,IllegalArgumentException {
 		String userlower = username.toLowerCase();		
 		checkNameExists(userlower);
 		PersistenceManager pm = getPersistenceManager();		
 		String hash = BCrypt.hashpw(password, BCrypt.gensalt());
-		try{
-			pm.makePersistent(new Account(userlower,hash));			
-		}finally{
+		
+		Account acc = new Account(userlower,hash);
+		try {
+			pm.makePersistent(acc);			
+		} finally{
 			pm.close();
 		}
-		return;
+		
+		HttpServletRequest request = this.getThreadLocalRequest();
+		HttpSession session = request.getSession();
+		session.setAttribute("account", acc);
+		
+		System.out.println("New account session is: " + session);
+		
+		return session.getId();
 	}
 	
-	private void checkNameExists(String checkuser) throws UserNameException{
+	private void checkNameExists(String checkuser) throws UserNameException {
 		PersistenceManager pm = getPersistenceManager();
-		try{
+		try {
 			Query q = pm.newQuery(Account.class);
 			q.setFilter("username == userParam");
 			q.declareParameters("String userParam");
 			List<Account> results = (List<Account>) q.execute(checkuser);
-			if(!results.isEmpty()){
+			if (!results.isEmpty()) {
 				throw new UserNameException("Username " + checkuser + " already exists");
 			}
-		}finally{
+		} finally {
 			pm.close();
 		}
 		

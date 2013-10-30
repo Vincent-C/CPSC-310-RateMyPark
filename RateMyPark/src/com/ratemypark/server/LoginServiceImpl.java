@@ -1,14 +1,19 @@
 package com.ratemypark.server;
 
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.UnhandledException;
 
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.ratemypark.client.LoginService;
 import com.ratemypark.exception.BadPasswordException;
@@ -21,7 +26,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements
 	private static final PersistenceManagerFactory PMF = JDOHelper.getPersistenceManagerFactory("transactions-optional");
 	
 	@Override
-	public Boolean verifyLogin(String username, String password) throws IllegalArgumentException, UserNameException, BadPasswordException {
+	public String doLogin(String username, String password) throws IllegalArgumentException, UserNameException, BadPasswordException {
 
 		// Check if username exists in database, and return
 		String userlower = username.toLowerCase();	
@@ -29,32 +34,55 @@ public class LoginServiceImpl extends RemoteServiceServlet implements
 		
 		// Need to get password hash of the user and check with this
 		String hash = acc.getPasswordHash();
-		System.out.println(hash);
 		checkPassword(password, hash);
-		return true;
+
+		HttpServletRequest request = this.getThreadLocalRequest();
+		HttpSession session = request.getSession();
+		session.setAttribute("account", acc);
+		
+		System.out.println("Login session is: " + session);
+		
+		return session.getId();
 	}
+	
+	@Override
+	public String doLogin(String session) throws Exception {
+
+		HttpServletRequest request = this.getThreadLocalRequest();
+		HttpSession existingSession = request.getSession();
+		
+		if (existingSession.getId().equals(session)) {
+			Account gettedAccount = (Account) existingSession.getAttribute("account");
+			System.out.println("Already logged in to: " + gettedAccount.getUsername());
+		} else {
+			throw new Exception();
+		}
+
+		return existingSession.getId();
+	}
+	
 	
 	private PersistenceManager getPersistenceManager(){
 		return PMF.getPersistenceManager();
 	}
 	
-	private Account getAccount(String accountName) throws UserNameException{
+	private Account getAccount(String accountName) throws UserNameException {
 		PersistenceManager pm = getPersistenceManager();
 		try{
 			Query q = pm.newQuery(Account.class);
 			q.setFilter("username == userParam");
 			q.declareParameters("String userParam");
 			List<Account> results = (List<Account>) q.execute(accountName);
-			if(results.isEmpty()){
+			if (results.isEmpty()) {
 				throw new UserNameException("Username " + accountName + " does not exist");
-			}if(results.size()>1){
+			} if (results.size() > 1) {
 				// Should never run
 				System.out.println("Multiple entities for " + accountName + "exist in database");
-			}else{
+			} else {
 				// Return the Account entity
 				return results.get(0);
 			}
-		}finally{
+		} finally {
 			pm.close();
 		}
 		return null;

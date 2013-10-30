@@ -7,7 +7,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public interface NewAccountServiceAsync {
 	
-	void createNewAccount(String username, String password, AsyncCallback<Void> callback)
+	void createNewAccount(String username, String password, AsyncCallback<String> callback)
 		throws IllegalArgumentException;;
 
 }

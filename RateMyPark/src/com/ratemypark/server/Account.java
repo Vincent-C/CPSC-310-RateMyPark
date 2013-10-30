@@ -1,5 +1,6 @@
 package com.ratemypark.server;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.annotation.Nonnull;
@@ -10,7 +11,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 @PersistenceCapable
-public class Account {
+public class Account implements Serializable {
 	
 	@PrimaryKey
 	@Persistent

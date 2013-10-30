@@ -3,13 +3,16 @@ package com.ratemypark.client;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.ratemypark.exception.BadPasswordException;
 import com.ratemypark.exception.UserNameException;
+import javax.servlet.http.HttpSession;
 
 /**
  * The async counterpart of <code>LoginService</code>.
  */
 public interface LoginServiceAsync {
 	
-	void verifyLogin(String username, String password, AsyncCallback<Boolean> callback)
+	void doLogin(String username, String password, AsyncCallback<String> callback)
 		throws IllegalArgumentException;
 
+	void doLogin(String session, AsyncCallback<String> callback)
+			throws IllegalArgumentException;
 }

@@ -1,6 +1,10 @@
 package com.ratemypark.client;
 
 
+import java.util.Date;
+
+import javax.servlet.http.HttpSession;
+
 import com.ratemypark.exception.BadPasswordException;
 import com.ratemypark.exception.UserNameException;
 import com.ratemypark.shared.BCrypt;
@@ -12,6 +16,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -34,10 +39,21 @@ public class RateMyPark implements EntryPoint {
 	private static final String SERVER_ERROR = "An error occurred while "
 			+ "attempting to contact the server. Please check your network "
 			+ "connection and try again.";
+	
+	private final LoginServiceAsync loginSvc = GWT.create(LoginService.class);
+
+	private final LogoutServiceAsync logoutSvc = GWT.create(LogoutService.class);
 
 	private static class LoginDialog extends DialogBox {
+		private Button loginButton;
+		private Button logoutButton;
+		private Button newAccountButton;
 
-		public LoginDialog() {
+		public LoginDialog(Button loginMain, Button logoutMain, Button newAccountMain) {
+			this.loginButton = loginMain; // The login button to show this dialog, NOT the login button in this dialog
+			this.newAccountButton = newAccountMain;
+			this.logoutButton = logoutMain;
+			
 			// Set the dialog box's caption
 			setText("Login");
 			setAnimationEnabled(true);
@@ -69,17 +85,28 @@ public class RateMyPark implements EntryPoint {
 					String username = usernameField.getText();
 					String password = passwordField.getText();
 					
-					loginSvc.verifyLogin(username, password,
-					new AsyncCallback<Boolean>() {
+					loginSvc.doLogin(username, password,
+					new AsyncCallback<String>() {
 						public void onFailure(Throwable caught) {
 							handleError(caught);
 							System.out.println("LOGIN FAIL username " + caught.getMessage());
 						}
-
-						public void onSuccess(Boolean result) {
-							System.out.println("LOGIN SUCCESS");
+						// result is the session ID from doLogin
+						public void onSuccess(String result) {
+							final long DURATION = 1000 * 60 * 60 * 24 * 14; //duration remembering login. 2 weeks in this example.
+						    Date expires = new Date(System.currentTimeMillis() + DURATION);
+						    Cookies.setCookie("sid", result, expires, null, "/", false);
+						    
 							Window.alert("Logged in");
+							System.out.println("Client side cookie login: " + Cookies.getCookie("sid"));
+							
 							LoginDialog.this.hide();
+							toggleLoginButtons();
+						}
+						private void toggleLoginButtons() {
+							LoginDialog.this.loginButton.setVisible(false);
+							LoginDialog.this.newAccountButton.setVisible(false);
+							LoginDialog.this.logoutButton.setVisible(true);
 						}
 					});
 				}
@@ -102,15 +129,22 @@ public class RateMyPark implements EntryPoint {
 		    Window.alert(error.getMessage());
 		    if (error instanceof UserNameException) {
 		    	
-		    }else if(error instanceof BadPasswordException){
+		    } else if(error instanceof BadPasswordException){
 		    	
 		    }
 		}
 	}
 	
 	private static class NewAccountDialog extends DialogBox {
+		private Button loginButton;
+		private Button logoutButton;
+		private Button newAccountButton;
 
-		public NewAccountDialog() {
+		public NewAccountDialog(Button loginMain, Button logoutMain, Button newAccountMain) {
+			this.loginButton = loginMain;
+			this.logoutButton = logoutMain;
+			this.newAccountButton = newAccountMain;
+			
 			// Set the dialog box's caption
 			setText("New Account");
 			setAnimationEnabled(true);
@@ -143,16 +177,28 @@ public class RateMyPark implements EntryPoint {
 					String password = passwordField.getText();
 					
 					newAccountSvc.createNewAccount(username, password,
-					new AsyncCallback<Void>() {
+					new AsyncCallback<String>() {
 						public void onFailure(Throwable caught) {
 							System.out.println("Error occured: " + caught.getMessage());
 							handleError(caught);
 						}
 
-						public void onSuccess(Void result) {
-							System.out.println("SUCCESS");
+						public void onSuccess(String result) {
+							final long DURATION = 1000 * 60 * 60 * 24 * 14; //duration remembering login. 2 weeks in this example.
+						    Date expires = new Date(System.currentTimeMillis() + DURATION);
+						    Cookies.setCookie("sid", result, expires, null, "/", false);
+						    
+							System.out.println("Client side cookie new account: " + Cookies.getCookie("sid"));
 							Window.alert("NEW ACCOUNT CREATED");
+							
 							NewAccountDialog.this.hide();
+							toggleLoginButtons();
+						}
+						
+						private void toggleLoginButtons() {
+							NewAccountDialog.this.loginButton.setVisible(false);
+							NewAccountDialog.this.newAccountButton.setVisible(false);
+							NewAccountDialog.this.logoutButton.setVisible(true);
 						}
 					});
 				}
@@ -183,29 +229,84 @@ public class RateMyPark implements EntryPoint {
 	 */
 	public void onModuleLoad() {
 		final Button loginButton = new Button("Login");
+		final Button logoutButton = new Button("Logout");
 		final Button newAccountButton = new Button("New Account");
-
+		
 		// We can add style names to widgets
 		loginButton.addStyleName("loginButton");
+		logoutButton.addStyleName("logoutButton");
+		logoutButton.setVisible(false); // Hide logout button on initial load
 		newAccountButton.addStyleName("newAccountButton");
 
 		// Add the loginButton and newAccountButton to the RootPanel
 		RootPanel.get("loginButtonContainer").add(loginButton);
+		RootPanel.get("logoutButtonContainer").add(logoutButton);
 		RootPanel.get("newAccountButtonContainer").add(newAccountButton);
+		
+		String sessionID = Cookies.getCookie("sid");
+		if (sessionID != null) {
+			loginSvc.doLogin(sessionID,
+					new AsyncCallback<String>() {
+						public void onFailure(Throwable caught) {
+							System.out.println("Not logged in");
+						}
+						// result is the session ID from doLogin
+						public void onSuccess(String result) {
+							final long DURATION = 1000 * 60 * 60 * 24 * 14; //duration remembering login. 2 weeks in this example.
+						    Date expires = new Date(System.currentTimeMillis() + DURATION);
+						    Cookies.setCookie("sid", result, expires, null, "/", false);
+						    
+							Window.alert("Logged in");
+							System.out.println("Client side cookie login: " + Cookies.getCookie("sid"));
+							toggleLoginButtons();
+						}
+						
+						private void toggleLoginButtons() {
+							loginButton.setVisible(false);
+							newAccountButton.setVisible(false);
+							logoutButton.setVisible(true);
+						}
+					});
+		}
 	
 		loginButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				LoginDialog loginDialog = new LoginDialog();
+				LoginDialog loginDialog = new LoginDialog(loginButton, logoutButton, newAccountButton);
 				loginDialog.show();
+			}
+		});
+		
+		logoutButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				logoutSvc.logout("asdf",
+				new AsyncCallback<String>() {
+					public void onFailure(Throwable caught) {
+						System.out.println("LOGOUT FAILED");
+					}
+					public void onSuccess(String result) {
+					    Cookies.removeCookie("sid");
+					    
+						Window.alert("Logged out");
+						System.out.println("Client side cookie logout: " + Cookies.getCookie("sid"));
+						
+						toggleLoginButtons();
+					}
+					private void toggleLoginButtons() {
+						loginButton.setVisible(true);
+						newAccountButton.setVisible(true);
+						logoutButton.setVisible(false);
+					}
+				});
+				
 			}
 		});
 		
 		newAccountButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				NewAccountDialog newAccontDialog = new NewAccountDialog();
+				NewAccountDialog newAccontDialog = new NewAccountDialog(loginButton, logoutButton, newAccountButton);
 				newAccontDialog.show();
 			}
 		});
-
+		
 	}
 }

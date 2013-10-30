@@ -10,5 +10,6 @@ import com.ratemypark.exception.UserNameException;
  */
 @RemoteServiceRelativePath("login")
 public interface LoginService extends RemoteService {
-  Boolean verifyLogin(String username, String password) throws UserNameException,BadPasswordException;
+  String doLogin(String username, String password) throws UserNameException,BadPasswordException;
+  String doLogin(String session) throws Exception;
 }
