@@ -44,9 +44,7 @@ public class LoadParksServiceImpl extends RemoteServiceServlet implements LoadPa
 	@Override
 	public List<Park> getParks() {
 		PersistenceManager pm = getPersistenceManager();
-
 		List<Park> parks;
-
 		try {
 			Query q = pm.newQuery(Park.class);
 			q.setOrdering("pid desc");
@@ -61,9 +59,7 @@ public class LoadParksServiceImpl extends RemoteServiceServlet implements LoadPa
 	@Override
 	public String[] getParkNames() {
 		PersistenceManager pm = getPersistenceManager();
-
 		List<String> parkNames = new ArrayList<String>();
-
 		try {
 			Query q = pm.newQuery(Park.class);
 			q.setOrdering("pid desc");
@@ -75,7 +71,7 @@ public class LoadParksServiceImpl extends RemoteServiceServlet implements LoadPa
 		} finally {
 			pm.close();
 		}
-		return (String[]) parkNames.toArray();
+		return (String[]) parkNames.toArray(new String[0]);
 	}
 
 	// Get a specific Park 
@@ -86,7 +82,8 @@ public class LoadParksServiceImpl extends RemoteServiceServlet implements LoadPa
 		try {
 			Query q = pm.newQuery(Park.class, "pid == parkID");
 			q.declareParameters("Long parkID");
-			park = (Park) q.execute(parkID);
+			List<Park> parks = (List<Park>) q.execute(parkID);
+			park = parks.get(0);
 		} finally {
 			pm.close();
 		}

@@ -248,7 +248,11 @@ public class RateMyPark implements EntryPoint {
 		RootPanel.get("logoutButtonContainer").add(logoutButton);
 		RootPanel.get("newAccountButtonContainer").add(newAccountButton);
 
-		loadParksSvc.loadParks(new AsyncCallback<List<Park>>() {
+		// Boolean HACK: true if you want to load the database from the XML, else keep at false
+		Boolean loadDB = false;
+		
+		if(loadDB){
+			loadParksSvc.loadParks(new AsyncCallback<List<Park>>() {
 			public void onFailure(Throwable caught) {
 				System.out.println("Parks did not load properly");
 			}
@@ -256,20 +260,22 @@ public class RateMyPark implements EntryPoint {
 			public void onSuccess(List<Park> parks) {
 				Window.alert("Parks loaded.");
 				System.out.println("Parks loaded.");
+				}
+			});
+		}
+		// Test to get the 5th park in the list (with PID = 5)
+		Long pid = new Long(5);
+		loadParksSvc.getPark(pid, new AsyncCallback<Park>() {
+			public void onFailure(Throwable caught) {
+				System.out.println("Parks did not load properly");
+			}
+
+			public void onSuccess(Park park) {
+				Window.alert("Park " + park.getPname() + " loaded.");
+				System.out.println("Park " + park.getPname() + " loaded.");
 			}
 		});
-//		Long pid = new Long(5);
-//		loadParksSvc.getPark(pid, new AsyncCallback<Park>() {
-//			public void onFailure(Throwable caught) {
-//				System.out.println("Parks did not load properly");
-//			}
-//
-//			public void onSuccess(Park park) {
-//				Window.alert("Park " + park.getPname() + " loaded.");
-//				System.out.println("Park " + park.getPname() + " loaded.");
-//			}
-//		});
-		
+		// Test to get all the parkNames
 		loadParksSvc.getParkNames(new AsyncCallback<String[]>() {
 			public void onFailure(Throwable caught) {
 				System.out.println("Parks did not get properly");
