@@ -1,11 +1,10 @@
 package com.ratemypark.client;
 
-import java.util.ArrayList;
-
+import java.util.List;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.ratemypark.server.LoadParksServiceImpl;
-import com.ratemypark.server.Park;
+import com.ratemypark.client.Park;
 
 public class DisplayData implements EntryPoint {
 
@@ -29,8 +28,7 @@ public class DisplayData implements EntryPoint {
 		Table.setText(0, 11, "Neighbourhood URL");
 		
 		// Load park service
-		LoadParksServiceImpl parkFetcher;
-		parkList = parkFetcher.loadParks();
+		parkList = LoadParksServiceImpl.getParks();
 		
 		for (Park p: parkList) {
 			int index = 1;
