@@ -36,6 +36,16 @@
     <url-pattern>/ratemypark/new-account</url-pattern>
   </servlet-mapping>
   
+  <servlet>
+    <servlet-name>loadParksServiceImpl</servlet-name>
+    <servlet-class>com.ratemypark.server.LoadParksServiceImpl</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>loadParksServiceImpl</servlet-name>
+    <url-pattern>/ratemypark/load-parks</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>RateMyPark.html</welcome-file>
