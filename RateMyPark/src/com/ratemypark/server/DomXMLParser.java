@@ -12,6 +12,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.ratemypark.client.Coordinate;
+import com.ratemypark.client.Park;
+
 public class DomXMLParser {
 	
 	private ArrayList<Park> parkList;
@@ -67,7 +70,7 @@ public class DomXMLParser {
 
 					String coords = element.getElementsByTagName("GoogleMapDest").item(0).getTextContent();
 					String[] coordsArray = coords.split(",");
-					Coordinate coordinate = new Coordinate(Double.parseDouble(coordsArray[0]), Double.parseDouble(coordsArray[1]));
+					Coordinate coordinate = null;// new Coordinate(Double.parseDouble(coordsArray[0]), Double.parseDouble(coordsArray[1]));
 
 					Double hectare = Double.parseDouble(element.getElementsByTagName("Hectare").item(0).getTextContent());
 

@@ -1,8 +1,10 @@
 package com.ratemypark.server;
 
 import java.util.ArrayList;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.ratemypark.client.Park;
 
 public class DisplayData implements EntryPoint {
 

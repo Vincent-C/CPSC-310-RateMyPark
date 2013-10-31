@@ -1,4 +1,4 @@
-package com.ratemypark.server;
+package com.ratemypark.client;
 
 // Mostly taken from CPSC 210 Android application project
 
@@ -24,6 +24,9 @@ public class Coordinate {
 	 * @param latitude The latitude 
 	 * @param longitude The longitude
 	 */
+	
+	public Coordinate(){}
+	
 	public Coordinate(double latitude, double longitude) {
 		this.latitude = latitude;
 		this.longitude = longitude;
