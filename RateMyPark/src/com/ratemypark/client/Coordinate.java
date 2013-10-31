@@ -1,11 +1,13 @@
 package com.ratemypark.client;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 // Mostly taken from CPSC 210 Android application project
 
 /**
  * Encapsulates a latitude/longitude pair.
  */
-public class Coordinate {
+public class Coordinate implements IsSerializable {
 	
 	// This class is fully implemented for you.
 	
