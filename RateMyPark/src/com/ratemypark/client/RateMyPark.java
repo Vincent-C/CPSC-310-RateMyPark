@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpSession;
 
 import com.ratemypark.exception.BadPasswordException;
+import com.ratemypark.exception.DatabaseException;
 import com.ratemypark.exception.UserNameException;
 import com.ratemypark.shared.BCrypt;
 import com.ratemypark.shared.FieldVerifier;
@@ -43,7 +44,152 @@ public class RateMyPark implements EntryPoint {
 	private final LogoutServiceAsync logoutSvc = GWT.create(LogoutService.class);
 
 	private final LoadParksServiceAsync loadParksSvc = GWT.create(LoadParksService.class);
+	
+	
+	/**
+	 * This is the entry point method.
+	 */
+	public void onModuleLoad() {		
+		loadHeader();
+		loadParksMethod(); // DB related stuff
+		//loadParksContent();
+	}
 
+	private void loadHeader() {
+		final Button loginButton = new Button("Login");
+		final Button logoutButton = new Button("Logout");
+		final Button newAccountButton = new Button("New Account");
+
+		// We can add style names to widgets
+		loginButton.addStyleName("loginButton");
+		logoutButton.addStyleName("logoutButton");
+		logoutButton.setVisible(false); // Hide logout button on initial load
+		newAccountButton.addStyleName("newAccountButton");
+		
+		// Add the loginButton and newAccountButton to the RootPanel
+		RootPanel.get("loginButtonContainer").add(loginButton);
+		RootPanel.get("logoutButtonContainer").add(logoutButton);
+		RootPanel.get("newAccountButtonContainer").add(newAccountButton);
+		
+		String sessionID = Cookies.getCookie("sid");
+		if (sessionID != null) {
+			loginSvc.doLogin(sessionID, new AsyncCallback<String>() {
+				public void onFailure(Throwable caught) {
+					System.out.println("Not logged in");
+				}
+
+				// result is the session ID from doLogin
+				public void onSuccess(String result) {
+					final long DURATION = 1000 * 60 * 60 * 24 * 14; // duration remembering login. 2 weeks in this
+																	// example.
+					Date expires = new Date(System.currentTimeMillis() + DURATION);
+					Cookies.setCookie("sid", result, expires, null, "/", false);
+
+					Window.alert("Logged in");
+					System.out.println("Client side cookie login: " + Cookies.getCookie("sid"));
+					toggleLoginButtons();
+				}
+
+				private void toggleLoginButtons() {
+					loginButton.setVisible(false);
+					newAccountButton.setVisible(false);
+					logoutButton.setVisible(true);
+				}
+			});
+		}
+
+		loginButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				LoginDialog loginDialog = new LoginDialog(loginButton, logoutButton, newAccountButton);
+				loginDialog.show();
+			}
+		});
+
+		logoutButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				logoutSvc.logout(new AsyncCallback<Void>() {
+					public void onFailure(Throwable caught) {
+						System.out.println("LOGOUT FAILED");
+					}
+
+					public void onSuccess(Void ignore) {
+						Cookies.removeCookie("sid");
+
+						Window.alert("Logged out");
+						System.out.println("Client side cookie logout: " + Cookies.getCookie("sid"));
+
+						toggleLoginButtons();
+					}
+
+					private void toggleLoginButtons() {
+						loginButton.setVisible(true);
+						newAccountButton.setVisible(true);
+						logoutButton.setVisible(false);
+					}
+				});
+
+			}
+		});
+
+		newAccountButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				NewAccountDialog newAccontDialog = new NewAccountDialog(loginButton, logoutButton, newAccountButton);
+				newAccontDialog.show();
+			}
+		});
+	}
+ 
+	private void loadParksMethod() {
+		final Button loadParksButton = new Button("Load Parks");
+		final TextBox loadParksTextBox = new TextBox();
+
+		// We can add style names to widgets
+		loadParksButton.addStyleName("loadParkButton");
+
+		RootPanel.get("loadParksButtonContainer").add(loadParksButton);
+		RootPanel.get("loadParksTextBoxContainer").add(loadParksTextBox);
+
+		// Boolean HACK: true if you want to load the database from the XML, else keep at false
+		Boolean loadDB = false;
+		if (loadDB) {
+			loadParksSvc.loadParks(new AsyncCallback<List<Park>>() {
+				public void onFailure(Throwable caught) {
+					System.out.println("Parks did not load properly");
+				}
+
+				public void onSuccess(List<Park> parks) {
+					Window.alert("Parks loaded.");
+					System.out.println("Parks loaded.");
+				}
+			});
+		}
+		// Test to get the 5th park in the list (with PID = 5)
+		loadParksButton.addClickHandler(new ClickHandler () {
+			public void onClick(ClickEvent event) {
+				// Assume input is valid				
+				String s = loadParksTextBox.getText();
+				Long pid = Long.valueOf(s);
+				
+				loadParksSvc.getPark(pid, new AsyncCallback<Park>() {
+				public void onFailure(Throwable caught) {
+					System.out.println("Error occured: " + caught.getMessage());
+					handleError(caught);
+				}
+
+				public void onSuccess(Park park) {
+					Window.alert("Park " + park.getPname() + " loaded.");
+					System.out.println("Park " + park.getPname() + " loaded.");
+				}
+				});
+			}
+		});
+		
+	}
+	
+	private void loadParksContent() {
+		// TODO show park data here
+	}
+	
 	private static class LoginDialog extends DialogBox {
 		private Button loginButton;
 		private Button logoutButton;
@@ -227,135 +373,9 @@ public class RateMyPark implements EntryPoint {
 			}
 		}
 	}
-
-	/**
-	 * This is the entry point method.
-	 */
-	public void onModuleLoad() {
-		final Button loginButton = new Button("Login");
-		final Button logoutButton = new Button("Logout");
-		final Button newAccountButton = new Button("New Account");
-		final Button loadParksButton = new Button("Load Parks");
-
-		// We can add style names to widgets
-		loginButton.addStyleName("loginButton");
-		logoutButton.addStyleName("logoutButton");
-		logoutButton.setVisible(false); // Hide logout button on initial load
-		newAccountButton.addStyleName("newAccountButton");
-
-		// Add the loginButton and newAccountButton to the RootPanel
-		RootPanel.get("loginButtonContainer").add(loginButton);
-		RootPanel.get("logoutButtonContainer").add(logoutButton);
-		RootPanel.get("newAccountButtonContainer").add(newAccountButton);
-
-		// Boolean HACK: true if you want to load the database from the XML, else keep at false
-		Boolean loadDB = false;
-		
-		if(loadDB){
-			loadParksSvc.loadParks(new AsyncCallback<List<Park>>() {
-			public void onFailure(Throwable caught) {
-				System.out.println("Parks did not load properly");
-			}
-
-			public void onSuccess(List<Park> parks) {
-				Window.alert("Parks loaded.");
-				System.out.println("Parks loaded.");
-				}
-			});
+	private void handleError(Throwable error) {
+		Window.alert(error.getMessage());
+		if (error instanceof DatabaseException) {
 		}
-		// Test to get the 5th park in the list (with PID = 5)
-		Long pid = new Long(5);
-		loadParksSvc.getPark(pid, new AsyncCallback<Park>() {
-			public void onFailure(Throwable caught) {
-				System.out.println("Parks did not load properly");
-			}
-
-			public void onSuccess(Park park) {
-				Window.alert("Park " + park.getPname() + " loaded.");
-				System.out.println("Park " + park.getPname() + " loaded.");
-			}
-		});
-		// Test to get all the parkNames
-		loadParksSvc.getParkNames(new AsyncCallback<String[]>() {
-			public void onFailure(Throwable caught) {
-				System.out.println("Parks did not get properly");
-			}
-
-			public void onSuccess(String[] parks) {
-				Window.alert("Parks gotted.");
-				System.out.println("Parks gotted.");
-				for(String s : parks){
-					System.out.println(s);
-				}
-			}
-		});
-
-		String sessionID = Cookies.getCookie("sid");
-		if (sessionID != null) {
-			loginSvc.doLogin(sessionID, new AsyncCallback<String>() {
-				public void onFailure(Throwable caught) {
-					System.out.println("Not logged in");
-				}
-
-				// result is the session ID from doLogin
-				public void onSuccess(String result) {
-					final long DURATION = 1000 * 60 * 60 * 24 * 14; // duration remembering login. 2 weeks in this
-																	// example.
-					Date expires = new Date(System.currentTimeMillis() + DURATION);
-					Cookies.setCookie("sid", result, expires, null, "/", false);
-
-					Window.alert("Logged in");
-					System.out.println("Client side cookie login: " + Cookies.getCookie("sid"));
-					toggleLoginButtons();
-				}
-
-				private void toggleLoginButtons() {
-					loginButton.setVisible(false);
-					newAccountButton.setVisible(false);
-					logoutButton.setVisible(true);
-				}
-			});
-		}
-
-		loginButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				LoginDialog loginDialog = new LoginDialog(loginButton, logoutButton, newAccountButton);
-				loginDialog.show();
-			}
-		});
-
-		logoutButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				logoutSvc.logout("asdf", new AsyncCallback<String>() {
-					public void onFailure(Throwable caught) {
-						System.out.println("LOGOUT FAILED");
-					}
-
-					public void onSuccess(String result) {
-						Cookies.removeCookie("sid");
-
-						Window.alert("Logged out");
-						System.out.println("Client side cookie logout: " + Cookies.getCookie("sid"));
-
-						toggleLoginButtons();
-					}
-
-					private void toggleLoginButtons() {
-						loginButton.setVisible(true);
-						newAccountButton.setVisible(true);
-						logoutButton.setVisible(false);
-					}
-				});
-
-			}
-		});
-
-		newAccountButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				NewAccountDialog newAccontDialog = new NewAccountDialog(loginButton, logoutButton, newAccountButton);
-				newAccontDialog.show();
-			}
-		});
-
 	}
 }
