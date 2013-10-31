@@ -242,11 +242,13 @@ public class RateMyPark implements EntryPoint {
 		logoutButton.addStyleName("logoutButton");
 		logoutButton.setVisible(false); // Hide logout button on initial load
 		newAccountButton.addStyleName("newAccountButton");
+		loadParksButton.addStyleName("loadParksButton");
 
 		// Add the loginButton and newAccountButton to the RootPanel
 		RootPanel.get("loginButtonContainer").add(loginButton);
 		RootPanel.get("logoutButtonContainer").add(logoutButton);
 		RootPanel.get("newAccountButtonContainer").add(newAccountButton);
+		RootPanel.get("loadParksButtonContainer").add(loadParksButton);
 
 		// Boolean HACK: true if you want to load the database from the XML, else keep at false
 		Boolean loadDB = false;
