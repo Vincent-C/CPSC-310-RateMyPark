@@ -17,6 +17,7 @@ import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.ratemypark.client.LoginService;
 import com.ratemypark.exception.BadPasswordException;
+import com.ratemypark.exception.NotLoggedInException;
 import com.ratemypark.exception.UserNameException;
 import com.ratemypark.shared.BCrypt;
 
@@ -46,7 +47,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String doLogin(String session) throws Exception {
+	public String doLogin(String session) throws NotLoggedInException {
 
 		HttpServletRequest request = this.getThreadLocalRequest();
 		HttpSession existingSession = request.getSession();
@@ -55,7 +56,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements
 			Account gettedAccount = (Account) existingSession.getAttribute("account");
 			System.out.println("Already logged in to: " + gettedAccount.getUsername());
 		} else {
-			throw new Exception();
+			throw new NotLoggedInException();
 		}
 
 		return existingSession.getId();

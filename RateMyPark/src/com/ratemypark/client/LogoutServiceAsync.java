@@ -7,6 +7,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public interface LogoutServiceAsync {
 	
-	void logout(String username, AsyncCallback<String> callback);
+	void logout(AsyncCallback<Void> callback);
 
 }

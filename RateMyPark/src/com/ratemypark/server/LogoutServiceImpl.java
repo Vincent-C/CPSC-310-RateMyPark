@@ -10,7 +10,7 @@ public class LogoutServiceImpl extends RemoteServiceServlet implements
 		LogoutService {
 
 	@Override
-	public String logout(String s) {
+	public void logout() {
 		HttpServletRequest request = this.getThreadLocalRequest();
 		HttpSession session = request.getSession();
 
@@ -19,8 +19,6 @@ public class LogoutServiceImpl extends RemoteServiceServlet implements
 		session.invalidate();
 		
 		System.out.println("Logout session is: " + session);
-		
-		return null;
 	}
 
 }

@@ -326,12 +326,12 @@ public class RateMyPark implements EntryPoint {
 
 		logoutButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				logoutSvc.logout("asdf", new AsyncCallback<String>() {
+				logoutSvc.logout(new AsyncCallback<Void>() {
 					public void onFailure(Throwable caught) {
 						System.out.println("LOGOUT FAILED");
 					}
 
-					public void onSuccess(String result) {
+					public void onSuccess(Void ignore) {
 						Cookies.removeCookie("sid");
 
 						Window.alert("Logged out");

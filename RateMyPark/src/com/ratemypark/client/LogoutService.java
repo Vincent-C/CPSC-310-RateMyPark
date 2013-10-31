@@ -7,6 +7,5 @@ import com.ratemypark.exception.UserNameException;
 
 @RemoteServiceRelativePath("logout")
 public interface LogoutService extends RemoteService {
-	 String logout(String password);
-
+	 void logout();
 }
