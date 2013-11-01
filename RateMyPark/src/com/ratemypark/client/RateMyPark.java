@@ -44,15 +44,14 @@ public class RateMyPark implements EntryPoint {
 	private final LogoutServiceAsync logoutSvc = GWT.create(LogoutService.class);
 
 	private final LoadParksServiceAsync loadParksSvc = GWT.create(LoadParksService.class);
-	
-	
+
 	/**
 	 * This is the entry point method.
 	 */
-	public void onModuleLoad() {		
+	public void onModuleLoad() {
 		loadHeader();
 		loadParksMethod(); // DB related stuff
-		//loadParksContent();
+		// loadParksContent();
 	}
 
 	private void loadHeader() {
@@ -65,12 +64,12 @@ public class RateMyPark implements EntryPoint {
 		logoutButton.addStyleName("logoutButton");
 		logoutButton.setVisible(false); // Hide logout button on initial load
 		newAccountButton.addStyleName("newAccountButton");
-		
+
 		// Add the loginButton and newAccountButton to the RootPanel
 		RootPanel.get("loginButtonContainer").add(loginButton);
 		RootPanel.get("logoutButtonContainer").add(logoutButton);
 		RootPanel.get("newAccountButtonContainer").add(newAccountButton);
-		
+
 		String sessionID = Cookies.getCookie("sid");
 		if (sessionID != null) {
 			loginSvc.doLogin(sessionID, new AsyncCallback<String>() {
@@ -138,7 +137,7 @@ public class RateMyPark implements EntryPoint {
 			}
 		});
 	}
- 
+
 	private void loadParksMethod() {
 		final Button loadParksButton = new Button("Load Parks");
 		final TextBox loadParksTextBox = new TextBox();
@@ -163,33 +162,56 @@ public class RateMyPark implements EntryPoint {
 				}
 			});
 		}
-		// Test to get the 5th park in the list (with PID = 5)
-		loadParksButton.addClickHandler(new ClickHandler () {
+		// Code that gets the park from a user-inputted pid
+		loadParksButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				// Assume input is valid				
+				// Assume input is valid
 				String s = loadParksTextBox.getText();
 				Long pid = Long.valueOf(s);
-				
-				loadParksSvc.getPark(pid, new AsyncCallback<Park>() {
-				public void onFailure(Throwable caught) {
-					System.out.println("Error occured: " + caught.getMessage());
-					handleError(caught);
-				}
 
-				public void onSuccess(Park park) {
-					Window.alert("Park " + park.getPname() + " loaded.");
-					System.out.println("Park " + park.getPname() + " loaded.");
-				}
+				loadParksSvc.getPark(pid, new AsyncCallback<Park>() {
+					public void onFailure(Throwable caught) {
+						System.out.println("Error occured: " + caught.getMessage());
+						handleError(caught);
+					}
+
+					public void onSuccess(Park park) {
+						Window.alert("Park " + park.getPname() + " loaded.");
+						System.out.println("Park " + park.getPname() + " loaded.");
+					}
 				});
 			}
 		});
-		
+		// Code to test getParks
+//		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
+//			public void onFailure(Throwable caught) {
+//				System.out.println("Error occured: " + caught.getMessage());
+//				handleError(caught);
+//			}
+//
+//			public void onSuccess(List<Park> parks) {
+//				Window.alert(parks.get(3).getPname() + " loaded.");
+//				System.out.println(parks.get(5).getPname() + " loaded.");
+//			}
+//		});
+		// Code to test getParkNames
+//		loadParksSvc.getParkNames(new AsyncCallback<String[]>() {
+//			public void onFailure(Throwable caught) {
+//				System.out.println("Error occured: " + caught.getMessage());
+//				handleError(caught);
+//			}
+//
+//			public void onSuccess(String[] parks) {
+//				Window.alert("Park " + parks[1] + " loaded.");
+//				System.out.println("Park " + parks[1] + " loaded.");
+//			}
+//		});
 	}
-	
+
 	private void loadParksContent() {
 		// TODO show park data here
 	}
-	
+
 	private static class LoginDialog extends DialogBox {
 		private Button loginButton;
 		private Button logoutButton;
@@ -373,6 +395,7 @@ public class RateMyPark implements EntryPoint {
 			}
 		}
 	}
+
 	private void handleError(Throwable error) {
 		Window.alert(error.getMessage());
 		if (error instanceof DatabaseException) {
