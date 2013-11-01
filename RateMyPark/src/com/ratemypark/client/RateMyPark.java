@@ -179,7 +179,8 @@ public class RateMyPark implements EntryPoint {
 					}
 
 					public void onSuccess(Park park) {
-						Window.alert(park.getPname() + " loaded.");
+						Window.alert(park.getPname() + " loaded, with coordinates (" + park.getLatitude()+ "," + park.getLongitude() + ").");
+						
 						System.out.println(park.getPname() + " loaded.");
 					}
 				});
@@ -216,7 +217,7 @@ public class RateMyPark implements EntryPoint {
 					table.setText(index, 5, p.getStreetName());
 					table.setText(index, 6, p.getEwStreet());
 					table.setText(index, 7, p.getNsStreet());
-					table.setText(index, 8, "Empty coordinate");
+					table.setText(index, 8, getCoordinateString(p));
 					table.setText(index, 9, String.valueOf(p.getHectare()));
 					table.setText(index, 10, p.getNeighbourhoodName());
 					table.setText(index, 11, p.getNeighbourhoodURL());
