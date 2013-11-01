@@ -89,7 +89,7 @@ public class LoadParksServiceImpl extends RemoteServiceServlet implements LoadPa
 			q.declareParameters("Long parkID");
 			List<Park> parks = (List<Park>) q.execute(parkID);
 			if(parks.isEmpty()){
-				throw new DatabaseException("There is no park that corresponds to the given parkID, " + parkID);
+				throw new DatabaseException("No park that corresponds to the given parkID: " + parkID);
 			}
 			park = parks.get(0);
 		} finally {
