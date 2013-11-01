@@ -10,9 +10,9 @@ import javax.servlet.http.HttpSession;
  */
 public interface LoginServiceAsync {
 	
-	void doLogin(String username, String password, AsyncCallback<String> callback)
+	void doLogin(String username, String password, AsyncCallback<LoginInfo> callback)
 		throws IllegalArgumentException;
 
-	void doLogin(String session, AsyncCallback<String> callback)
+	void doLogin(String session, AsyncCallback<LoginInfo> callback)
 			throws IllegalArgumentException;
 }

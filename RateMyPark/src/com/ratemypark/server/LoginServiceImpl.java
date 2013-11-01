@@ -15,6 +15,7 @@ import org.apache.commons.lang.UnhandledException;
 
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.ratemypark.client.LoginInfo;
 import com.ratemypark.client.LoginService;
 import com.ratemypark.exception.BadPasswordException;
 import com.ratemypark.exception.NotLoggedInException;
@@ -27,7 +28,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements
 	private static final PersistenceManagerFactory PMF = JDOHelper.getPersistenceManagerFactory("transactions-optional");
 	
 	@Override
-	public String doLogin(String username, String password) throws IllegalArgumentException, UserNameException, BadPasswordException {
+	public LoginInfo doLogin(String username, String password) throws IllegalArgumentException, UserNameException, BadPasswordException {
 
 		// Check if username exists in database, and return
 		String userlower = username.toLowerCase();	
@@ -43,23 +44,29 @@ public class LoginServiceImpl extends RemoteServiceServlet implements
 		
 		System.out.println("Login session is: " + session);
 		
-		return session.getId();
+		LoginInfo ret = new LoginInfo(acc.getUsername(), session.getId());
+		
+		return ret;
 	}
 	
 	@Override
-	public String doLogin(String session) throws NotLoggedInException {
+	public LoginInfo doLogin(String session) throws NotLoggedInException {
 
 		HttpServletRequest request = this.getThreadLocalRequest();
 		HttpSession existingSession = request.getSession();
 		
+		Account gettedAccount;
 		if (existingSession.getId().equals(session)) {
-			Account gettedAccount = (Account) existingSession.getAttribute("account");
+			gettedAccount = (Account) existingSession.getAttribute("account");
 			System.out.println("Already logged in to: " + gettedAccount.getUsername());
+
 		} else {
 			throw new NotLoggedInException();
 		}
+		
+		LoginInfo ret = new LoginInfo(gettedAccount.getUsername(), existingSession.getId());
 
-		return existingSession.getId();
+		return ret;
 	}
 	
 	

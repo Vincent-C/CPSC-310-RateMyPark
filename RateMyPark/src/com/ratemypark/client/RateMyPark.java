@@ -73,19 +73,19 @@ public class RateMyPark implements EntryPoint {
 
 		String sessionID = Cookies.getCookie("sid");
 		if (sessionID != null) {
-			loginSvc.doLogin(sessionID, new AsyncCallback<String>() {
+			loginSvc.doLogin(sessionID, new AsyncCallback<LoginInfo>() {
 				public void onFailure(Throwable caught) {
 					System.out.println("Not logged in");
 				}
 
 				// result is the session ID from doLogin
-				public void onSuccess(String result) {
+				public void onSuccess(LoginInfo result) {
 					final long DURATION = 1000 * 60 * 60 * 24 * 14; // duration remembering login. 2 weeks in this
 																	// example.
 					Date expires = new Date(System.currentTimeMillis() + DURATION);
-					Cookies.setCookie("sid", result, expires, null, "/", false);
+					Cookies.setCookie("sid", result.getSessionId(), expires, null, "/", false);
 
-					Window.alert("Logged in");
+					Window.alert("Logged in as" + result.getUsername());
 					System.out.println("Client side cookie login: " + Cookies.getCookie("sid"));
 					toggleLoginButtons();
 				}
@@ -317,20 +317,20 @@ public class RateMyPark implements EntryPoint {
 					String username = usernameField.getText();
 					String password = passwordField.getText();
 
-					loginSvc.doLogin(username, password, new AsyncCallback<String>() {
+					loginSvc.doLogin(username, password, new AsyncCallback<LoginInfo>() {
 						public void onFailure(Throwable caught) {
 							handleError(caught);
 							System.out.println("LOGIN FAIL username " + caught.getMessage());
 						}
 
 						// result is the session ID from doLogin
-						public void onSuccess(String result) {
+						public void onSuccess(LoginInfo result) {
 							// duration remembering login. 2 weeks in this example.
 							final long DURATION = 1000 * 60 * 60 * 24 * 14;
 							Date expires = new Date(System.currentTimeMillis() + DURATION);
-							Cookies.setCookie("sid", result, expires, null, "/", false);
+							Cookies.setCookie("sid", result.getSessionId(), expires, null, "/", false);
 
-							Window.alert("Logged in");
+							Window.alert("Logged in as " + result.getUsername());
 							System.out.println("Client side cookie login: " + Cookies.getCookie("sid"));
 
 							LoginDialog.this.hide();
