@@ -189,7 +189,7 @@ public class RateMyPark implements EntryPoint {
 		// Still working on this, does not seem to be working properly yet.
 		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
 			public void onFailure(Throwable caught) {
-				System.out.println("Parks did not load properly");
+				System.out.println("Parks did not get properly");
 			}
 			public void onSuccess(List<Park> parkList) {
 				
@@ -221,7 +221,7 @@ public class RateMyPark implements EntryPoint {
 					table.setText(index, 10, p.getNeighbourhoodName());
 					table.setText(index, 11, p.getNeighbourhoodURL());
 					index++;
-					System.out.println("Adding index" + index);
+//					System.out.println("Adding index" + index);
 				}
 				RootPanel.get("body").add(table);
 				
