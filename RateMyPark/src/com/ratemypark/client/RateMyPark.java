@@ -183,33 +183,39 @@ public class RateMyPark implements EntryPoint {
 			}
 		});
 		// Code to test getParks
-//		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
-//			public void onFailure(Throwable caught) {
-//				System.out.println("Error occured: " + caught.getMessage());
-//				handleError(caught);
-//			}
-//
-//			public void onSuccess(List<Park> parks) {
-//				Window.alert(parks.get(3).getPname() + " loaded.");
-//				System.out.println(parks.get(5).getPname() + " loaded.");
-//			}
-//		});
+		// loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
+		// public void onFailure(Throwable caught) {
+		// System.out.println("Error occured: " + caught.getMessage());
+		// handleError(caught);
+		// }
+		//
+		// public void onSuccess(List<Park> parks) {
+		// Window.alert(parks.get(3).getPname() + " loaded.");
+		// System.out.println(parks.get(5).getPname() + " loaded.");
+		// }
+		// });
 		// Code to test getParkNames
-//		loadParksSvc.getParkNames(new AsyncCallback<String[]>() {
-//			public void onFailure(Throwable caught) {
-//				System.out.println("Error occured: " + caught.getMessage());
-//				handleError(caught);
-//			}
-//
-//			public void onSuccess(String[] parks) {
-//				Window.alert("Park " + parks[1] + " loaded.");
-//				System.out.println("Park " + parks[1] + " loaded.");
-//			}
-//		});
+		// loadParksSvc.getParkNames(new AsyncCallback<String[]>() {
+		// public void onFailure(Throwable caught) {
+		// System.out.println("Error occured: " + caught.getMessage());
+		// handleError(caught);
+		// }
+		//
+		// public void onSuccess(String[] parks) {
+		// Window.alert("Park " + parks[1] + " loaded.");
+		// System.out.println("Park " + parks[1] + " loaded.");
+		// }
+		// });
 	}
 
 	private void loadParksContent() {
 		// TODO show park data here
+	}
+
+	private void handleError(Throwable error) {
+		Window.alert(error.getMessage());
+		if (error instanceof DatabaseException) {
+		}
 	}
 
 	private static class LoginDialog extends DialogBox {
@@ -396,9 +402,4 @@ public class RateMyPark implements EntryPoint {
 		}
 	}
 
-	private void handleError(Throwable error) {
-		Window.alert(error.getMessage());
-		if (error instanceof DatabaseException) {
-		}
-	}
 }

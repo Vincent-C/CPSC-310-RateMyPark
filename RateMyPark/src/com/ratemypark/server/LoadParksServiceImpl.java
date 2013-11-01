@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.ratemypark.client.LoadParksService;
 import com.ratemypark.client.Park;
+import com.ratemypark.exception.DatabaseException;
 import com.ratemypark.exception.UserNameException;
 import com.ratemypark.shared.BCrypt;
 
@@ -80,13 +81,16 @@ public class LoadParksServiceImpl extends RemoteServiceServlet implements LoadPa
 
 	// Get a specific Park
 	@Override
-	public Park getPark(Long parkID) {
+	public Park getPark(Long parkID) throws DatabaseException {
 		PersistenceManager pm = getPersistenceManager();
 		Park park;
 		try {
 			Query q = pm.newQuery(Park.class, "pid == parkID");
 			q.declareParameters("Long parkID");
 			List<Park> parks = (List<Park>) q.execute(parkID);
+			if(parks.isEmpty()){
+				throw new DatabaseException("There is no park that corresponds to the given parkID, " + parkID);
+			}
 			park = parks.get(0);
 		} finally {
 			pm.close();

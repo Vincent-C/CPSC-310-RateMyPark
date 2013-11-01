@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.ratemypark.exception.DatabaseException;
 
 @RemoteServiceRelativePath("load-parks")
 public interface LoadParksService extends RemoteService{
@@ -12,5 +13,5 @@ public interface LoadParksService extends RemoteService{
 	public List<Park> loadParks();
 	public List<Park> getParks();
 	public String[] getParkNames();
-	public Park getPark(Long parkID);
+	public Park getPark(Long parkID) throws DatabaseException;
 }
