@@ -12,7 +12,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.ratemypark.client.Coordinate;
 import com.ratemypark.client.Park;
 
 public class DomXMLParser {
@@ -70,7 +69,8 @@ public class DomXMLParser {
 
 					String coords = element.getElementsByTagName("GoogleMapDest").item(0).getTextContent();
 					String[] coordsArray = coords.split(",");
-					Coordinate coordinate = null;// new Coordinate(Double.parseDouble(coordsArray[0]), Double.parseDouble(coordsArray[1]));
+					Double latitude = Double.parseDouble(coordsArray[0]);
+					Double longitude = Double.parseDouble(coordsArray[1]);
 
 					Double hectare = Double.parseDouble(element.getElementsByTagName("Hectare").item(0).getTextContent());
 
@@ -89,14 +89,15 @@ public class DomXMLParser {
 					System.out.println(streetName);
 					System.out.println(ewStreet);
 					System.out.println(nsStreet);
-					System.out.println(coordinate);
+					System.out.println(latitude);
+					System.out.println(longitude);
 					System.out.println(hectare);
 					System.out.println(neighbourhoodName);
 					System.out.println(neighbourhoodURL);
 					 */
 
 					// And finally, create Park object, and append to list of Parks					
-					Park park = new Park(pid, pname, official, streetNumber, streetName, ewStreet, nsStreet, coordinate, hectare, neighbourhoodName, neighbourhoodURL);
+					Park park = new Park(pid, pname, official, streetNumber, streetName, ewStreet, nsStreet, latitude, longitude, hectare, neighbourhoodName, neighbourhoodURL);
 					parkList.add(park);
 
 				}

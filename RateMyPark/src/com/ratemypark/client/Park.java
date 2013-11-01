@@ -10,8 +10,6 @@ import javax.jdo.annotations.PrimaryKey;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-//import com.google.api.services.coordinate.Coordinate;
-
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
 public class Park implements IsSerializable {
 
@@ -31,7 +29,9 @@ public class Park implements IsSerializable {
 	@Persistent
 	private String nsStreet;
 	@Persistent
-	private Coordinate coordinate;
+	private Double latitude;
+	@Persistent
+	private Double longitude;
 	@Persistent
 	private Double hectare;
 	@Persistent
@@ -49,7 +49,7 @@ public class Park implements IsSerializable {
 	}
 
 	public Park(Long pid, String pname, boolean official, Integer streetNumber, String streetName, String ewStreet,
-			String nsStreet, Coordinate coordinate, Double hectare, String neighbourhoodName, String neighbourhoodURL) {
+			String nsStreet, Double latitude, Double longitude, Double hectare, String neighbourhoodName, String neighbourhoodURL) {
 		this();
 		this.pid = pid;
 		this.pname = pname;
@@ -58,7 +58,8 @@ public class Park implements IsSerializable {
 		this.streetName = streetName;
 		this.ewStreet = ewStreet;
 		this.nsStreet = nsStreet;
-		this.coordinate = coordinate;
+		this.latitude = latitude;
+		this.longitude = longitude;
 		this.hectare = hectare;
 		this.neighbourhoodName = neighbourhoodName;
 		this.neighbourhoodURL = neighbourhoodURL;
@@ -92,8 +93,12 @@ public class Park implements IsSerializable {
 		return this.nsStreet;
 	}
 
-	public Coordinate getCoordinate() {
-		return this.coordinate;
+	public Double getLatitude() {
+		return this.latitude;
+	}
+	
+	public Double getLongitude() {
+		return this.longitude;
 	}
 
 	public Double getHectare() {

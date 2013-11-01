@@ -261,8 +261,8 @@ public class RateMyPark implements EntryPoint {
 	}
 	
 	private String getCoordinateString(Park p) {
-		double latitude = p.getCoordinate().getLatitude();
-		double longitude = p.getCoordinate().getLongitude();
+		double latitude = p.getLatitude();
+		double longitude = p.getLongitude();
 		return String.valueOf(latitude) + ", " + String.valueOf(longitude);
 	}
 	
