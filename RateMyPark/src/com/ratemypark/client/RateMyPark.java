@@ -186,6 +186,7 @@ public class RateMyPark implements EntryPoint {
 			}
 		});
 		
+		// Still working on this, does not seem to be working properly yet.
 		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
 			public void onFailure(Throwable caught) {
 				System.out.println("Parks did not load properly");
