@@ -22,6 +22,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
@@ -147,6 +148,8 @@ public class RateMyPark implements EntryPoint {
 
 		RootPanel.get("loadParksButtonContainer").add(loadParksButton);
 		RootPanel.get("loadParksTextBoxContainer").add(loadParksTextBox);
+		
+		final FlexTable table = new FlexTable();
 
 		// Boolean HACK: true if you want to load the database from the XML, else keep at false
 		Boolean loadDB = false;
@@ -182,6 +185,47 @@ public class RateMyPark implements EntryPoint {
 				});
 			}
 		});
+		
+		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
+			public void onFailure(Throwable caught) {
+				System.out.println("Parks did not load properly");
+			}
+			public void onSuccess(List<Park> parkList) {
+				
+				table.setBorderWidth(12);
+				table.setText(0, 0, "");
+				table.setText(0, 1, "Park ID");
+				table.setText(0, 2, "Park Name");
+				table.setText(0, 3, "Official");
+				table.setText(0, 4, "Street Number");
+				table.setText(0, 5, "Street Name");
+				table.setText(0, 6, "East-West Street Name");
+				table.setText(0, 7, "North-South Street Name");
+				table.setText(0, 8, "Coordinates");
+				table.setText(0, 9, "Size in Hectares");
+				table.setText(0, 10, "Neighbourhood Name");
+				table.setText(0, 11, "Neighbourhood URL");
+				for (Park p: parkList) {
+					int index = 1;
+					table.insertRow(index);
+					table.setText(index, 1, String.valueOf(p.getPid()));
+					table.setText(index, 2, p.getPname());
+					table.setText(index, 3, isOfficialString(p));
+					table.setText(index, 4, String.valueOf(p.getStreetNumber()));
+					table.setText(index, 5, p.getStreetName());
+					table.setText(index, 6, p.getEwStreet());
+					table.setText(index, 7, p.getNsStreet());
+					table.setText(index, 8, getCoordinateString(p));
+					table.setText(index, 9, String.valueOf(p.getHectare()));
+					table.setText(index, 10, p.getNeighbourhoodName());
+					table.setText(index, 11, p.getNeighbourhoodURL());
+					index++;
+					System.out.println("Adding index" + index);
+				}
+				RootPanel.get("body").add(table);
+				
+			}
+		});
 		// Code to test getParks
 		// loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
 		// public void onFailure(Throwable caught) {
@@ -208,6 +252,19 @@ public class RateMyPark implements EntryPoint {
 		// });
 	}
 
+	private String isOfficialString(Park p) {
+		if (p.isOfficial())
+			return "Yes";
+		else
+			return "No";
+	}
+	
+	private String getCoordinateString(Park p) {
+		double latitude = p.getCoordinate().getLatitude();
+		double longitude = p.getCoordinate().getLongitude();
+		return String.valueOf(latitude) + ", " + String.valueOf(longitude);
+	}
+	
 	private void loadParksContent() {
 		// TODO show park data here
 	}
