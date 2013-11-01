@@ -151,7 +151,7 @@ public class RateMyPark implements EntryPoint {
 		
 		final FlexTable table = new FlexTable();
 
-		// Boolean HACK: true if you want to load the database from the XML, else keep at false
+		// Boolean HACK: true if you want to (re)load the database from the XML, else keep at false
 		Boolean loadDB = false;
 		if (loadDB) {
 			loadParksSvc.loadParks(new AsyncCallback<List<Park>>() {
@@ -179,8 +179,8 @@ public class RateMyPark implements EntryPoint {
 					}
 
 					public void onSuccess(Park park) {
-						Window.alert("Park " + park.getPname() + " loaded.");
-						System.out.println("Park " + park.getPname() + " loaded.");
+						Window.alert(park.getPname() + " loaded.");
+						System.out.println(park.getPname() + " loaded.");
 					}
 				});
 			}
@@ -206,8 +206,8 @@ public class RateMyPark implements EntryPoint {
 				table.setText(0, 9, "Size in Hectares");
 				table.setText(0, 10, "Neighbourhood Name");
 				table.setText(0, 11, "Neighbourhood URL");
+				int index = 1;
 				for (Park p: parkList) {
-					int index = 1;
 					table.insertRow(index);
 					table.setText(index, 1, String.valueOf(p.getPid()));
 					table.setText(index, 2, p.getPname());
@@ -216,7 +216,7 @@ public class RateMyPark implements EntryPoint {
 					table.setText(index, 5, p.getStreetName());
 					table.setText(index, 6, p.getEwStreet());
 					table.setText(index, 7, p.getNsStreet());
-					table.setText(index, 8, getCoordinateString(p));
+					table.setText(index, 8, "Empty coordinate");
 					table.setText(index, 9, String.valueOf(p.getHectare()));
 					table.setText(index, 10, p.getNeighbourhoodName());
 					table.setText(index, 11, p.getNeighbourhoodURL());
