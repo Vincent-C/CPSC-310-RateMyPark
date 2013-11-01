@@ -152,7 +152,7 @@ public class RateMyPark implements EntryPoint {
 		final FlexTable table = new FlexTable();
 
 		// Boolean HACK: true if you want to (re)load the database from the XML, else keep at false
-		Boolean loadDB = false;
+		Boolean loadDB = true;
 		if (loadDB) {
 			loadParksSvc.loadParks(new AsyncCallback<List<Park>>() {
 				public void onFailure(Throwable caught) {
@@ -187,7 +187,6 @@ public class RateMyPark implements EntryPoint {
 			}
 		});
 		
-		// Still working on this, does not seem to be working properly yet.
 		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
 			public void onFailure(Throwable caught) {
 				System.out.println("Parks did not get properly");
