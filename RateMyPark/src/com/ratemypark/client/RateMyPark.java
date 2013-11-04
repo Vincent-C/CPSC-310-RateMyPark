@@ -21,10 +21,15 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -53,7 +58,7 @@ public class RateMyPark implements EntryPoint {
 	public void onModuleLoad() {
 		loadHeader();
 		loadParksMethod(); // DB related stuff
-		// loadParksContent();
+		loadParksContent();
 	}
 
 	private void loadHeader() {
@@ -64,47 +69,84 @@ public class RateMyPark implements EntryPoint {
 		// We can add style names to widgets
 		loginButton.addStyleName("loginButton");
 		logoutButton.addStyleName("logoutButton");
-		logoutButton.setVisible(false); // Hide logout button on initial load
 		newAccountButton.addStyleName("newAccountButton");
 
 		// Add the loginButton and newAccountButton to the RootPanel
 		RootPanel.get("loginButtonContainer").add(loginButton);
 		RootPanel.get("logoutButtonContainer").add(logoutButton);
+		RootPanel.get("logoutButtonContainer").getElement().setAttribute("style", "display:none");
 		RootPanel.get("newAccountButtonContainer").add(newAccountButton);
+		
+		
+		loginButton.getElement().setId("loginButtonId");
+		logoutButton.getElement().setId("logoutButtonId");
+		newAccountButton.getElement().setId("newAccountButtonId");
+		
+		final AsyncCallback<LoginInfo> loginCallback = new AsyncCallback<LoginInfo>() {
+			public void onFailure(Throwable caught) {
+				handleError(caught);
+			}
+	
+			// result is the session ID from doLogin
+			public void onSuccess(final LoginInfo result) {
+				// duration remembering login. 2 weeks in this example.
+				final long DURATION = 1000 * 60 * 60 * 24 * 14;
+				Date expires = new Date(System.currentTimeMillis() + DURATION);
+				Cookies.setCookie("sid", result.getSessionID(), expires, null, "/", false);
+				
+				String username = result.getUsername();
+				
+				Anchor profileLink = new Anchor(username, "#profile");
+				// GWT wraps links in a div, so make it inline...
+				
+				profileLink.addClickHandler(new ClickHandler() {
+					public void onClick(ClickEvent event) {
+//						event.preventDefault();
+						loadProfilePage(result);
+					}
+				});
+			
+				RootPanel.get("username").getElement().setInnerHTML("Logged in as: ");
+				RootPanel.get("username").add(profileLink);
+				
+				System.out.println("Client side cookie login: " + Cookies.getCookie("sid"));
+
+				toggleLoginButtons();
+			}
+	
+			private void toggleLoginButtons() {
+				Element loginContainer = RootPanel.get("loginButtonContainer").getElement();
+				Element logoutContainer = RootPanel.get("logoutButtonContainer").getElement();
+				Element newAccountContainer = RootPanel.get("newAccountButtonContainer").getElement();
+				
+				if (loginContainer.getAttribute("style") == "display:none") {
+					loginContainer.setAttribute("style", "");
+					logoutContainer.setAttribute("style", "display:none");
+					newAccountContainer.setAttribute("style", "");
+				} else {
+					loginContainer.setAttribute("style", "display:none");
+					logoutContainer.setAttribute("style", "");
+					newAccountContainer.setAttribute("style", "display:none");
+				}
+			}
+			
+			private void handleError(Throwable error) {
+				if (error instanceof UserNameException) {
+					Window.alert(error.getMessage());
+				} else if (error instanceof BadPasswordException) {
+					Window.alert(error.getMessage());
+				}
+			}
+		};
 
 		String sessionID = Cookies.getCookie("sid");
 		if (sessionID != null) {
-			loginSvc.doLogin(sessionID, new AsyncCallback<LoginInfo>() {
-				public void onFailure(Throwable caught) {
-					System.out.println("Not logged in");
-				}
-
-				// result is the session ID from doLogin
-				public void onSuccess(LoginInfo result) {
-					final long DURATION = 1000 * 60 * 60 * 24 * 14; // duration remembering login. 2 weeks in this
-																	// example.
-					Date expires = new Date(System.currentTimeMillis() + DURATION);
-					Cookies.setCookie("sid", result.getSessionID(), expires, null, "/", false);
-					
-					String username = result.getUsername();
-					RootPanel.get("username").getElement().setInnerText("Logged in as: " + username);
-					
-					System.out.println("Client side cookie login: " + Cookies.getCookie("sid"));
-					
-					toggleLoginButtons();
-				}
-
-				private void toggleLoginButtons() {
-					loginButton.setVisible(false);
-					newAccountButton.setVisible(false);
-					logoutButton.setVisible(true);
-				}
-			});
+			loginSvc.doLogin(sessionID, loginCallback);
 		}
 
 		loginButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				LoginDialog loginDialog = new LoginDialog(loginButton, logoutButton, newAccountButton);
+				LoginDialog loginDialog = new LoginDialog(loginCallback);
 				loginDialog.show();
 			}
 		});
@@ -129,9 +171,9 @@ public class RateMyPark implements EntryPoint {
 					}
 
 					private void toggleLoginButtons() {
-						loginButton.setVisible(true);
-						newAccountButton.setVisible(true);
-						logoutButton.setVisible(false);
+						RootPanel.get("loginButtonContainer").getElement().setAttribute("style", "");
+						RootPanel.get("logoutButtonContainer").getElement().setAttribute("style", "display:none");
+						RootPanel.get("newAccountButtonContainer").getElement().setAttribute("style", "");
 					}
 				});
 
@@ -140,23 +182,24 @@ public class RateMyPark implements EntryPoint {
 
 		newAccountButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				NewAccountDialog newAccontDialog = new NewAccountDialog(loginButton, logoutButton, newAccountButton);
+				NewAccountDialog newAccontDialog = new NewAccountDialog(loginCallback);
 				newAccontDialog.show();
 			}
 		});
 	}
 
 	private void loadParksMethod() {
+		RootPanel.get("body").clear();
+		
 		final Button loadParksButton = new Button("Load Parks");
 		final TextBox loadParksTextBox = new TextBox();
 
 		// We can add style names to widgets
 		loadParksButton.addStyleName("loadParkButton");
 
-		RootPanel.get("loadParksButtonContainer").add(loadParksButton);
-		RootPanel.get("loadParksTextBoxContainer").add(loadParksTextBox);
-		
-		final FlexTable table = new FlexTable();
+		RootPanel.get("body").add(loadParksButton);
+		RootPanel.get("body").add(loadParksTextBox);
+
 
 		// Boolean HACK: true if you want to (re)load the database from the XML, else keep at false
 		Boolean loadDB = false;
@@ -193,7 +236,106 @@ public class RateMyPark implements EntryPoint {
 				});
 			}
 		});
+
+		// Code to test getParks
+		// loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
+		// public void onFailure(Throwable caught) {
+		// System.out.println("Error occured: " + caught.getMessage());
+		// handleError(caught);
+		// }
+		//
+		// public void onSuccess(List<Park> parks) {
+		// Window.alert(parks.get(3).getPname() + " loaded.");
+		// System.out.println(parks.get(5).getPname() + " loaded.");
+		// }
+		// });
+		// Code to test getParkNames
+		// loadParksSvc.getParkNames(new AsyncCallback<String[]>() {
+		// public void onFailure(Throwable caught) {
+		// System.out.println("Error occured: " + caught.getMessage());
+		// handleError(caught);
+		// }
+		//
+		// public void onSuccess(String[] parks) {
+		// Window.alert("Park " + parks[1] + " loaded.");
+		// System.out.println("Park " + parks[1] + " loaded.");
+		// }
+		// });
+	}
+	
+	private void loadProfilePage(final LoginInfo profile) {
+		RootPanel.get("body").clear();
 		
+		// Add title to page
+		HTMLPanel header = new HTMLPanel("<div class='contentHeader'>" + "Profile Page for " + profile.getUsername() + "</div>");
+		RootPanel.get("body").add(header);
+		
+		VerticalPanel vPanel = new VerticalPanel();
+		
+		vPanel.add(new HTML("<b>First Name:</b>"));
+		final TextBox firstName = new TextBox();
+		firstName.setText(profile.getFirstName());
+		vPanel.add(firstName);
+		
+		vPanel.add(new HTML("<b>Last Name:</b>"));
+		final TextBox lastName = new TextBox();
+		lastName.setText(profile.getLastName());
+		vPanel.add(lastName);
+		
+		final Button editProfile = new Button("Edit Profile");
+		editProfile.addClickHandler(new ClickHandler() {
+			private final EditProfileServiceAsync profileSvc = GWT.create(EditProfileService.class);
+
+			public void onClick(ClickEvent event) {
+				String first = firstName.getText();
+				String last = lastName.getText();
+				LoginInfo newProfile = new LoginInfo(profile.getUsername(), Cookies.getCookie("sid"));
+				newProfile.setFirstName(first);
+				newProfile.setLastName(last);
+				
+				profileSvc.editProfile(newProfile, new AsyncCallback<LoginInfo>() {
+					public void onFailure(Throwable caught) {
+						System.out.println("Error occured: " + caught.getMessage());
+						handleError(caught);
+					}
+
+					public void onSuccess(LoginInfo result) {
+						Window.alert("Profile updated!");
+						loadProfilePage(result);
+					}
+				});
+			}
+		});
+		vPanel.add(editProfile);
+		
+		final Button back = new Button("Back to Main Page");
+		back.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				loadParksMethod();
+				loadParksContent();
+			}
+		});
+		vPanel.add(back);
+		
+		RootPanel.get("body").add(vPanel);
+	    
+	}
+
+	private String isOfficialString(Park p) {
+		if (p.isOfficial())
+			return "Yes";
+		else
+			return "No";
+	}
+	
+	private String getCoordinateString(Park p) {
+		double latitude = p.getLatitude();
+		double longitude = p.getLongitude();
+		return String.valueOf(latitude) + ", " + String.valueOf(longitude);
+	}
+	
+	private void loadParksContent() {
+		final FlexTable table = new FlexTable();
 		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
 			public void onFailure(Throwable caught) {
 				System.out.println("Parks did not get properly");
@@ -231,50 +373,8 @@ public class RateMyPark implements EntryPoint {
 //					System.out.println("Adding index" + index);
 				}
 				RootPanel.get("body").add(table);
-				
 			}
 		});
-		// Code to test getParks
-		// loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
-		// public void onFailure(Throwable caught) {
-		// System.out.println("Error occured: " + caught.getMessage());
-		// handleError(caught);
-		// }
-		//
-		// public void onSuccess(List<Park> parks) {
-		// Window.alert(parks.get(3).getPname() + " loaded.");
-		// System.out.println(parks.get(5).getPname() + " loaded.");
-		// }
-		// });
-		// Code to test getParkNames
-		// loadParksSvc.getParkNames(new AsyncCallback<String[]>() {
-		// public void onFailure(Throwable caught) {
-		// System.out.println("Error occured: " + caught.getMessage());
-		// handleError(caught);
-		// }
-		//
-		// public void onSuccess(String[] parks) {
-		// Window.alert("Park " + parks[1] + " loaded.");
-		// System.out.println("Park " + parks[1] + " loaded.");
-		// }
-		// });
-	}
-
-	private String isOfficialString(Park p) {
-		if (p.isOfficial())
-			return "Yes";
-		else
-			return "No";
-	}
-	
-	private String getCoordinateString(Park p) {
-		double latitude = p.getLatitude();
-		double longitude = p.getLongitude();
-		return String.valueOf(latitude) + ", " + String.valueOf(longitude);
-	}
-	
-	private void loadParksContent() {
-		// TODO show park data here
 	}
 
 	private void handleError(Throwable error) {
@@ -284,14 +384,10 @@ public class RateMyPark implements EntryPoint {
 	}
 
 	private static class LoginDialog extends DialogBox {
-		private Button loginButton;
-		private Button logoutButton;
-		private Button newAccountButton;
+		AsyncCallback<LoginInfo> loginCallback;
 
-		public LoginDialog(Button loginMain, Button logoutMain, Button newAccountMain) {
-			this.loginButton = loginMain; // The login button to show this dialog, NOT the login button in this dialog
-			this.newAccountButton = newAccountMain;
-			this.logoutButton = logoutMain;
+		public LoginDialog(AsyncCallback<LoginInfo> loginCallback) {
+			this.loginCallback = loginCallback;
 
 			// Set the dialog box's caption
 			setText("Login");
@@ -324,35 +420,9 @@ public class RateMyPark implements EntryPoint {
 				public void onClick(ClickEvent event) {
 					String username = usernameField.getText();
 					String password = passwordField.getText();
+					LoginDialog.this.hide();
 
-					loginSvc.doLogin(username, password, new AsyncCallback<LoginInfo>() {
-						public void onFailure(Throwable caught) {
-							handleError(caught);
-							System.out.println("LOGIN FAIL username " + caught.getMessage());
-						}
-
-						// result is the session ID from doLogin
-						public void onSuccess(LoginInfo result) {
-							// duration remembering login. 2 weeks in this example.
-							final long DURATION = 1000 * 60 * 60 * 24 * 14;
-							Date expires = new Date(System.currentTimeMillis() + DURATION);
-							Cookies.setCookie("sid", result.getSessionID(), expires, null, "/", false);
-							
-							String username = result.getUsername();
-							
-							RootPanel.get("username").getElement().setInnerText("Logged in as: " + username);
-							System.out.println("Client side cookie login: " + Cookies.getCookie("sid"));
-
-							LoginDialog.this.hide();
-							toggleLoginButtons();
-						}
-
-						private void toggleLoginButtons() {
-							LoginDialog.this.loginButton.setVisible(false);
-							LoginDialog.this.newAccountButton.setVisible(false);
-							LoginDialog.this.logoutButton.setVisible(true);
-						}
-					});
+					loginSvc.doLogin(username, password, LoginDialog.this.loginCallback);
 				}
 			});
 
@@ -369,27 +439,14 @@ public class RateMyPark implements EntryPoint {
 
 			setWidget(dialogVPanel);
 		}
-
-		private void handleError(Throwable error) {
-			Window.alert(error.getMessage());
-			if (error instanceof UserNameException) {
-
-			} else if (error instanceof BadPasswordException) {
-
-			}
-		}
 	}
 
 	private static class NewAccountDialog extends DialogBox {
-		private Button loginButton;
-		private Button logoutButton;
-		private Button newAccountButton;
+		AsyncCallback<LoginInfo> loginCallback;
 
-		public NewAccountDialog(Button loginMain, Button logoutMain, Button newAccountMain) {
-			this.loginButton = loginMain;
-			this.logoutButton = logoutMain;
-			this.newAccountButton = newAccountMain;
-
+		public NewAccountDialog(AsyncCallback<LoginInfo> loginCallback) {
+			this.loginCallback = loginCallback;
+			
 			// Set the dialog box's caption
 			setText("New Account");
 			setAnimationEnabled(true);
@@ -420,6 +477,7 @@ public class RateMyPark implements EntryPoint {
 				public void onClick(ClickEvent event) {
 					String username = usernameField.getText();
 					String password = passwordField.getText();
+					NewAccountDialog.this.hide();
 
 					newAccountSvc.createNewAccount(username, password, new AsyncCallback<LoginInfo>() {
 						public void onFailure(Throwable caught) {
@@ -428,25 +486,14 @@ public class RateMyPark implements EntryPoint {
 						}
 
 						public void onSuccess(LoginInfo result) {
-							final long DURATION = 1000 * 60 * 60 * 24 * 14; // duration remembering login. 2 weeks in
-																			// this example.
-							Date expires = new Date(System.currentTimeMillis() + DURATION);
-							Cookies.setCookie("sid", result.getSessionID(), expires, null, "/", false);
-							
-							String username = result.getUsername();
-							RootPanel.get("username").getElement().setInnerText("Logged in as: " + username);
-							
-							System.out.println("Client side cookie new account: " + Cookies.getCookie("sid"));
-							Window.alert("New account created: " + username);
-
-							NewAccountDialog.this.hide();
-							toggleLoginButtons();
+							NewAccountDialog.this.loginCallback.onSuccess(result);;
+							Window.alert("New account created: " + result.getUsername());
 						}
 
-						private void toggleLoginButtons() {
-							NewAccountDialog.this.loginButton.setVisible(false);
-							NewAccountDialog.this.newAccountButton.setVisible(false);
-							NewAccountDialog.this.logoutButton.setVisible(true);
+						private void handleError(Throwable error) {
+							Window.alert(error.getMessage());
+							if (error instanceof UserNameException) {
+							}
 						}
 					});
 				}
@@ -464,12 +511,6 @@ public class RateMyPark implements EntryPoint {
 			});
 			setWidget(dialogVPanel);
 
-		}
-
-		private void handleError(Throwable error) {
-			Window.alert(error.getMessage());
-			if (error instanceof UserNameException) {
-			}
 		}
 	}
 
