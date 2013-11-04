@@ -10,8 +10,10 @@ import com.ratemypark.exception.DatabaseException;
 public interface LoadParksService extends RemoteService{
 	
 	// might want to return void
-	public List<Park> loadParks();
+	public void loadXMLParks();
+	void loadParks(List<Park> parks);
 	public List<Park> getParks();
 	public String[] getParkNames();
 	public Park getPark(Long parkID) throws DatabaseException;
+	List<Park> getParks(List<Long> pids);
 }

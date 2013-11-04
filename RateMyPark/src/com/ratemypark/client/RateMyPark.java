@@ -204,12 +204,12 @@ public class RateMyPark implements EntryPoint {
 		// Boolean HACK: true if you want to (re)load the database from the XML, else keep at false
 		Boolean loadDB = false;
 		if (loadDB) {
-			loadParksSvc.loadParks(new AsyncCallback<List<Park>>() {
+			loadParksSvc.loadXMLParks(new AsyncCallback<Void>() {
 				public void onFailure(Throwable caught) {
 					System.out.println("Parks did not load properly");
 				}
 
-				public void onSuccess(List<Park> parks) {
+				public void onSuccess(Void ignore) {
 					Window.alert("Parks loaded.");
 					System.out.println("Parks loaded.");
 				}
