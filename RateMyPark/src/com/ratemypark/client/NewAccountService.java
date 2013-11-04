@@ -9,5 +9,5 @@ import com.ratemypark.exception.UserNameException;
  */
 @RemoteServiceRelativePath("new-account")
 public interface NewAccountService extends RemoteService {
-  String createNewAccount(String username, String password) throws UserNameException, IllegalArgumentException;
+  LoginInfo createNewAccount(String username, String password) throws UserNameException, IllegalArgumentException;
 }

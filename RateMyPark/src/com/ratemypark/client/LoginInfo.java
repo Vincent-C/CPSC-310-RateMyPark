@@ -21,7 +21,7 @@ public class LoginInfo implements Serializable {
 		return this.username;
 	}
 	
-	public String getSessionId() {
+	public String getSessionID() {
 		return this.sessionID;
 	}
 	

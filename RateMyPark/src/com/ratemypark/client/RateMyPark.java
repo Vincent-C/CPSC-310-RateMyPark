@@ -12,6 +12,7 @@ import com.ratemypark.shared.BCrypt;
 import com.ratemypark.shared.FieldVerifier;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -83,10 +84,13 @@ public class RateMyPark implements EntryPoint {
 					final long DURATION = 1000 * 60 * 60 * 24 * 14; // duration remembering login. 2 weeks in this
 																	// example.
 					Date expires = new Date(System.currentTimeMillis() + DURATION);
-					Cookies.setCookie("sid", result.getSessionId(), expires, null, "/", false);
-
-					Window.alert("Logged in as" + result.getUsername());
+					Cookies.setCookie("sid", result.getSessionID(), expires, null, "/", false);
+					
+					String username = result.getUsername();
+					RootPanel.get("username").getElement().setInnerText("Logged in as: " + username);
+					
 					System.out.println("Client side cookie login: " + Cookies.getCookie("sid"));
+					
 					toggleLoginButtons();
 				}
 
@@ -117,6 +121,9 @@ public class RateMyPark implements EntryPoint {
 
 						Window.alert("Logged out");
 						System.out.println("Client side cookie logout: " + Cookies.getCookie("sid"));
+						
+						// Clear username text
+						RootPanel.get("username").getElement().setInnerText("");
 
 						toggleLoginButtons();
 					}
@@ -152,7 +159,7 @@ public class RateMyPark implements EntryPoint {
 		final FlexTable table = new FlexTable();
 
 		// Boolean HACK: true if you want to (re)load the database from the XML, else keep at false
-		Boolean loadDB = true;
+		Boolean loadDB = false;
 		if (loadDB) {
 			loadParksSvc.loadParks(new AsyncCallback<List<Park>>() {
 				public void onFailure(Throwable caught) {
@@ -306,6 +313,7 @@ public class RateMyPark implements EntryPoint {
 			final Button login = new Button("Login");
 			login.getElement().setId("loginButton");
 			dialogVPanel.add(login);
+			
 			login.addClickHandler(new ClickHandler() {
 
 				/**
@@ -328,9 +336,11 @@ public class RateMyPark implements EntryPoint {
 							// duration remembering login. 2 weeks in this example.
 							final long DURATION = 1000 * 60 * 60 * 24 * 14;
 							Date expires = new Date(System.currentTimeMillis() + DURATION);
-							Cookies.setCookie("sid", result.getSessionId(), expires, null, "/", false);
-
-							Window.alert("Logged in as " + result.getUsername());
+							Cookies.setCookie("sid", result.getSessionID(), expires, null, "/", false);
+							
+							String username = result.getUsername();
+							
+							RootPanel.get("username").getElement().setInnerText("Logged in as: " + username);
 							System.out.println("Client side cookie login: " + Cookies.getCookie("sid"));
 
 							LoginDialog.this.hide();
@@ -411,20 +421,23 @@ public class RateMyPark implements EntryPoint {
 					String username = usernameField.getText();
 					String password = passwordField.getText();
 
-					newAccountSvc.createNewAccount(username, password, new AsyncCallback<String>() {
+					newAccountSvc.createNewAccount(username, password, new AsyncCallback<LoginInfo>() {
 						public void onFailure(Throwable caught) {
 							System.out.println("Error occured: " + caught.getMessage());
 							handleError(caught);
 						}
 
-						public void onSuccess(String result) {
+						public void onSuccess(LoginInfo result) {
 							final long DURATION = 1000 * 60 * 60 * 24 * 14; // duration remembering login. 2 weeks in
 																			// this example.
 							Date expires = new Date(System.currentTimeMillis() + DURATION);
-							Cookies.setCookie("sid", result, expires, null, "/", false);
-
+							Cookies.setCookie("sid", result.getSessionID(), expires, null, "/", false);
+							
+							String username = result.getUsername();
+							RootPanel.get("username").getElement().setInnerText("Logged in as: " + username);
+							
 							System.out.println("Client side cookie new account: " + Cookies.getCookie("sid"));
-							Window.alert("NEW ACCOUNT CREATED");
+							Window.alert("New account created: " + username);
 
 							NewAccountDialog.this.hide();
 							toggleLoginButtons();

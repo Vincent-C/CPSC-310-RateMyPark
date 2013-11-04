@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.ratemypark.client.LoginInfo;
 import com.ratemypark.client.NewAccountService;
 import com.ratemypark.exception.UserNameException;
 import com.ratemypark.shared.BCrypt;
@@ -20,7 +21,7 @@ public class NewAccountServiceImpl extends RemoteServiceServlet implements
 	private static final PersistenceManagerFactory PMF = JDOHelper.getPersistenceManagerFactory("transactions-optional");
 
 	@Override
-	public String createNewAccount(String username, String password) throws UserNameException,IllegalArgumentException {
+	public LoginInfo createNewAccount(String username, String password) throws UserNameException,IllegalArgumentException {
 		String userlower = username.toLowerCase();		
 		checkNameExists(userlower);
 		PersistenceManager pm = getPersistenceManager();		
@@ -39,7 +40,9 @@ public class NewAccountServiceImpl extends RemoteServiceServlet implements
 		
 		System.out.println("New account session is: " + session);
 		
-		return session.getId();
+		LoginInfo ret = new LoginInfo(acc.getUsername(), session.getId());
+		
+		return ret;
 	}
 	
 	private void checkNameExists(String checkuser) throws UserNameException {
