@@ -22,6 +22,10 @@ public class Account implements Serializable {
 	@Persistent
 	private String email;
 	@Persistent
+	private String firstName;
+	@Persistent
+	private String lastName;
+	@Persistent
 	private Date dateCreated;
 	
 	public Account() {
@@ -52,6 +56,22 @@ public class Account implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
 	public Date getDateCreated() {
