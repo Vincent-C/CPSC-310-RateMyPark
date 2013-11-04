@@ -46,6 +46,16 @@
     <url-pattern>/ratemypark/load-parks</url-pattern>
   </servlet-mapping>
   
+  <servlet>
+    <servlet-name>editProfileServiceImpl</servlet-name>
+    <servlet-class>com.ratemypark.server.EditProfileServiceImpl</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>editProfileServiceImpl</servlet-name>
+    <url-pattern>/ratemypark/edit-profile</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>RateMyPark.html</welcome-file>

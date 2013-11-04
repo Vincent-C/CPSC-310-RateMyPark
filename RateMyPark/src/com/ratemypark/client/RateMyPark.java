@@ -21,10 +21,14 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
@@ -54,7 +58,7 @@ public class RateMyPark implements EntryPoint {
 	public void onModuleLoad() {
 		loadHeader();
 		loadParksMethod(); // DB related stuff
-		// loadParksContent();
+		loadParksContent();
 	}
 
 	private void loadHeader() {
@@ -84,7 +88,7 @@ public class RateMyPark implements EntryPoint {
 			}
 	
 			// result is the session ID from doLogin
-			public void onSuccess(LoginInfo result) {
+			public void onSuccess(final LoginInfo result) {
 				// duration remembering login. 2 weeks in this example.
 				final long DURATION = 1000 * 60 * 60 * 24 * 14;
 				Date expires = new Date(System.currentTimeMillis() + DURATION);
@@ -92,10 +96,18 @@ public class RateMyPark implements EntryPoint {
 				
 				String username = result.getUsername();
 				
-				Hyperlink profileLink = new Hyperlink(username, "profile");
+				Anchor profileLink = new Anchor(username, "#profile");
 				// GWT wraps links in a div, so make it inline...
-				profileLink.getElement().setAttribute("style", "display:inline-block"); 
-				RootPanel.get("username").getElement().setInnerHTML("Logged in as: " + profileLink);
+				
+				profileLink.addClickHandler(new ClickHandler() {
+					public void onClick(ClickEvent event) {
+//						event.preventDefault();
+						loadProfilePage(result);
+					}
+				});
+			
+				RootPanel.get("username").getElement().setInnerHTML("Logged in as: ");
+				RootPanel.get("username").add(profileLink);
 				
 				System.out.println("Client side cookie login: " + Cookies.getCookie("sid"));
 
@@ -177,16 +189,17 @@ public class RateMyPark implements EntryPoint {
 	}
 
 	private void loadParksMethod() {
+		RootPanel.get("body").clear();
+		
 		final Button loadParksButton = new Button("Load Parks");
 		final TextBox loadParksTextBox = new TextBox();
 
 		// We can add style names to widgets
 		loadParksButton.addStyleName("loadParkButton");
 
-		RootPanel.get("loadParksButtonContainer").add(loadParksButton);
-		RootPanel.get("loadParksTextBoxContainer").add(loadParksTextBox);
-		
-		final FlexTable table = new FlexTable();
+		RootPanel.get("body").add(loadParksButton);
+		RootPanel.get("body").add(loadParksTextBox);
+
 
 		// Boolean HACK: true if you want to (re)load the database from the XML, else keep at false
 		Boolean loadDB = false;
@@ -223,7 +236,106 @@ public class RateMyPark implements EntryPoint {
 				});
 			}
 		});
+
+		// Code to test getParks
+		// loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
+		// public void onFailure(Throwable caught) {
+		// System.out.println("Error occured: " + caught.getMessage());
+		// handleError(caught);
+		// }
+		//
+		// public void onSuccess(List<Park> parks) {
+		// Window.alert(parks.get(3).getPname() + " loaded.");
+		// System.out.println(parks.get(5).getPname() + " loaded.");
+		// }
+		// });
+		// Code to test getParkNames
+		// loadParksSvc.getParkNames(new AsyncCallback<String[]>() {
+		// public void onFailure(Throwable caught) {
+		// System.out.println("Error occured: " + caught.getMessage());
+		// handleError(caught);
+		// }
+		//
+		// public void onSuccess(String[] parks) {
+		// Window.alert("Park " + parks[1] + " loaded.");
+		// System.out.println("Park " + parks[1] + " loaded.");
+		// }
+		// });
+	}
+	
+	private void loadProfilePage(final LoginInfo profile) {
+		RootPanel.get("body").clear();
 		
+		// Add title to page
+		HTMLPanel header = new HTMLPanel("<div class='contentHeader'>" + "Profile Page for " + profile.getUsername() + "</div>");
+		RootPanel.get("body").add(header);
+		
+		VerticalPanel vPanel = new VerticalPanel();
+		
+		vPanel.add(new HTML("<b>First Name:</b>"));
+		final TextBox firstName = new TextBox();
+		firstName.setText(profile.getFirstName());
+		vPanel.add(firstName);
+		
+		vPanel.add(new HTML("<b>Last Name:</b>"));
+		final TextBox lastName = new TextBox();
+		lastName.setText(profile.getLastName());
+		vPanel.add(lastName);
+		
+		final Button editProfile = new Button("Edit Profile");
+		editProfile.addClickHandler(new ClickHandler() {
+			private final EditProfileServiceAsync profileSvc = GWT.create(EditProfileService.class);
+
+			public void onClick(ClickEvent event) {
+				String first = firstName.getText();
+				String last = lastName.getText();
+				LoginInfo newProfile = new LoginInfo(profile.getUsername(), Cookies.getCookie("sid"));
+				newProfile.setFirstName(first);
+				newProfile.setLastName(last);
+				
+				profileSvc.editProfile(newProfile, new AsyncCallback<LoginInfo>() {
+					public void onFailure(Throwable caught) {
+						System.out.println("Error occured: " + caught.getMessage());
+						handleError(caught);
+					}
+
+					public void onSuccess(LoginInfo result) {
+						Window.alert("Profile updated!");
+						loadProfilePage(result);
+					}
+				});
+			}
+		});
+		vPanel.add(editProfile);
+		
+		final Button back = new Button("Back to Main Page");
+		back.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				loadParksMethod();
+				loadParksContent();
+			}
+		});
+		vPanel.add(back);
+		
+		RootPanel.get("body").add(vPanel);
+	    
+	}
+
+	private String isOfficialString(Park p) {
+		if (p.isOfficial())
+			return "Yes";
+		else
+			return "No";
+	}
+	
+	private String getCoordinateString(Park p) {
+		double latitude = p.getLatitude();
+		double longitude = p.getLongitude();
+		return String.valueOf(latitude) + ", " + String.valueOf(longitude);
+	}
+	
+	private void loadParksContent() {
+		final FlexTable table = new FlexTable();
 		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
 			public void onFailure(Throwable caught) {
 				System.out.println("Parks did not get properly");
@@ -261,50 +373,8 @@ public class RateMyPark implements EntryPoint {
 //					System.out.println("Adding index" + index);
 				}
 				RootPanel.get("body").add(table);
-				
 			}
 		});
-		// Code to test getParks
-		// loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
-		// public void onFailure(Throwable caught) {
-		// System.out.println("Error occured: " + caught.getMessage());
-		// handleError(caught);
-		// }
-		//
-		// public void onSuccess(List<Park> parks) {
-		// Window.alert(parks.get(3).getPname() + " loaded.");
-		// System.out.println(parks.get(5).getPname() + " loaded.");
-		// }
-		// });
-		// Code to test getParkNames
-		// loadParksSvc.getParkNames(new AsyncCallback<String[]>() {
-		// public void onFailure(Throwable caught) {
-		// System.out.println("Error occured: " + caught.getMessage());
-		// handleError(caught);
-		// }
-		//
-		// public void onSuccess(String[] parks) {
-		// Window.alert("Park " + parks[1] + " loaded.");
-		// System.out.println("Park " + parks[1] + " loaded.");
-		// }
-		// });
-	}
-
-	private String isOfficialString(Park p) {
-		if (p.isOfficial())
-			return "Yes";
-		else
-			return "No";
-	}
-	
-	private String getCoordinateString(Park p) {
-		double latitude = p.getLatitude();
-		double longitude = p.getLongitude();
-		return String.valueOf(latitude) + ", " + String.valueOf(longitude);
-	}
-	
-	private void loadParksContent() {
-		// TODO show park data here
 	}
 
 	private void handleError(Throwable error) {

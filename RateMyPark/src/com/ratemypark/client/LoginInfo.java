@@ -25,9 +25,14 @@ public class LoginInfo implements Serializable {
 		return this.sessionID;
 	}
 	
-	public String getName() {
-		String fullName = this.firstName + this.lastName;
-		return fullName;
+	public String getDisplayName() {
+		String displayName = this.getUsername();
+		if (this.firstName != null && this.lastName != null ) {
+			displayName = this.firstName + this.lastName;
+		} else if (this.firstName != null && this.lastName == null ) {
+			displayName = this.firstName;
+		}
+		return displayName;
 	}
 	
 	public String getFirstName() {
