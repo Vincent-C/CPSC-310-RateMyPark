@@ -1,6 +1,7 @@
 package com.ratemypark.server;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.jdo.JDOHelper;
@@ -23,23 +24,25 @@ public class LoadParksServiceImpl extends RemoteServiceServlet implements LoadPa
 			.getPersistenceManagerFactory("transactions-optional");
 
 	@Override
-	public List<Park> loadParks() {
-		PersistenceManager pm = getPersistenceManager();
-
+	public void loadXMLParks() {
 		DomXMLParser parser = new DomXMLParser();
-
 		List<Park> parks = parser.parse();
+		loadParks(parks);
+		return;
+	}
+
+	@Override
+	public void loadParks(List<Park> parks) {
+		PersistenceManager pm = getPersistenceManager();
 		try {
 			for (Park p : parks) {
 				pm.makePersistent(p);
-				System.out.println("Wrote park to database: " + p.getPname());
+				// System.out.println("Wrote park to database: " + p.getPname());
 			}
 		} finally {
 			pm.close();
 		}
-		// Not sure what I should return
-		return parks;
-
+		return;
 	}
 
 	@Override
@@ -62,6 +65,45 @@ public class LoadParksServiceImpl extends RemoteServiceServlet implements LoadPa
 	}
 
 	@Override
+	public List<Park> getParks(List<Long> pids) {
+		PersistenceManager pm = getPersistenceManager();
+		List<Park> parks = new ArrayList<Park>();
+		try {
+			Query q = pm.newQuery(Park.class);
+			// q.setOrdering("pid desc");
+
+			List<Park> result = (List<Park>) q.execute();
+			for (Park p : result) {
+				if (pids.contains(p.getPid()))
+					parks.add(p);
+			}
+
+		} finally {
+			pm.close();
+		}
+		return parks;
+	}
+
+	// Get a specific Park
+	@Override
+	public Park getPark(Long parkID) throws DatabaseException {
+		PersistenceManager pm = getPersistenceManager();
+		Park park;
+		try {
+			Query q = pm.newQuery(Park.class, "pid == parkID");
+			q.declareParameters("Long parkID");
+			List<Park> parks = (List<Park>) q.execute(parkID);
+			if (parks.isEmpty()) {
+				throw new DatabaseException("No park that corresponds to the given parkID: " + parkID);
+			}
+			park = parks.get(0);
+		} finally {
+			pm.close();
+		}
+		return park;
+	}
+
+	@Override
 	public String[] getParkNames() {
 		PersistenceManager pm = getPersistenceManager();
 		List<String> parkNames = new ArrayList<String>();
@@ -77,25 +119,6 @@ public class LoadParksServiceImpl extends RemoteServiceServlet implements LoadPa
 			pm.close();
 		}
 		return (String[]) parkNames.toArray(new String[0]);
-	}
-
-	// Get a specific Park
-	@Override
-	public Park getPark(Long parkID) throws DatabaseException {
-		PersistenceManager pm = getPersistenceManager();
-		Park park;
-		try {
-			Query q = pm.newQuery(Park.class, "pid == parkID");
-			q.declareParameters("Long parkID");
-			List<Park> parks = (List<Park>) q.execute(parkID);
-			if(parks.isEmpty()){
-				throw new DatabaseException("No park that corresponds to the given parkID: " + parkID);
-			}
-			park = parks.get(0);
-		} finally {
-			pm.close();
-		}
-		return park;
 	}
 
 	private PersistenceManager getPersistenceManager() {
