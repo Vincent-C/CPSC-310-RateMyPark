@@ -50,11 +50,12 @@ public class NewAccountServiceImpl extends RemoteServiceServlet implements NewAc
 	private void checkNameExists(String checkuser) throws UserNameException {
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Account acc = pm.getObjectById(Account.class, checkuser);
+			// Exception should be thrown here
+			pm.getObjectById(Account.class, checkuser);
 			// Refresh the object, to make sure its up to date
-			pm.refresh(acc);
-		} catch (JDOObjectNotFoundException e) {
 			throw new UserNameException("Username " + checkuser + " already exists");
+		} catch (JDOObjectNotFoundException e) {
+			return;
 		} finally {
 			pm.close();
 		}
