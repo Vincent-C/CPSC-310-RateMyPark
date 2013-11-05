@@ -26,7 +26,8 @@ import com.ratemypark.shared.BCrypt;
 
 public class LoginServiceImpl extends RemoteServiceServlet implements LoginService {
 
-	private static final PersistenceManagerFactory PMF = JDOHelper.getPersistenceManagerFactory("transactions-optional");
+	private static final PersistenceManagerFactory PMF = JDOHelper
+			.getPersistenceManagerFactory("transactions-optional");
 
 	@Override
 	public LoginInfo doLogin(String username, String password) throws IllegalArgumentException, UserNameException,
@@ -71,17 +72,27 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		return ret;
 	}
 
+	private LoginInfo createLoginInfoFromAccount(HttpSession existingSession, Account gettedAccount) {
+		LoginInfo ret = new LoginInfo(gettedAccount.getUsername(), existingSession.getId());
+		ret.setFirstName(gettedAccount.getFirstName());
+		ret.setLastName(gettedAccount.getLastName());
+		// System.out.println(gettedAccount.getFirstName() + " " +
+		// gettedAccount.getLastName());
+		return ret;
+	}
+
+	private PersistenceManager getPersistenceManager() {
+		return PMF.getPersistenceManager();
+	}
+
 	private Account getAccount(String accountName) throws UserNameException {
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			// Get account based on the id (accountName)
 			Account acc = pm.getObjectById(Account.class, accountName);
-			// Refresh the object, to make sure its up to date
-			pm.refresh(acc);
-//			System.out.println(acc.getUsername() + ": " + acc.getFirstName() + " " + acc.getLastName());
+			System.out.println(acc.getUsername() + ": " + acc.getFirstName() + " " + acc.getLastName());
 			return acc;
 		} catch (JDOObjectNotFoundException e) {
-			throw new UserNameException("Username " + accountName + " does not exist in database");
+			throw new UserNameException("Username " + accountName + "exist in database");
 		} finally {
 			pm.close();
 		}
@@ -92,18 +103,5 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		if (!valid) {
 			throw new BadPasswordException("Wrong password");
 		}
-	}
-
-	private LoginInfo createLoginInfoFromAccount(HttpSession existingSession, Account gettedAccount) {
-		LoginInfo ret = new LoginInfo(gettedAccount.getUsername(), existingSession.getId());
-		ret.setFirstName(gettedAccount.getFirstName());
-		ret.setLastName(gettedAccount.getLastName());
-		// System.out.println(gettedAccount.getFirstName() + " " +
-		// gettedAccount.getLastName());
-		return ret;
-	}
-	
-	private PersistenceManager getPersistenceManager() {
-		return PMF.getPersistenceManager();
 	}
 }

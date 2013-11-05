@@ -21,20 +21,6 @@ public class EditProfileServiceImpl extends RemoteServiceServlet implements Edit
 	private static final PersistenceManagerFactory PMF = JDOHelper.getPersistenceManagerFactory("transactions-optional");
 
 	@Override
-	public LoginInfo getCurrentProfile() throws NotLoggedInException {
-		HttpServletRequest request = this.getThreadLocalRequest();
-		HttpSession existingSession = request.getSession();
-		Account newAccount;
-		if (existingSession != null && existingSession.getAttribute("account") != null) {
-			newAccount = (Account) existingSession.getAttribute("account");
-		} else {
-			throw new NotLoggedInException();
-		}
-		
-		return createLoginInfoFromAccount(existingSession, newAccount);
-	}
-	
-	@Override
 	public LoginInfo editProfile(LoginInfo newProfile) throws NotLoggedInException, UserNameException {
 		HttpServletRequest request = this.getThreadLocalRequest();
 		HttpSession existingSession = request.getSession();
@@ -53,20 +39,14 @@ public class EditProfileServiceImpl extends RemoteServiceServlet implements Edit
 		return newProfile;
 	}
 	
-	private LoginInfo createLoginInfoFromAccount(HttpSession existingSession, Account gettedAccount) {
-		LoginInfo ret = new LoginInfo(gettedAccount.getUsername(), existingSession.getId());
-		ret.setFirstName(gettedAccount.getFirstName());
-		ret.setLastName(gettedAccount.getLastName());
-		// System.out.println(gettedAccount.getFirstName() + " " +
-		// gettedAccount.getLastName());
-		return ret;
-	}	
+	private PersistenceManager getPersistenceManager(){
+		return PMF.getPersistenceManager();
+	}
 	
 	private Account editAccount(LoginInfo newProfile) throws UserNameException {
 		PersistenceManager pm = getPersistenceManager();
 		try{
 				Account acc = pm.getObjectById(Account.class, newProfile.getUsername());
-				pm.refresh(acc);
 				acc.setFirstName(newProfile.getFirstName());
 				acc.setLastName(newProfile.getLastName());
 				// Return the Account entity
@@ -78,9 +58,5 @@ public class EditProfileServiceImpl extends RemoteServiceServlet implements Edit
 		finally {
 			pm.close();
 		}
-	}
-	
-	private PersistenceManager getPersistenceManager(){
-		return PMF.getPersistenceManager();
 	}
 }

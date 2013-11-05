@@ -9,8 +9,6 @@ import javax.servlet.http.HttpSession;
  * The async counterpart of <code>EditProfileService</code>.
  */
 public interface EditProfileServiceAsync {
-
-	void getCurrentProfile(AsyncCallback<LoginInfo> callback);
 	
 	void editProfile(LoginInfo newProfile, AsyncCallback<LoginInfo> callback)
 		throws IllegalArgumentException;

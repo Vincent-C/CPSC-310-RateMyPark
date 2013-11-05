@@ -11,7 +11,6 @@ import com.ratemypark.exception.UserNameException;
  */
 @RemoteServiceRelativePath("edit-profile")
 public interface EditProfileService extends RemoteService {
-	LoginInfo getCurrentProfile() throws NotLoggedInException;	
-	LoginInfo editProfile(LoginInfo newProfile) throws NotLoggedInException, UserNameException;
+  LoginInfo editProfile(LoginInfo newProfile) throws NotLoggedInException, UserNameException;
   
 }
