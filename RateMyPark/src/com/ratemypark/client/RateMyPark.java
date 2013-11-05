@@ -254,37 +254,23 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 			public void onSuccess(List<Park> parkList) {
 
-				table.setBorderWidth(12);
+				table.setBorderWidth(6);
 				table.setText(0, 0, "");
 				table.setText(0, 1, "Park ID");
 				table.setText(0, 2, "Park Name");
-				table.setText(0, 3, "Official");
-				table.setText(0, 4, "Street Number");
-				table.setText(0, 5, "Street Name");
-				table.setText(0, 6, "East-West Street Name");
-				table.setText(0, 7, "North-South Street Name");
-				table.setText(0, 8, "Coordinates");
-				table.setText(0, 9, "Size in Hectares");
-				table.setText(0, 10, "Neighbourhood Name");
-				table.setText(0, 11, "Neighbourhood URL");
+				table.setText(0, 3, "Address");
+				table.setText(0, 4, "Neighbourhood Name");
+				table.setText(0, 5, "Neighbourhood URL");
 				int index = 1;
 				for (Park p : parkList) {
 					table.insertRow(index);
 					table.setText(index, 1, String.valueOf(p.getPid()));
-					//table.setText(index, 2, p.getPname());
 					Hyperlink link = new Hyperlink(p.getPname(), String.valueOf(p.getPid()));
 					table.setWidget(index, 2, link);
-					table.setText(index, 3, isOfficialString(p));
-					table.setText(index, 4, String.valueOf(p.getStreetNumber()));
-					table.setText(index, 5, p.getStreetName());
-					table.setText(index, 6, p.getEwStreet());
-					table.setText(index, 7, p.getNsStreet());
-					table.setText(index, 8, getCoordinateString(p));
-					table.setText(index, 9, String.valueOf(p.getHectare()));
-					table.setText(index, 10, p.getNeighbourhoodName());
-					table.setText(index, 11, p.getNeighbourhoodURL());
+					table.setText(index, 3, String.valueOf(p.getStreetNumber()) + " " + p.getStreetName());
+					table.setText(index, 4, p.getNeighbourhoodName());
+					table.setText(index, 5, p.getNeighbourhoodURL());
 					index++;
-					// System.out.println("Adding index" + index);
 				}
 				RootPanel.get("body").add(table);
 			}
@@ -321,8 +307,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 					}
 					if (p != null) {
-						System.out.println(p.getPid());
-						System.out.println(p.getPname());
+						//System.out.println(p.getPid());
+						//System.out.println(p.getPname());
 						table.setText(1, 1, String.valueOf(p.getPid()));
 						table.setText(1, 2, p.getPname());
 						table.setText(1, 3, isOfficialString(p));
@@ -334,7 +320,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						table.setText(1, 9, String.valueOf(p.getHectare()));
 						table.setText(1, 10, p.getNeighbourhoodName());
 						table.setText(1, 11, p.getNeighbourhoodURL());
-						// System.out.println("Adding index" + index);
 
 						RootPanel.get("body").add(table);
 					}
