@@ -48,7 +48,6 @@ public class NewAccountServiceImplTest {
 		helper.tearDown();
 	}
 
-
 	@Test
 	public void testCreateNewAccount() {
 		String username = "ferrari430sopro";
@@ -70,7 +69,7 @@ public class NewAccountServiceImplTest {
 			fail("IllegalArugmentException?? Someone wrote a bad test??");
 			e.printStackTrace();
 		} catch (UserNameException e) {
-			fail(username + " should not be a bad username...");
+			fail(e.getMessage() + " " + username + " should not be a bad username...");
 			e.printStackTrace();
 		}
 		
