@@ -18,7 +18,10 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
@@ -39,7 +42,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class RateMyPark implements EntryPoint {
+public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	/**
 	 * The message displayed to the user when the server cannot be reached or returns an error.
 	 */
@@ -56,12 +59,19 @@ public class RateMyPark implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
+		
+
 		loadParksIntoDatastore(); // DB related stuff (moved the boolean hack into this function)
 		// Load the header
 		loadHeader();
 		// Load the body
 		loadParksBody();
+		
+		// Add history listener
+	    History.addValueChangeHandler(this);
 
+	    // Now that we've setup our listener, fire the initial history state.
+	    History.fireCurrentHistoryState();
 		// loadParkTestMethods(); // used to test that the datastore contains the correct info
 	}
 
@@ -261,7 +271,9 @@ public class RateMyPark implements EntryPoint {
 				for (Park p : parkList) {
 					table.insertRow(index);
 					table.setText(index, 1, String.valueOf(p.getPid()));
-					table.setText(index, 2, p.getPname());
+					//table.setText(index, 2, p.getPname());
+					Hyperlink link = new Hyperlink(p.getPname(), String.valueOf(p.getPid()));
+					table.setWidget(index, 2, link);
 					table.setText(index, 3, isOfficialString(p));
 					table.setText(index, 4, String.valueOf(p.getStreetNumber()));
 					table.setText(index, 5, p.getStreetName());
@@ -279,9 +291,63 @@ public class RateMyPark implements EntryPoint {
 		});
 	}
 
+	private void loadSpecificParkTable(final String parkID) {
+		final FlexTable table = new FlexTable();
+		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
+			public void onFailure(Throwable caught) {
+				System.out.println("Park did not get properly");
+			}
+
+			public void onSuccess(List<Park> parkList) {
+				if (parkID != "" && parkID != null) {
+					table.setBorderWidth(12);
+					table.setText(0, 0, "");
+					table.setText(0, 1, "Park ID");
+					table.setText(0, 2, "Park Name");
+					table.setText(0, 3, "Official");
+					table.setText(0, 4, "Street Number");
+					table.setText(0, 5, "Street Name");
+					table.setText(0, 6, "East-West Street Name");
+					table.setText(0, 7, "North-South Street Name");
+					table.setText(0, 8, "Coordinates");
+					table.setText(0, 9, "Size in Hectares");
+					table.setText(0, 10, "Neighbourhood Name");
+					table.setText(0, 11, "Neighbourhood URL");
+					table.insertRow(1);
+					Park p = null;
+					for(Park park : parkList) {
+						if (park.getPid() == Long.parseLong(parkID))
+							p = park;
+
+					}
+					if (p != null) {
+						System.out.println(p.getPid());
+						System.out.println(p.getPname());
+						table.setText(1, 1, String.valueOf(p.getPid()));
+						table.setText(1, 2, p.getPname());
+						table.setText(1, 3, isOfficialString(p));
+						table.setText(1, 4, String.valueOf(p.getStreetNumber()));
+						table.setText(1, 5, p.getStreetName());
+						table.setText(1, 6, p.getEwStreet());
+						table.setText(1, 7, p.getNsStreet());
+						table.setText(1, 8, getCoordinateString(p));
+						table.setText(1, 9, String.valueOf(p.getHectare()));
+						table.setText(1, 10, p.getNeighbourhoodName());
+						table.setText(1, 11, p.getNeighbourhoodURL());
+						// System.out.println("Adding index" + index);
+
+						RootPanel.get("body").add(table);
+					}
+					else System.out.println("Park is null");
+				}
+				else System.out.println("ParkID is empty");
+			}
+		});
+	}
+	
 	private void loadParksIntoDatastore() {
 		// Boolean HACK: true if you want to (re)load the database from the XML, else keep at false
-		Boolean loadDB = false;
+		Boolean loadDB = true;
 		if (loadDB) {
 			loadParksSvc.loadXMLParks(new AsyncCallback<Void>() {
 				public void onFailure(Throwable caught) {
@@ -408,6 +474,15 @@ public class RateMyPark implements EntryPoint {
 		if (error instanceof DatabaseException) {
 		}
 	}
+	
+	public void onValueChange(ValueChangeEvent<String> event) {
+	    // This method is called whenever the application's history changes. Set
+	    // the label to reflect the current history token.
+		if (!event.getValue().isEmpty()) {
+			RootPanel.get("body").clear();
+			loadSpecificParkTable(event.getValue());
+		}
+	  }
 
 	private static class LoginDialog extends DialogBox {
 		AsyncCallback<LoginInfo> loginCallback;
