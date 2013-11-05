@@ -35,12 +35,15 @@ public class NewAccountServiceImpl extends RemoteServiceServlet implements
 		}
 		
 		HttpServletRequest request = this.getThreadLocalRequest();
-		HttpSession session = request.getSession();
-		session.setAttribute("account", acc);
+		String sessionID = "";
 		
-		System.out.println("New account session is: " + session);
-		
-		LoginInfo ret = new LoginInfo(acc.getUsername(), session.getId());
+		if (request != null) {
+			HttpSession session = request.getSession();
+			session.setAttribute("account", acc);
+			System.out.println("New account session is: " + session);
+			sessionID = session.getId();
+		}
+		LoginInfo ret = new LoginInfo(acc.getUsername(), sessionID);
 		
 		return ret;
 	}
