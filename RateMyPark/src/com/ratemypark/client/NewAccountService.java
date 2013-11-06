@@ -2,6 +2,7 @@ package com.ratemypark.client;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.ratemypark.exception.BadPasswordException;
 import com.ratemypark.exception.UserNameException;
 
 /**
@@ -9,5 +10,5 @@ import com.ratemypark.exception.UserNameException;
  */
 @RemoteServiceRelativePath("new-account")
 public interface NewAccountService extends RemoteService {
-  LoginInfo createNewAccount(String username, String password) throws UserNameException, IllegalArgumentException;
+  LoginInfo createNewAccount(String username, String password) throws UserNameException, IllegalArgumentException, BadPasswordException;
 }

@@ -40,7 +40,7 @@ public class RateMyParkTest extends GwtTest {
 		Button loginButton = (Button) RootPanel.get("loginButtonContainer").getWidget(0);
 	    assertTrue(loginButton.isAttached());
 	    
-		// Test that the header login button is properly attached to page
+		// Test that the header logout button is properly attached to page
 		Button logoutButton = (Button) RootPanel.get("logoutButtonContainer").getWidget(0);
 	    assertTrue(logoutButton.isAttached());
 	  }

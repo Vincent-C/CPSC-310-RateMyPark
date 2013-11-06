@@ -20,6 +20,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.ratemypark.client.Park;
+import com.ratemypark.exception.BadPasswordException;
 import com.ratemypark.exception.DatabaseException;
 import com.ratemypark.exception.UserNameException;
 import com.ratemypark.server.Account;
@@ -70,6 +71,9 @@ public class NewAccountServiceImplTest {
 			e.printStackTrace();
 		} catch (UserNameException e) {
 			fail(e.getMessage() + " " + username + " should not be a bad username...");
+			e.printStackTrace();
+		} catch (BadPasswordException e) {
+			fail(e.getMessage() + " : found empty password");
 			e.printStackTrace();
 		}
 		
