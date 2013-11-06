@@ -26,26 +26,30 @@ public class NewAccountServiceImpl extends RemoteServiceServlet implements NewAc
 			IllegalArgumentException {
 		String userlower = username.toLowerCase();
 		checkNameExists(userlower);
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = getPersistenceManager();		
 		String hash = BCrypt.hashpw(password, BCrypt.gensalt());
-
-		Account acc = new Account(userlower, hash);
+		
+		Account acc = new Account(userlower,hash);
 		try {
-			pm.makePersistent(acc);
-		} finally {
+			pm.makePersistent(acc);			
+		} finally{
 			pm.close();
 		}
-
+		
 		HttpServletRequest request = this.getThreadLocalRequest();
-		HttpSession session = request.getSession();
-		session.setAttribute("account", acc);
-
-		System.out.println("New account session is: " + session);
-
-		LoginInfo ret = new LoginInfo(acc.getUsername(), session.getId());
-
+		String sessionID = "";
+		
+		if (request != null) {
+			HttpSession session = request.getSession();
+			session.setAttribute("account", acc);
+			System.out.println("New account session is: " + session);
+			sessionID = session.getId();
+		}
+		LoginInfo ret = new LoginInfo(acc.getUsername(), sessionID);
+		
 		return ret;
 	}
+	
 
 	private void checkNameExists(String checkuser) throws UserNameException {
 		PersistenceManager pm = getPersistenceManager();
