@@ -65,7 +65,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		// Load the header
 		loadHeader();
 		// Load the body
-		loadParksBody();
+		// loadParksBody();
 		
 		// Add history listener
 	    History.addValueChangeHandler(this);
@@ -332,7 +332,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	
 	private void loadParksIntoDatastore() {
 		// Boolean HACK: true if you want to (re)load the database from the XML, else keep at false
-		Boolean loadDB = true;
+		Boolean loadDB = false;
 		if (loadDB) {
 			loadParksSvc.loadXMLParks(new AsyncCallback<Void>() {
 				public void onFailure(Throwable caught) {
@@ -465,8 +465,16 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	    // the label to reflect the current history token.
 		if (!event.getValue().isEmpty()) {
 			RootPanel.get("body").clear();
-			loadSpecificParkTable(event.getValue());
+			if (event.getValue().equals("profile")) {
+				//RootPanel.get("body").clear();
+				loadProfilePage();
+			}
+			else  {
+				//RootPanel.get("body").clear();
+				loadSpecificParkTable(event.getValue());
+			}
 		}
+		else loadParksBody();
 	  }
 
 	private static class LoginDialog extends DialogBox {
