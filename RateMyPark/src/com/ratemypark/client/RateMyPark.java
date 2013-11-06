@@ -62,7 +62,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		loadParksIntoDatastore(); // DB related stuff (moved the boolean hack into this function)
+		loadParksIntoDatastore(false); // DB related stuff (moved the boolean hack into this function)
 		// Load the header
 		loadHeader();
 		// Load the body
@@ -368,9 +368,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		});
 	}
 	
-	private void loadParksIntoDatastore() {
+	private void loadParksIntoDatastore(Boolean loadDB) {
 		// Boolean HACK: true if you want to (re)load the database from the XML, else keep at false
-		Boolean loadDB = false;
 		if (loadDB) {
 			loadParksSvc.loadXMLParks(new AsyncCallback<Void>() {
 				public void onFailure(Throwable caught) {
@@ -620,7 +619,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 						public void onSuccess(LoginInfo result) {
 							NewAccountDialog.this.loginCallback.onSuccess(result);
-							;
 							Window.alert("New account created: " + result.getUsername());
 						}
 

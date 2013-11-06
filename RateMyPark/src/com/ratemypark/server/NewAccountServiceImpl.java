@@ -25,20 +25,21 @@ public class NewAccountServiceImpl extends RemoteServiceServlet implements NewAc
 	public LoginInfo createNewAccount(String username, String password) throws UserNameException,
 			IllegalArgumentException {
 		String userlower = username.toLowerCase();
+		checkValidUsername(userlower);
 		checkNameExists(userlower);
-		PersistenceManager pm = getPersistenceManager();		
+		PersistenceManager pm = getPersistenceManager();
 		String hash = BCrypt.hashpw(password, BCrypt.gensalt());
-		
-		Account acc = new Account(userlower,hash);
+
+		Account acc = new Account(userlower, hash);
 		try {
-			pm.makePersistent(acc);			
-		} finally{
+			pm.makePersistent(acc);
+		} finally {
 			pm.close();
 		}
-		
+
 		HttpServletRequest request = this.getThreadLocalRequest();
 		String sessionID = "";
-		
+
 		if (request != null) {
 			HttpSession session = request.getSession();
 			session.setAttribute("account", acc);
@@ -46,10 +47,15 @@ public class NewAccountServiceImpl extends RemoteServiceServlet implements NewAc
 			sessionID = session.getId();
 		}
 		LoginInfo ret = new LoginInfo(acc.getUsername(), sessionID);
-		
+
 		return ret;
 	}
-	
+
+	private void checkValidUsername(String username) throws UserNameException {
+		if (!username.matches("^[a-z0-9]")) {
+			throw new UserNameException("Username can only contain letters and numbers");
+		}
+	}
 
 	private void checkNameExists(String checkuser) throws UserNameException {
 		PersistenceManager pm = getPersistenceManager();
