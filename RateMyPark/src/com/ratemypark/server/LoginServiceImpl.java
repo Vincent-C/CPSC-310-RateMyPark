@@ -41,34 +41,37 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		checkPassword(password, hash);
 
 		HttpServletRequest request = this.getThreadLocalRequest();
-		HttpSession session = request.getSession();
-		session.setAttribute("account", acc);
-
-		System.out.println("Login session is: " + session);
-
-		LoginInfo ret = createLoginInfoFromAccount(session, acc);
-
-		return ret;
+		if (request != null) {
+			HttpSession session = request.getSession();
+			session.setAttribute("account", acc);
+			
+			System.out.println("Login session is: " + session);
+			LoginInfo ret = createLoginInfoFromAccount(session.getId(), acc);
+			return ret;
+		}
+		
+		return null;
 	}
 
 	@Override
 	public LoginInfo doLogin(String session) throws NotLoggedInException {
 
 		HttpServletRequest request = this.getThreadLocalRequest();
-		HttpSession existingSession = request.getSession();
-
-		Account gettedAccount;
-		if (existingSession.getId().equals(session)) {
-			gettedAccount = (Account) existingSession.getAttribute("account");
-			System.out.println("Already logged in to: " + gettedAccount.getUsername());
-
-		} else {
-			throw new NotLoggedInException();
+		
+		if (request != null) {
+			HttpSession existingSession = request.getSession();
+			String existingSessionID = existingSession.getId();
+			if (existingSessionID.equals(session)) {
+				Account gettedAccount = (Account) existingSession.getAttribute("account");
+				System.out.println("Already logged in to: " + gettedAccount.getUsername());
+				LoginInfo ret = createLoginInfoFromAccount(existingSessionID, gettedAccount);
+				return ret;
+			} else {
+				throw new NotLoggedInException();
+			}
 		}
-
-		LoginInfo ret = createLoginInfoFromAccount(existingSession, gettedAccount);
-
-		return ret;
+		
+		return null;
 	}
 
 	private Account getAccount(String accountName) throws UserNameException {
@@ -94,8 +97,8 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		}
 	}
 
-	private LoginInfo createLoginInfoFromAccount(HttpSession existingSession, Account gettedAccount) {
-		LoginInfo ret = new LoginInfo(gettedAccount.getUsername(), existingSession.getId());
+	private LoginInfo createLoginInfoFromAccount(String existingSession, Account gettedAccount) {
+		LoginInfo ret = new LoginInfo(gettedAccount.getUsername(), existingSession);
 		ret.setFirstName(gettedAccount.getFirstName());
 		ret.setLastName(gettedAccount.getLastName());
 		// System.out.println(gettedAccount.getFirstName() + " " +
