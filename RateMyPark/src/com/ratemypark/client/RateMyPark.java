@@ -1,5 +1,6 @@
 package com.ratemypark.client;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,6 +24,8 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FocusWidget;
@@ -66,9 +69,9 @@ public class RateMyPark implements EntryPoint {
 	}
 
 	private void loadHeader() {
-		
-//		RootPanel.get("header").clear();
-		
+
+		// RootPanel.get("header").clear();
+
 		final Button loginButton = new Button("Login");
 		final Button logoutButton = new Button("Logout");
 		final Button newAccountButton = new Button("New Account");
@@ -153,6 +156,8 @@ public class RateMyPark implements EntryPoint {
 		loginButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				LoginDialog loginDialog = new LoginDialog(loginCallback);
+				loginDialog.setGlassEnabled(true);
+				loginDialog.center();
 				loginDialog.show();
 			}
 		});
@@ -167,7 +172,7 @@ public class RateMyPark implements EntryPoint {
 					public void onSuccess(Void ignore) {
 						Cookies.removeCookie("sid");
 						Window.alert("Logged out");
-//						System.out.println("Client side cookie logout: " + Cookies.getCookie("sid"));
+						// System.out.println("Client side cookie logout: " + Cookies.getCookie("sid"));
 						// Clear username text
 						RootPanel.get("username").getElement().setInnerText("");
 						toggleLoginButtons();
@@ -186,19 +191,21 @@ public class RateMyPark implements EntryPoint {
 
 		newAccountButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				NewAccountDialog newAccontDialog = new NewAccountDialog(loginCallback);
-				newAccontDialog.show();
+				NewAccountDialog newAccountDialog = new NewAccountDialog(loginCallback);
+				newAccountDialog.setGlassEnabled(true);
+				newAccountDialog.center();
+				newAccountDialog.show();
 			}
 		});
 	}
 
 	// This method is used to clear the body only once, then add the 'body' after, using the methods
-	private void loadParksBody(){
+	private void loadParksBody() {
 		RootPanel.get("body").clear();
 		loadParksTable();
 		loadParksTextandButton();
 	}
-	
+
 	private void loadParksTextandButton() {
 		final Button loadParksButton = new Button("Load Parks with PID:");
 		final TextBox loadParksTextBox = new TextBox();
@@ -208,7 +215,7 @@ public class RateMyPark implements EntryPoint {
 		loadParksTextBox.setWidth("35px");
 		RootPanel.get("body").add(loadParksButton);
 		RootPanel.get("body").add(loadParksTextBox);
-	
+
 		// Code that gets the park from a user-inputted pid
 		loadParksButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
@@ -233,17 +240,15 @@ public class RateMyPark implements EntryPoint {
 		});
 	}
 
-	
-
 	private void loadParksTable() {
 		final FlexTable table = new FlexTable();
+		final Button compareButton = new Button("Compare");
 		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
 			public void onFailure(Throwable caught) {
 				System.out.println("Parks did not get properly");
 			}
 
 			public void onSuccess(List<Park> parkList) {
-
 				table.setBorderWidth(12);
 				table.setText(0, 0, "");
 				table.setText(0, 1, "Park ID");
@@ -259,7 +264,10 @@ public class RateMyPark implements EntryPoint {
 				table.setText(0, 11, "Neighbourhood URL");
 				int index = 1;
 				for (Park p : parkList) {
+					final CheckBox cb = new CheckBox("");
 					table.insertRow(index);
+					cb.getElement().setAttribute("pid", String.valueOf(p.getPid()));
+					table.setWidget(index, 0, cb);
 					table.setText(index, 1, String.valueOf(p.getPid()));
 					table.setText(index, 2, p.getPname());
 					table.setText(index, 3, isOfficialString(p));
@@ -274,6 +282,37 @@ public class RateMyPark implements EntryPoint {
 					index++;
 					// System.out.println("Adding index" + index);
 				}
+
+				compareButton.addClickHandler(new ClickHandler() {
+					public void onClick(ClickEvent event) {
+						// Assume input is valid
+						List<Long> pids = new ArrayList<Long>();
+						for (int i = 1; i < table.getRowCount(); i++) {
+							CheckBox cb = (CheckBox) table.getWidget(i, 0);
+							if (cb.getValue()) {
+								pids.add(Long.parseLong(cb.getElement().getAttribute("pid")));
+							}
+						}
+						if (!pids.isEmpty()) {
+							loadParksSvc.getParks(pids, new AsyncCallback<List<Park>>() {
+								public void onFailure(Throwable caught) {
+									System.out.println("Error occured: " + caught.getMessage());
+									handleError(caught);
+								}
+
+								public void onSuccess(List<Park> parks) {
+									for (Park park : parks) {
+										System.out.println(park.getPname() + " loaded.");
+									}
+									CompareDialog cd = new CompareDialog(parks);
+									cd.showRelativeTo(compareButton);
+								}
+							});
+						}
+					}
+				});
+				RootPanel.get("body").add(new FlexTable());
+				RootPanel.get("body").add(compareButton);
 				RootPanel.get("body").add(table);
 			}
 		});
@@ -322,6 +361,7 @@ public class RateMyPark implements EntryPoint {
 			}
 		});
 	}
+
 	private void loadProfilePage() {
 		final EditProfileServiceAsync profileSvc = GWT.create(EditProfileService.class);
 
@@ -462,7 +502,7 @@ public class RateMyPark implements EntryPoint {
 					LoginDialog.this.hide();
 				}
 			});
-
+			
 			setWidget(dialogVPanel);
 		}
 	}
@@ -538,6 +578,79 @@ public class RateMyPark implements EntryPoint {
 			});
 			setWidget(dialogVPanel);
 
+		}
+	}
+
+	private static class CompareDialog extends DecoratedPopupPanel {
+
+		public CompareDialog(List<Park> parks) {
+			setAnimationEnabled(true);
+			VerticalPanel dialogVPanel = new VerticalPanel();
+
+			FlexTable table = new FlexTable();
+
+			table.setBorderWidth(12);
+			table.setText(0, 0, "");
+			table.setText(0, 1, "Park ID");
+			table.setText(0, 2, "Park Name");
+			table.setText(0, 3, "Official");
+			table.setText(0, 4, "Street Number");
+			table.setText(0, 5, "Street Name");
+			table.setText(0, 6, "East-West Street Name");
+			table.setText(0, 7, "North-South Street Name");
+			table.setText(0, 8, "Coordinates");
+			table.setText(0, 9, "Size in Hectares");
+			table.setText(0, 10, "Neighbourhood Name");
+			table.setText(0, 11, "Neighbourhood URL");
+			int index = 1;
+			for (Park p : parks) {
+				table.insertRow(index);
+				table.setText(index, 1, String.valueOf(p.getPid()));
+				table.setText(index, 2, p.getPname());
+				table.setText(index, 3, isOfficialString(p));
+				table.setText(index, 4, String.valueOf(p.getStreetNumber()));
+				table.setText(index, 5, p.getStreetName());
+				table.setText(index, 6, p.getEwStreet());
+				table.setText(index, 7, p.getNsStreet());
+				table.setText(index, 8, getCoordinateString(p));
+				table.setText(index, 9, String.valueOf(p.getHectare()));
+				table.setText(index, 10, p.getNeighbourhoodName());
+				table.setText(index, 11, p.getNeighbourhoodURL());
+				index++;
+				// System.out.println("Adding index" + index);
+			}
+
+			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_LEFT);
+			dialogVPanel.add(table);
+
+			// Close button setup
+			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
+			final Button closeButton = new Button("Close");
+			closeButton.getElement().setId("closeButton");
+			dialogVPanel.add(closeButton);
+
+			closeButton.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					CompareDialog.this.hide();
+				}
+			});
+			setGlassEnabled(true);
+			setWidget(dialogVPanel);
+			// setWidget(closeButton);
+
+		}
+
+		private String isOfficialString(Park p) {
+			if (p.isOfficial())
+				return "Yes";
+			else
+				return "No";
+		}
+
+		private String getCoordinateString(Park p) {
+			double latitude = p.getLatitude();
+			double longitude = p.getLongitude();
+			return String.valueOf(latitude) + ", " + String.valueOf(longitude);
 		}
 	}
 
