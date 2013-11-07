@@ -45,6 +45,18 @@ h1 {
 }
 
 #username {
+<<<<<<< HEAD
 	font-size: 16px;
 	padding: 3px 10px 10px 3px;
 }
+=======
+  font-size: 16px;
+  padding: 3px 10px 10px 3px;
+}
+
+.tableheader {
+	font-weight: bold;
+}
+}
+.
+>>>>>>> branch 'master' of git@github.com:UBCCPSC310/TornadoSharpShooters.git

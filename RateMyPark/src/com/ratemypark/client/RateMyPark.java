@@ -430,6 +430,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				HTMLPanel header = new HTMLPanel("<div class='contentHeader'>" + "Profile Page for "
 						+ profile.getUsername() + "</div>");
 				RootPanel.get("body").add(header);
+				
 
 				VerticalPanel vPanel = new VerticalPanel();
 
