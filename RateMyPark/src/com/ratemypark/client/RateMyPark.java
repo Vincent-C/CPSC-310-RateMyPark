@@ -264,6 +264,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				table.setText(0, 3, "Address");
 				table.setText(0, 4, "Neighbourhood Name");
 				table.setText(0, 5, "Neighbourhood URL");
+				table.getRowFormatter().setStyleName(0, "tableheader");
 				int index = 1;
 				for (Park p : parkList) {
 					final CheckBox cb = new CheckBox("");
@@ -337,6 +338,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					table.setText(0, 9, "Size in Hectares");
 					table.setText(0, 10, "Neighbourhood Name");
 					table.setText(0, 11, "Neighbourhood URL");
+					table.getRowFormatter().setStyleName(0, "tableheader");
 					table.insertRow(1);
 					Park p = null;
 					for(Park park : parkList) {
@@ -428,6 +430,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				HTMLPanel header = new HTMLPanel("<div class='contentHeader'>" + "Profile Page for "
 						+ profile.getUsername() + "</div>");
 				RootPanel.get("body").add(header);
+				
 
 				VerticalPanel vPanel = new VerticalPanel();
 
@@ -667,6 +670,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			table.setText(0, 9, "Size in Hectares");
 			table.setText(0, 10, "Neighbourhood Name");
 			table.setText(0, 11, "Neighbourhood URL");
+			table.getRowFormatter().setStyleName(0, "tableheader");
 			int index = 1;
 			for (Park p : parks) {
 				table.insertRow(index);
