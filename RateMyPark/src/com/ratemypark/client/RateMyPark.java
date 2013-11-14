@@ -41,6 +41,12 @@ import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
+
+import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.maps.client.LoadApi;
+import com.google.gwt.maps.client.LoadApi.LoadLibrary;
+
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -67,12 +73,13 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		loadHeader();
 		// Load the body
 		// loadParksBody();
-		
-		// Add history listener
-	    History.addValueChangeHandler(this);
+		// loadMapApi(); // called in loadSpecificParkTable() instead
 
-	    // Now that we've setup our listener, fire the initial history state.
-	    History.fireCurrentHistoryState();
+		// Add history listener
+		History.addValueChangeHandler(this);
+
+		// Now that we've setup our listener, fire the initial history state.
+		History.fireCurrentHistoryState();
 		// loadParkTestMethods(); // used to test that the datastore contains the correct info
 	}
 
@@ -369,7 +376,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			}
 		});
 	}
-	
+
 	private void loadParksIntoDatastore(Boolean loadDB) {
 		// Boolean HACK: true if you want to (re)load the database from the XML, else keep at false
 		if (loadDB) {
@@ -430,7 +437,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				HTMLPanel header = new HTMLPanel("<div class='contentHeader'>" + "Profile Page for "
 						+ profile.getUsername() + "</div>");
 				RootPanel.get("body").add(header);
-				
+
 
 				VerticalPanel vPanel = new VerticalPanel();
 
@@ -500,10 +507,10 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		if (error instanceof DatabaseException) {
 		}
 	}
-	
+
 	public void onValueChange(ValueChangeEvent<String> event) {
-	    // This method is called whenever the application's history changes. Set
-	    // the label to reflect the current history token.
+		// This method is called whenever the application's history changes. Set
+		// the label to reflect the current history token.
 		if (!event.getValue().isEmpty()) {
 			RootPanel.get("body").clear();
 			if (event.getValue().equals("profile")) {
@@ -513,10 +520,82 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			else  {
 				//RootPanel.get("body").clear();
 				loadSpecificParkTable(event.getValue());
+				loadMapApi(event.getValue());
 			}
 		}
 		else loadParksBody();
-	  }
+	}
+
+	private void loadMapApi(final String parkID) {
+
+		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
+			public void onFailure(Throwable caught) {
+				System.out.println("Park did not get properly");
+			}
+
+			public void onSuccess(List<Park> parkList) {
+
+				if (parkID != "" && parkID != null) {
+					Park p = null;
+					for(Park park : parkList) {
+						if (park.getPid() == Long.parseLong(parkID))
+							p = park;
+
+					}
+					if (p != null) {
+						
+						boolean sensor = true;
+						
+						//Testing:
+						System.out.println(p.getPname());
+						final Double latitude = p.getLatitude();
+						System.out.println(latitude);
+						final Double longitude = p.getLongitude();
+
+						// load all the libs for use in the maps
+						ArrayList<LoadLibrary> loadLibraries = new ArrayList<LoadApi.LoadLibrary>();
+						loadLibraries.add(LoadLibrary.ADSENSE);
+						loadLibraries.add(LoadLibrary.DRAWING);
+						loadLibraries.add(LoadLibrary.GEOMETRY);
+						loadLibraries.add(LoadLibrary.PANORAMIO);
+						loadLibraries.add(LoadLibrary.PLACES);
+						loadLibraries.add(LoadLibrary.WEATHER);
+						loadLibraries.add(LoadLibrary.VISUALIZATION);
+
+						Runnable onLoad = new Runnable() {
+							@Override
+							public void run() {
+								drawMap(latitude, longitude);
+							}
+						};
+						
+						LoadApi.go(onLoad, loadLibraries, sensor);
+						// ignore this; map added to body with addMapWidget() instead
+						//RootPanel.get("body").add(table);
+					}
+
+
+
+					else System.out.println("Park is null");
+				}
+				else System.out.println("ParkID is empty");
+			}
+		});
+	}
+
+
+	private void drawMap(Double latitude, Double longitude) {
+		drawStreetViewSideBySide(latitude, longitude);
+	}
+
+	private void addMapWidget(Widget widget) {
+		RootPanel.get("body").add(widget);
+	}
+
+	private void drawStreetViewSideBySide(Double latitude, Double longitude) {
+		StreetViewSideBySideMapWidget wMap = new StreetViewSideBySideMapWidget(latitude, longitude);
+		addMapWidget(wMap);
+	}
 
 	private static class LoginDialog extends DialogBox {
 		AsyncCallback<LoginInfo> loginCallback;
@@ -571,7 +650,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					LoginDialog.this.hide();
 				}
 			});
-			
+
 			setWidget(dialogVPanel);
 		}
 	}
