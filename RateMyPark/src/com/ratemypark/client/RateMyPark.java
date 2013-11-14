@@ -354,8 +354,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 					}
 					if (p != null) {
-						//System.out.println(p.getPid());
-						//System.out.println(p.getPname());
+						// Create table of data related to this specific park
 						table.setText(1, 1, String.valueOf(p.getPid()));
 						table.setText(1, 2, p.getPname());
 						table.setText(1, 3, isOfficialString(p));
@@ -369,6 +368,32 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						table.setText(1, 11, p.getNeighbourhoodURL());
 
 						RootPanel.get("body").add(table);
+						
+						// Add map widget
+						boolean sensor = true;
+						
+						final Double latitude = p.getLatitude();
+						final Double longitude = p.getLongitude();
+
+						// load all the libs for use in the maps
+						ArrayList<LoadLibrary> loadLibraries = new ArrayList<LoadApi.LoadLibrary>();
+						loadLibraries.add(LoadLibrary.ADSENSE);
+						loadLibraries.add(LoadLibrary.DRAWING);
+						loadLibraries.add(LoadLibrary.GEOMETRY);
+						loadLibraries.add(LoadLibrary.PANORAMIO);
+						loadLibraries.add(LoadLibrary.PLACES);
+						loadLibraries.add(LoadLibrary.WEATHER);
+						loadLibraries.add(LoadLibrary.VISUALIZATION);
+
+						Runnable onLoad = new Runnable() {
+							@Override
+							public void run() {
+								drawMap(latitude, longitude);
+							}
+						};
+						
+						LoadApi.go(onLoad, loadLibraries, sensor);
+						
 					}
 					else System.out.println("Park is null");
 				}
@@ -520,69 +545,10 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			else  {
 				//RootPanel.get("body").clear();
 				loadSpecificParkTable(event.getValue());
-				loadMapApi(event.getValue());
 			}
 		}
 		else loadParksBody();
 	}
-
-	private void loadMapApi(final String parkID) {
-
-		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
-			public void onFailure(Throwable caught) {
-				System.out.println("Park did not get properly");
-			}
-
-			public void onSuccess(List<Park> parkList) {
-
-				if (parkID != "" && parkID != null) {
-					Park p = null;
-					for(Park park : parkList) {
-						if (park.getPid() == Long.parseLong(parkID))
-							p = park;
-
-					}
-					if (p != null) {
-						
-						boolean sensor = true;
-						
-						//Testing:
-						System.out.println(p.getPname());
-						final Double latitude = p.getLatitude();
-						System.out.println(latitude);
-						final Double longitude = p.getLongitude();
-
-						// load all the libs for use in the maps
-						ArrayList<LoadLibrary> loadLibraries = new ArrayList<LoadApi.LoadLibrary>();
-						loadLibraries.add(LoadLibrary.ADSENSE);
-						loadLibraries.add(LoadLibrary.DRAWING);
-						loadLibraries.add(LoadLibrary.GEOMETRY);
-						loadLibraries.add(LoadLibrary.PANORAMIO);
-						loadLibraries.add(LoadLibrary.PLACES);
-						loadLibraries.add(LoadLibrary.WEATHER);
-						loadLibraries.add(LoadLibrary.VISUALIZATION);
-
-						Runnable onLoad = new Runnable() {
-							@Override
-							public void run() {
-								drawMap(latitude, longitude);
-							}
-						};
-						
-						LoadApi.go(onLoad, loadLibraries, sensor);
-						// ignore this; map added to body with addMapWidget() instead
-						//RootPanel.get("body").add(table);
-					}
-
-
-
-					else System.out.println("Park is null");
-				}
-				else System.out.println("ParkID is empty");
-			}
-		});
-	}
-
 
 	private void drawMap(Double latitude, Double longitude) {
 		drawStreetViewSideBySide(latitude, longitude);
