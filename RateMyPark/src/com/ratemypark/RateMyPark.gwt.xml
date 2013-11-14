@@ -18,7 +18,7 @@
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
 
   <!-- Other module inherits                                      -->
-  <inherits name='com.google.gwt.maps.Maps' />
+  <inherits name='com.google.gwt.maps.Maps'/>
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='com.ratemypark.client.RateMyPark'/>

@@ -15,5 +15,9 @@
 	<classpathentry kind="lib" path="lib/gwt-test-utils-0.45.jar"/>
 	<classpathentry kind="lib" path="lib/javassist-3.12.0.GA.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.5.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-ajaxloader-javadoc.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-ajaxloader.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-maps-api-3.10.0-alpha-6-javadoc.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-maps-api-3.10.0-alpha-6.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
