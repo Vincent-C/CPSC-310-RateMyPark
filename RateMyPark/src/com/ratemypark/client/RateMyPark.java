@@ -42,11 +42,9 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.maps.client.LoadApi;
 import com.google.gwt.maps.client.LoadApi.LoadLibrary;
-
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -221,6 +219,43 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		loadParksTextandButton();
 	}
 
+	public void onValueChange(ValueChangeEvent<String> event) {
+		// This method is called whenever the application's history changes. Set
+		// the label to reflect the current history token.
+		if (!event.getValue().isEmpty()) {
+			RootPanel.get("body").clear();
+			if (event.getValue().equals("profile")) {
+				// RootPanel.get("body").clear();
+				loadProfilePage();
+			} else {
+				// RootPanel.get("body").clear();
+				loadSpecifcParkPage(event.getValue());
+			}
+		} else
+			loadParksBody();
+	}
+
+	private void loadSpecifcParkPage(final String parkID) {
+
+		loadParksSvc.getPark(Long.parseLong(parkID), new AsyncCallback<Park>() {
+			public void onFailure(Throwable caught) {
+				System.out.println("Park did not get properly");
+			}
+
+			public void onSuccess(Park park) {
+				if (park != null) {
+					// Create table of data related to this specific park
+					loadSpecificParkTable(park);
+					loadMapApi(park);
+				} else {
+					System.out.println("Park is null");
+				}
+			}
+		});
+
+	}
+
+
 	private void loadParksTextandButton() {
 		final Button loadParksButton = new Button("Load Parks with PID:");
 		final TextBox loadParksTextBox = new TextBox();
@@ -323,83 +358,73 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		});
 	}
 
-	private void loadSpecificParkTable(final String parkID) {
+	private void loadSpecificParkTable(Park park) {
 		final FlexTable table = new FlexTable();
-		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
-			public void onFailure(Throwable caught) {
-				System.out.println("Park did not get properly");
-			}
+		table.setBorderWidth(12);
+		table.setText(0, 0, "");
+		table.setText(0, 1, "Park ID");
+		table.setText(0, 2, "Park Name");
+		table.setText(0, 3, "Official");
+		table.setText(0, 4, "Street Number");
+		table.setText(0, 5, "Street Name");
+		table.setText(0, 6, "East-West Street Name");
+		table.setText(0, 7, "North-South Street Name");
+		table.setText(0, 8, "Coordinates");
+		table.setText(0, 9, "Size in Hectares");
+		table.setText(0, 10, "Neighbourhood Name");
+		table.setText(0, 11, "Neighbourhood URL");
+		table.getRowFormatter().setStyleName(0, "tableheader");
+		table.insertRow(1);
+		// Create table of data related to this specific park
+		table.setText(1, 1, String.valueOf(park.getPid()));
+		table.setText(1, 2, park.getPname());
+		table.setText(1, 3, isOfficialString(park));
+		table.setText(1, 4, String.valueOf(park.getStreetNumber()));
+		table.setText(1, 5, park.getStreetName());
+		table.setText(1, 6, park.getEwStreet());
+		table.setText(1, 7, park.getNsStreet());
+		table.setText(1, 8, getCoordinateString(park));
+		table.setText(1, 9, String.valueOf(park.getHectare()));
+		table.setText(1, 10, park.getNeighbourhoodName());
+		table.setText(1, 11, park.getNeighbourhoodURL());
 
-			public void onSuccess(List<Park> parkList) {
-				if (parkID != "" && parkID != null) {
-					table.setBorderWidth(12);
-					table.setText(0, 0, "");
-					table.setText(0, 1, "Park ID");
-					table.setText(0, 2, "Park Name");
-					table.setText(0, 3, "Official");
-					table.setText(0, 4, "Street Number");
-					table.setText(0, 5, "Street Name");
-					table.setText(0, 6, "East-West Street Name");
-					table.setText(0, 7, "North-South Street Name");
-					table.setText(0, 8, "Coordinates");
-					table.setText(0, 9, "Size in Hectares");
-					table.setText(0, 10, "Neighbourhood Name");
-					table.setText(0, 11, "Neighbourhood URL");
-					table.getRowFormatter().setStyleName(0, "tableheader");
-					table.insertRow(1);
-					Park p = null;
-					for(Park park : parkList) {
-						if (park.getPid() == Long.parseLong(parkID))
-							p = park;
+		RootPanel.get("body").add(table);
+	}
 
-					}
-					if (p != null) {
-						// Create table of data related to this specific park
-						table.setText(1, 1, String.valueOf(p.getPid()));
-						table.setText(1, 2, p.getPname());
-						table.setText(1, 3, isOfficialString(p));
-						table.setText(1, 4, String.valueOf(p.getStreetNumber()));
-						table.setText(1, 5, p.getStreetName());
-						table.setText(1, 6, p.getEwStreet());
-						table.setText(1, 7, p.getNsStreet());
-						table.setText(1, 8, getCoordinateString(p));
-						table.setText(1, 9, String.valueOf(p.getHectare()));
-						table.setText(1, 10, p.getNeighbourhoodName());
-						table.setText(1, 11, p.getNeighbourhoodURL());
+	private void loadMapApi(Park park) {
+		if (park != null) {
+			boolean sensor = true;
 
-						RootPanel.get("body").add(table);
-						
-						// Add map widget
-						boolean sensor = true;
-						
-						final Double latitude = p.getLatitude();
-						final Double longitude = p.getLongitude();
+			// Testing:
+			System.out.println(park.getPname());
+			final Double latitude = park.getLatitude();
+			System.out.println(latitude);
+			final Double longitude = park.getLongitude();
 
-						// load all the libs for use in the maps
-						ArrayList<LoadLibrary> loadLibraries = new ArrayList<LoadApi.LoadLibrary>();
-						loadLibraries.add(LoadLibrary.ADSENSE);
-						loadLibraries.add(LoadLibrary.DRAWING);
-						loadLibraries.add(LoadLibrary.GEOMETRY);
-						loadLibraries.add(LoadLibrary.PANORAMIO);
-						loadLibraries.add(LoadLibrary.PLACES);
-						loadLibraries.add(LoadLibrary.WEATHER);
-						loadLibraries.add(LoadLibrary.VISUALIZATION);
+			// load all the libs for use in the maps
+			ArrayList<LoadLibrary> loadLibraries = new ArrayList<LoadApi.LoadLibrary>();
+			loadLibraries.add(LoadLibrary.ADSENSE);
+			loadLibraries.add(LoadLibrary.DRAWING);
+			loadLibraries.add(LoadLibrary.GEOMETRY);
+			loadLibraries.add(LoadLibrary.PANORAMIO);
+			loadLibraries.add(LoadLibrary.PLACES);
+			loadLibraries.add(LoadLibrary.WEATHER);
+			loadLibraries.add(LoadLibrary.VISUALIZATION);
 
-						Runnable onLoad = new Runnable() {
-							@Override
-							public void run() {
-								drawMap(latitude, longitude);
-							}
-						};
-						
-						LoadApi.go(onLoad, loadLibraries, sensor);
-						
-					}
-					else System.out.println("Park is null");
+			Runnable onLoad = new Runnable() {
+				@Override
+				public void run() {
+					drawMap(latitude, longitude);
 				}
-				else System.out.println("ParkID is empty");
-			}
-		});
+			};
+
+			LoadApi.go(onLoad, loadLibraries, sensor);
+			// ignore this; map added to body with addMapWidget() instead
+			// RootPanel.get("body").add(table);
+		}
+
+		else
+			System.out.println("Park is null");
 	}
 
 	private void loadParksIntoDatastore(Boolean loadDB) {
@@ -462,7 +487,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				HTMLPanel header = new HTMLPanel("<div class='contentHeader'>" + "Profile Page for "
 						+ profile.getUsername() + "</div>");
 				RootPanel.get("body").add(header);
-
 
 				VerticalPanel vPanel = new VerticalPanel();
 
@@ -531,23 +555,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		Window.alert(error.getMessage());
 		if (error instanceof DatabaseException) {
 		}
-	}
-
-	public void onValueChange(ValueChangeEvent<String> event) {
-		// This method is called whenever the application's history changes. Set
-		// the label to reflect the current history token.
-		if (!event.getValue().isEmpty()) {
-			RootPanel.get("body").clear();
-			if (event.getValue().equals("profile")) {
-				//RootPanel.get("body").clear();
-				loadProfilePage();
-			}
-			else  {
-				//RootPanel.get("body").clear();
-				loadSpecificParkTable(event.getValue());
-			}
-		}
-		else loadParksBody();
 	}
 
 	private void drawMap(Double latitude, Double longitude) {
