@@ -229,13 +229,13 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				loadProfilePage();
 			} else {
 				// RootPanel.get("body").clear();
-				loadSpecifcParkPage(event.getValue());
+				loadSpecificParkPage(event.getValue());
 			}
 		} else
 			loadParksBody();
 	}
 
-	private void loadSpecifcParkPage(final String parkID) {
+	private void loadSpecificParkPage(final String parkID) {
 
 		loadParksSvc.getPark(Long.parseLong(parkID), new AsyncCallback<Park>() {
 			public void onFailure(Throwable caught) {
