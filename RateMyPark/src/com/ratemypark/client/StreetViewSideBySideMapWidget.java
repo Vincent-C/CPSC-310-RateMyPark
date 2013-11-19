@@ -90,7 +90,7 @@ public class StreetViewSideBySideMapWidget extends Composite {
   private void draw() {
     pWidget.clear();
 
-    pWidget.add(new HTML("<br>Street View Demo - click on the map"));
+    //pWidget.add(new HTML("<br>Street View Demo - click on the map"));
 
     hp = new HorizontalPanel();
     pWidget.add(hp);
