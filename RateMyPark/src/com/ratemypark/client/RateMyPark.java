@@ -705,7 +705,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 		public CompareDialog(List<Park> parks) {
 			setAnimationEnabled(true);
-			VerticalPanel dialogVPanel = new VerticalPanel();
+			final VerticalPanel dialogVPanel = new VerticalPanel();
 
 			FlexTable table = new FlexTable();
 
@@ -743,6 +743,42 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_LEFT);
 			dialogVPanel.add(table);
+			
+			// Directions map setup
+			for (Park p : parks) {
+				if (p != null) {
+					boolean sensor = true;
+
+					// Testing:
+					System.out.println(p.getPname());
+					final Double latitude = p.getLatitude();
+					System.out.println(latitude);
+					final Double longitude = p.getLongitude();
+
+					// load all the libs for use in the maps
+					ArrayList<LoadLibrary> loadLibraries = new ArrayList<LoadApi.LoadLibrary>();
+					loadLibraries.add(LoadLibrary.ADSENSE);
+					loadLibraries.add(LoadLibrary.DRAWING);
+					loadLibraries.add(LoadLibrary.GEOMETRY);
+					loadLibraries.add(LoadLibrary.PANORAMIO);
+					loadLibraries.add(LoadLibrary.PLACES);
+					loadLibraries.add(LoadLibrary.WEATHER);
+					loadLibraries.add(LoadLibrary.VISUALIZATION);
+
+					Runnable onLoad = new Runnable() {
+						@Override
+						public void run() {
+							DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget();
+							dialogVPanel.add(wMap);
+						}
+					};
+
+					LoadApi.go(onLoad, loadLibraries, sensor);
+				}
+
+				else
+					System.out.println("Park is null");
+			}
 
 			// Close button setup
 			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
