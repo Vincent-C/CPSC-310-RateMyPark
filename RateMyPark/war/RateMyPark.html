@@ -5,55 +5,160 @@
 <!-- with a "Quirks Mode" doctype is not supported. -->
 
 <html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
-    <!--                                                               -->
-    <!-- Consider inlining CSS to reduce the number of requested files -->
-    <!--                                                               -->
-    <link type="text/css" rel="stylesheet" href="RateMyPark.css">
+<!--                                                               -->
+<!-- Consider inlining CSS to reduce the number of requested files -->
+<!--                                                               -->
+<link type="text/css" rel="stylesheet" href="RateMyPark.css">
 
-    <!--                                           -->
-    <!-- Any title is fine                         -->
-    <!--                                           -->
-    <title>RateMyPark</title>
-    
-    <!--                                           -->
-    <!-- This script loads your compiled module.   -->
-    <!-- If you add any GWT meta tags, they must   -->
-    <!-- be added before this line.                -->
-    <!--                                           -->
-    <script type="text/javascript" language="javascript" src="ratemypark/ratemypark.nocache.js"></script>
-  </head>
+<!--                                           -->
+<!-- Any title is fine                         -->
+<!--                                           -->
+<title>RateMyPark</title>
 
-  <!--                                           -->
-  <!-- The body can have arbitrary html, or      -->
-  <!-- you can leave the body empty if you want  -->
-  <!-- to create a completely dynamic UI.        -->
-  <!--                                           -->
-  <body>
+<!--                                           -->
+<!-- This script loads your compiled module.   -->
+<!-- If you add any GWT meta tags, they must   -->
+<!-- be added before this line.                -->
+<!--                                           -->
+<script type="text/javascript" language="javascript"
+	src="ratemypark/ratemypark.nocache.js"></script>
+</head>
 
-    <!-- OPTIONAL: include this if you want history support -->
-    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
-    
-    <!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
-    <noscript>
-      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
-        Your web browser must have JavaScript enabled
-        in order for this application to display correctly.
-      </div>
-    </noscript>
-    
-    <div style="height:30px;">
-        <span class="headerRight" id="newAccountButtonContainer"></span>
-    	<span class="headerRight" id="loginButtonContainer"></span>
-    	<span class="headerRight" id="logoutButtonContainer"></span>
-    	<span class="headerRight" id="username"></span>
-    </div>
-    
-    <h1>RateMyPark</h1>
-      
-    <div id="body"></div>
-    
-  </body>
+<!--                                           -->
+<!-- The body can have arbitrary html, or      -->
+<!-- you can leave the body empty if you want  -->
+<!-- to create a completely dynamic UI.        -->
+<!--                                           -->
+<body>
+	<div id="fb-root"></div>
+	<script type="text/javascript">
+  // You probably don't want to use globals, but this is just example code
+  var fbAppId = '1454990918060855';
+  var objectToLike = 'http://techcrunch.com/2013/02/06/facebook-launches-developers-live-video-channel-to-keep-its-developer-ecosystem-up-to-date/';
+
+  // This check is just here to make sure you set your app ID. You don't
+  // need to use it in production. 
+  if (fbAppId === 'replace me') {
+    alert('Please set the fbAppId in the sample.');
+  }
+
+  /*
+   * This is boilerplate code that is used to initialize
+   * the Facebook JS SDK.  You would normally set your
+   * App ID in this code.
+   */
+
+  // Additional JS functions here
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : fbAppId, // App ID
+      status     : true,    // check login status
+      cookie     : true,    // enable cookies to allow the
+                            // server to access the session
+      xfbml      : true     // parse page for xfbml or html5
+                            // social plugins like login button below
+    });
+
+    // Put additional init code here
+  };
+
+  // Load the SDK Asynchronously
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/all.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+  /*
+   * This function makes a call to the og.likes API.  The
+   * object argument is the object you like.  Other types
+   * of APIs may take other arguments. (i.e. the book.reads
+   * API takes a book= argument.)
+   *
+   * Because it's a sample, it also sets the privacy
+   * parameter so that it will create a story that only you
+   * can see.  Remove the privacy parameter and the story
+   * will be visible to whatever the default privacy was when
+   * you added the app.
+   *
+   * Also note that you can view any story with the id, as
+   * demonstrated with the code below.
+   *
+   * APIs used in postLike():
+   * Call the Graph API from JS:
+   *   https://developers.facebook.com/docs/reference/javascript/FB.api
+   * The Open Graph og.likes API:
+   *   https://developers.facebook.com/docs/reference/opengraph/action-type/og.likes
+   * Privacy argument:
+   *   https://developers.facebook.com/docs/reference/api/privacy-parameter
+   */
+
+  function postLike() {
+  	console.log("anything");
+    FB.api(
+       'https://graph.facebook.com/me/og.likes',
+       'post',
+       { object: window.location.href,
+         privacy: {'value': 'SELF'} },
+       function(response) {
+         if (!response) {
+           alert('Error occurred.');
+         } else if (response.error) {
+           document.getElementById('result').innerHTML =
+             'Error: ' + response.error.message;
+         } else {
+           document.getElementById('result').innerHTML =
+             '<a href=\"https://www.facebook.com/me/activity/' +
+             response.id + '\">' +
+             'Story created.  ID is ' +
+             response.id + '</a>';
+         }
+       }
+    );
+  }
+</script>
+
+	<!--
+  Login Button
+
+  https://developers.facebook.com/docs/reference/plugins/login
+
+  This example needs the 'publish_actions' permission in
+  order to publish an action.  The scope parameter below
+  is what prompts the user for that permission.
+-->
+
+	<!-- OPTIONAL: include this if you want history support -->
+	<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1'
+		style="position: absolute; width: 0; height: 0; border: 0"></iframe>
+
+	<!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
+	<noscript>
+		<div
+			style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+			Your web browser must have JavaScript enabled in order for this
+			application to display correctly.</div>
+	</noscript>
+
+	<div style="height: 30px;">
+		<span class="headerRight" id="newAccountButtonContainer"></span> <span
+			class="headerRight" id="loginButtonContainer"></span> <span
+			class="headerRight" id="logoutButtonContainer"></span> <span
+			class="headerRight" id="username"></span>
+	</div>
+
+	<h1>RateMyPark</h1>
+
+	<div id="body"></div>
+	<div id="fb-footer" style="display:none"> 
+		<div class="fb-login-button" data-show-faces="true" data-width="200"
+		data-max-rows="1" data-scope="publish_actions"></div>
+		<div id="result"></div>
+	</div>
+</body>
 </html>

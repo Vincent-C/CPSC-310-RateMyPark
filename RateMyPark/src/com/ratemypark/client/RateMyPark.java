@@ -247,6 +247,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					// Create table of data related to this specific park
 					loadSpecificParkTable(park);
 					loadMapApi(park);
+					loadFacebookButtons(park);
 				} else {
 					System.out.println("Park is null");
 				}
@@ -288,6 +289,14 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				});
 			}
 		});
+	}
+	
+	private void loadFacebookButtons(Park park) {
+		RootPanel.get("fb-footer").getElement().setAttribute("style", "");
+		String pageURL = Window.Location.getHref();
+		System.out.println("Website URL: " + pageURL);
+		HTMLPanel likeButton = new HTMLPanel("<input type= 'button' value='Like this Park: " + park.getPname() + "!' onclick='postLike();'>");
+		RootPanel.get("fb-footer").add(likeButton);
 	}
 
 	private void loadParksTable() {
