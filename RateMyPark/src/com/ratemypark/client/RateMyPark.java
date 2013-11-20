@@ -476,7 +476,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		});
 		
 		// If user is logged in, allow the user to write a review
-		// If the user logs in while in a park page, they will have to refresh before they can see this...
 		newReviewsPanel.getElement().setId("newReviewsPanel");
 		if (loginInfo != null) {
 			newReviewsPanel.add(new HTML("<b>Write a new review:</b>"));

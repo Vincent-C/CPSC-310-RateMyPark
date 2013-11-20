@@ -39,14 +39,12 @@ public class ReviewServiceImpl extends RemoteServiceServlet implements ReviewSer
 		PersistenceManager pm = getPersistenceManager();
 		List<Review> reviews = new ArrayList<Review>();
 		try {
-			Query q = pm.newQuery(Review.class);
-			List<Review> result = (List<Review>) q.execute();
-			// Loop hack due to com.google.appengine.datanucleus.query.StreamingQueryResult serialization errors
+			Query q = pm.newQuery(Review.class, "pid == parkID");
+			q.declareParameters("Long parkID");
+			List<Review> result = (List<Review>) q.execute(pid);
 			for (Review r : result) {
-				if (r.getPid().equals(pid)) {
-					Review hackedReview = pm.detachCopy(r);
-					reviews.add(hackedReview); // Client.rpc being even more stupid with dates..
-				}
+				Review hackedReview = pm.detachCopy(r); // Prevents 'com.google.appengine.datanucleus.query.StreamingQueryResult' errors
+				reviews.add(hackedReview);
 			}
 		} finally {
 			pm.close();
