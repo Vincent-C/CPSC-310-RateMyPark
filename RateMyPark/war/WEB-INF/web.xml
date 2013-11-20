@@ -56,6 +56,16 @@
     <url-pattern>/ratemypark/edit-profile</url-pattern>
   </servlet-mapping>
   
+  <servlet>
+    <servlet-name>reviewServiceImpl</servlet-name>
+    <servlet-class>com.ratemypark.server.ReviewServiceImpl</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>reviewServiceImpl</servlet-name>
+    <url-pattern>/ratemypark/review</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>RateMyPark.html</welcome-file>

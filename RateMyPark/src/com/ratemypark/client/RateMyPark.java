@@ -39,6 +39,7 @@ import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -61,6 +62,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	private final LogoutServiceAsync logoutSvc = GWT.create(LogoutService.class);
 
 	private final LoadParksServiceAsync loadParksSvc = GWT.create(LoadParksService.class);
+	
+	private LoginInfo loginInfo = null;
 
 	/**
 	 * This is the entry point method.
@@ -115,6 +118,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				final long DURATION = 1000 * 60 * 60 * 24 * 14;
 				Date expires = new Date(System.currentTimeMillis() + DURATION);
 				Cookies.setCookie("sid", result.getSessionID(), expires, null, "/", false);
+				loginInfo = result;
 
 				String username = result.getUsername();
 
@@ -132,8 +136,13 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				RootPanel.get("username").add(profileLink);
 
 				System.out.println("Client side cookie login: " + Cookies.getCookie("sid"));
-
 				toggleLoginButtons();
+				
+				// Reload page if user was on a park page
+				if (!History.getToken().isEmpty() && !History.getToken().equals("profile")) {
+					RootPanel.get("body").clear();
+					loadSpecificParkPage(History.getToken());
+				}
 			}
 
 			private void toggleLoginButtons() {
@@ -183,13 +192,15 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					}
 
 					public void onSuccess(Void ignore) {
+						loginInfo = null;
 						Cookies.removeCookie("sid");
 						Window.alert("Logged out");
 						// System.out.println("Client side cookie logout: " + Cookies.getCookie("sid"));
 						// Clear username text
 						RootPanel.get("username").getElement().setInnerText("");
 						toggleLoginButtons();
-						loadParksBody();
+						
+						History.newItem("");
 					}
 
 					private void toggleLoginButtons() {
@@ -248,6 +259,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					loadSpecificParkTable(park);
 					loadMapApi(park);
 					loadFacebookButtons(park);
+					loadParkReviews(park);
 				} else {
 					System.out.println("Park is null");
 				}
@@ -434,6 +446,69 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 		else
 			System.out.println("Park is null");
+	}
+	
+	private void loadParkReviews(Park park) {
+		final ReviewServiceAsync reviewSvc = GWT.create(ReviewService.class);
+		final Long pid = park.getPid();
+		
+		HTMLPanel header = new HTMLPanel("<div class='contentHeader'>" + "Reviews for "
+				+ park.getPname() + "</div>");
+		RootPanel.get("body").add(header);
+
+		final VerticalPanel reviewsPanel = new VerticalPanel();
+		reviewsPanel.setStyleName("reviewsPanel");
+		final VerticalPanel newReviewsPanel = new VerticalPanel();
+		newReviewsPanel.setStyleName("reviewsPanel");
+		RootPanel.get("body").add(reviewsPanel);
+		RootPanel.get("body").add(newReviewsPanel);
+		
+		reviewSvc.getReviews(pid, new AsyncCallback<List<Review>>() {
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to get reviews");
+			}
+			public void onSuccess(List<Review> result) {
+				for (Review r : result) {
+					reviewsPanel.add(new HTML("<b>" + "Review by: " + r.getUsername() + "</b> " + r.getDateCreated().toString()));
+					reviewsPanel.add(new HTML(r.getReviewText()));
+				}
+			}
+		});
+		
+		// If user is logged in, allow the user to write a review
+		// If the user logs in while in a park page, they will have to refresh before they can see this...
+		newReviewsPanel.getElement().setId("newReviewsPanel");
+		if (loginInfo != null) {
+			newReviewsPanel.add(new HTML("<b>Write a new review:</b>"));
+			
+		    final TextArea reviewTextArea = new TextArea();
+		    reviewTextArea.setCharacterWidth(100);
+		    reviewTextArea.setVisibleLines(5);
+		    newReviewsPanel.add(reviewTextArea);
+		    
+		    final Button submitReview = new Button("Submit Review");
+		    submitReview.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+			    	String reviewText = reviewTextArea.getText();
+			    	if (reviewText.length() > 500) {
+			    		Window.alert("Your review is too long.");
+			    	} else {
+				    	// Only logged in users be able to see this, so loginInfo should not be null
+						reviewSvc.newReview(loginInfo.getUsername(), pid, reviewText, new AsyncCallback<Review>() {
+							public void onFailure(Throwable caught) {
+								Window.alert("Could not create your review!");
+							}
+							
+							public void onSuccess(Review newReview) {
+								reviewsPanel.add(new HTML("<b>" + "Review by: " + newReview.getUsername() + "</b> " + newReview.getDateCreated().toString()));
+								reviewsPanel.add(new HTML(newReview.getReviewText()));
+							}
+						});
+			    	}
+				}
+		    });
+		    newReviewsPanel.add(submitReview);
+		}
 	}
 
 	private void loadParksIntoDatastore(Boolean loadDB) {

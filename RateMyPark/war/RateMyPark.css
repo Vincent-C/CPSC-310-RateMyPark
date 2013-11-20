@@ -32,7 +32,7 @@ h1 {
 }
 
 .contentHeader {
-  font-size: 22px;
+  font-size: 20px;
   padding-bottom: 10px;
 }
 
@@ -40,6 +40,9 @@ h1 {
 	font-weight: bold;
 }
 
+.reviewsPanel {
+	padding: 0 30px 30px 20px;
+}
 
 /** Set ids using widget.getElement().setId("idOfElement") */
 #closeButton {
