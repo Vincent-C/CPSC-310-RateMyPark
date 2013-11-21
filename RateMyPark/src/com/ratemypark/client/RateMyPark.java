@@ -227,8 +227,10 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	// This method is used to clear the body only once, then add the 'body' after, using the methods
 	private void loadParksBody() {
 		RootPanel.get("body").clear();
+		loadDirectionsButton();
 		loadParksTable();
 		loadParksTextandButton();
+		
 	}
 
 	public void onValueChange(ValueChangeEvent<String> event) {
@@ -243,8 +245,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				// RootPanel.get("body").clear();
 				loadSpecificParkPage(event.getValue());
 			}
-		} else
+		} else {
 			loadParksBody();
+		}
 	}
 
 	private void loadSpecificParkPage(final String parkID) {
@@ -304,6 +307,52 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		});
 	}
 
+	private void loadDirectionsButton() {
+		final Button loadDirectionsButton = new Button("Map directions");
+		final TextBox loadLatitudeTextBox = new TextBox();
+		final TextBox loadLongitudeTextBox = new TextBox();
+		final TextBox loadParkTextBox = new TextBox();
+		HTML explanation = new HTML();
+
+		// We can add style names to widgets
+		loadDirectionsButton.addStyleName("loadDirectionButton");
+		loadLatitudeTextBox.setWidth("55px");
+		loadLongitudeTextBox.setWidth("55px");
+		loadParkTextBox.setWidth("50px");
+		loadLatitudeTextBox.setText("Latitude");
+		loadLongitudeTextBox.setText("Longitude");
+		loadParkTextBox.setText("Park ID");
+		RootPanel.get("body").add(loadLatitudeTextBox);
+		RootPanel.get("body").add(loadLongitudeTextBox);
+		RootPanel.get("body").add(loadParkTextBox);
+		RootPanel.get("body").add(loadDirectionsButton);
+
+		loadDirectionsButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				// Assume input is valid
+				String s1 = loadLatitudeTextBox.getText();
+				String s2 = loadLongitudeTextBox.getText();
+				String s3 = loadParkTextBox.getText();
+				Double latitude = Double.valueOf(s1);
+				Double longitude = Double.valueOf(s2);
+				Long parkID = Long.valueOf(s3);
+
+				loadParksSvc.getPark(parkID, new AsyncCallback<Park>() {
+					public void onFailure(Throwable caught) {
+						System.out.println("Error occured: " + caught.getMessage());
+						handleError(caught);
+					}
+
+					public void onSuccess(Park result) {
+						DirectionsDialog dd = new DirectionsDialog(result);
+						dd.showRelativeTo(loadDirectionsButton);
+						
+					}
+				});
+			}
+		});
+	}
+	
 	private void loadFacebookButtons(Park park) {
 		RootPanel.get("fb-footer").getElement().setAttribute("style", "");
 		String pageURL = Window.Location.getHref();
@@ -450,6 +499,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			System.out.println("Park is null");
 	}
 
+	
 	private void loadParkReviews(Park park) {
 		final ReviewServiceAsync reviewSvc = GWT.create(ReviewService.class);
 		final Long pid = park.getPid();
@@ -1034,6 +1084,59 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			double latitude = p.getLatitude();
 			double longitude = p.getLongitude();
 			return String.valueOf(latitude) + ", " + String.valueOf(longitude);
+		}
+	}
+	
+	private static class DirectionsDialog extends DecoratedPopupPanel {
+		public DirectionsDialog(Park park) {
+			
+			setAnimationEnabled(true);
+			final VerticalPanel dialogVPanel = new VerticalPanel();
+			
+			if (park != null) {
+				boolean sensor = true;
+
+				final Double latitude = park.getLatitude();
+				final Double longitude = park.getLongitude();
+
+				// load all the libs for use in the maps
+				ArrayList<LoadLibrary> loadLibraries = new ArrayList<LoadApi.LoadLibrary>();
+				loadLibraries.add(LoadLibrary.ADSENSE);
+				loadLibraries.add(LoadLibrary.DRAWING);
+				loadLibraries.add(LoadLibrary.GEOMETRY);
+				loadLibraries.add(LoadLibrary.PANORAMIO);
+				loadLibraries.add(LoadLibrary.PLACES);
+				loadLibraries.add(LoadLibrary.WEATHER);
+				loadLibraries.add(LoadLibrary.VISUALIZATION);
+
+				Runnable onLoad = new Runnable() {
+					@Override
+					public void run() {
+						DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget();
+						dialogVPanel.add(wMap);
+					}
+				};
+
+				LoadApi.go(onLoad, loadLibraries, sensor);
+				// ignore this; map added to body with addMapWidget() instead
+				// RootPanel.get("body").add(table);
+			}
+
+			else
+				System.out.println("Park is null");
+		
+		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
+		final Button closeButton = new Button("Close");
+		closeButton.getElement().setId("closeButton");
+		dialogVPanel.add(closeButton);
+
+		closeButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				DirectionsDialog.this.hide();
+			}
+		});
+		setGlassEnabled(true);
+		setWidget(dialogVPanel);
 		}
 	}
 
