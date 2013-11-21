@@ -6,17 +6,17 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ratemypark.client.Ratings;
+import com.ratemypark.client.Rating;
 
 public class RatingsTest {
 
-	Ratings ratings;
+	Rating ratings;
 
 	@Before
 	public void setup(){
 		Long pid = new Long(1);
 		String accname = "account1";
-		ratings = new Ratings(pid,accname);
+		ratings = new Rating(pid,accname);
 		
 	}
 	
