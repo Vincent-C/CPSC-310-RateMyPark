@@ -309,32 +309,36 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 	private void loadDirectionsButton() {
 		final Button loadDirectionsButton = new Button("Map directions");
-		final TextBox loadLatitudeTextBox = new TextBox();
-		final TextBox loadLongitudeTextBox = new TextBox();
+		//final TextBox loadLatitudeTextBox = new TextBox();
+		//final TextBox loadLongitudeTextBox = new TextBox();
+		final TextBox loadLocationBox = new TextBox();
 		final TextBox loadParkTextBox = new TextBox();
-		HTML explanation = new HTML();
 
 		// We can add style names to widgets
 		loadDirectionsButton.addStyleName("loadDirectionButton");
-		loadLatitudeTextBox.setWidth("55px");
-		loadLongitudeTextBox.setWidth("55px");
+		//loadLatitudeTextBox.setWidth("55px");
+		//loadLongitudeTextBox.setWidth("55px");
+		loadLocationBox.setWidth("110px");
 		loadParkTextBox.setWidth("50px");
-		loadLatitudeTextBox.setText("Latitude");
-		loadLongitudeTextBox.setText("Longitude");
+		//loadLatitudeTextBox.setText("Latitude");
+		//loadLongitudeTextBox.setText("Longitude");
+		loadLocationBox.setText("Insert your address here");
 		loadParkTextBox.setText("Park ID");
-		RootPanel.get("body").add(loadLatitudeTextBox);
-		RootPanel.get("body").add(loadLongitudeTextBox);
+		//RootPanel.get("body").add(loadLatitudeTextBox);
+		//RootPanel.get("body").add(loadLongitudeTextBox);
+		RootPanel.get("body").add(loadLocationBox);
 		RootPanel.get("body").add(loadParkTextBox);
 		RootPanel.get("body").add(loadDirectionsButton);
 
 		loadDirectionsButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				// Assume input is valid
-				String s1 = loadLatitudeTextBox.getText();
-				String s2 = loadLongitudeTextBox.getText();
+				//String s1 = loadLatitudeTextBox.getText();
+				//String s2 = loadLongitudeTextBox.getText();
+				final String location = loadLocationBox.getText();
 				String s3 = loadParkTextBox.getText();
-				final Double latitude = Double.valueOf(s1);
-				final Double longitude = Double.valueOf(s2);
+				//final Double latitude = Double.valueOf(s1);
+				//final Double longitude = Double.valueOf(s2);
 				Long parkID = Long.valueOf(s3);
 
 				loadParksSvc.getPark(parkID, new AsyncCallback<Park>() {
@@ -344,7 +348,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					}
 
 					public void onSuccess(Park result) {
-						DirectionsDialog dd = new DirectionsDialog(latitude, longitude, result);
+						DirectionsDialog dd = new DirectionsDialog(location, result);
 						dd.showRelativeTo(loadDirectionsButton);
 						
 					}
@@ -1045,7 +1049,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						@Override
 						public void run() {
 							// Temporary replacement
-							DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget(1.1, 2.2, 3.3, 4.4, null);
+							DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget("", 3.3, 4.4, null);
 							dialogVPanel.add(wMap);
 						}
 					};
@@ -1089,7 +1093,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	}
 	
 	private static class DirectionsDialog extends DecoratedPopupPanel {
-		public DirectionsDialog(final Double originLat, final Double originLong, Park park) {
+		public DirectionsDialog(final String location, Park park) {
 			
 			setAnimationEnabled(true);
 			final VerticalPanel dialogVPanel = new VerticalPanel();
@@ -1113,7 +1117,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				Runnable onLoad = new Runnable() {
 					@Override
 					public void run() {
-						DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget(originLat, originLong, latitude, longitude, null);
+						DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget(location, latitude, longitude, null);
 						dialogVPanel.add(wMap);
 					}
 				};

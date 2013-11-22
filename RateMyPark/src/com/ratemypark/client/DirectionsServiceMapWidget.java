@@ -70,14 +70,14 @@ public class DirectionsServiceMapWidget extends Composite {
   private MapWidget mapWidget;
   private HTML htmlDistanceMatrixService = new HTML("&nbsp;");
 
-  public DirectionsServiceMapWidget(Double originLat, Double originLong, Double destinationLat, Double destinationLong, List<Park> parks) {
+  public DirectionsServiceMapWidget(String location, Double destinationLat, Double destinationLong, List<Park> parks) {
     pWidget = new VerticalPanel();
     initWidget(pWidget);
 
-    draw(originLat, originLong, destinationLat, destinationLong, parks);
+    draw(location, destinationLat, destinationLong, parks);
   }
 
-  private void draw(Double originLat, Double originLong, Double destinationLat, Double destinationLong, List<Park> parks) {
+  private void draw(String location, Double destinationLat, Double destinationLong, List<Park> parks) {
     pWidget.clear();
     pWidget.add(new HTML("<br/>"));
 
@@ -86,12 +86,12 @@ public class DirectionsServiceMapWidget extends Composite {
     hp.add(new HTML("Directions Service&nbsp;&nbsp;&nbsp;&nbsp;"));
     hp.add(htmlDistanceMatrixService);
 
-    drawMap();
-    drawDirectionsWithMidPoint(originLat, originLong, destinationLat, destinationLong, parks);
+    drawMap(destinationLat, destinationLong);
+    drawDirectionsWithMidPoint(location, destinationLat, destinationLong, parks);
   }
 
-  private void drawMap() {
-    LatLng center = LatLng.newInstance(49.249783, -123.15525);
+  private void drawMap(Double latitude, Double longitude) {
+    LatLng center = LatLng.newInstance(latitude, longitude);
     MapOptions opts = MapOptions.newInstance();
     opts.setZoom(8);
     opts.setCenter(center);
@@ -107,7 +107,7 @@ public class DirectionsServiceMapWidget extends Composite {
     });
   }
 
-  private void drawDirectionsWithMidPoint(Double originLat, Double originLong, Double destinationLat, Double destinationLong, List<Park> parks) {
+  private void drawDirectionsWithMidPoint(String location, Double destinationLat, Double destinationLong, List<Park> parks) {
     DirectionsRendererOptions options = DirectionsRendererOptions.newInstance();
     final DirectionsRenderer directionsDisplay = DirectionsRenderer.newInstance(options);
     directionsDisplay.setMap(mapWidget);
@@ -115,12 +115,11 @@ public class DirectionsServiceMapWidget extends Composite {
     //String origin = "Arlington, WA";
     //String destination = "Seattle, WA";
     
-    LatLng origin = LatLng.newInstance(originLat, originLong);
     LatLng destination = LatLng.newInstance(destinationLat, destinationLong);
     
 
     DirectionsRequest request = DirectionsRequest.newInstance();
-    request.setOrigin(origin);
+    request.setOrigin(location);
     request.setDestination(destination);
     request.setTravelMode(TravelMode.DRIVING);
     request.setOptimizeWaypoints(true);
