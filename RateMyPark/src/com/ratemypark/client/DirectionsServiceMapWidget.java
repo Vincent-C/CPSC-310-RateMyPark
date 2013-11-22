@@ -23,6 +23,8 @@ package com.ratemypark.client;
  * #L%
  */
 
+import java.util.List;
+
 import com.google.gwt.ajaxloader.client.ArrayHelper;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -68,14 +70,14 @@ public class DirectionsServiceMapWidget extends Composite {
   private MapWidget mapWidget;
   private HTML htmlDistanceMatrixService = new HTML("&nbsp;");
 
-  public DirectionsServiceMapWidget() {
+  public DirectionsServiceMapWidget(String location, Double destinationLat, Double destinationLong, List<Park> parks) {
     pWidget = new VerticalPanel();
     initWidget(pWidget);
 
-    draw();
+    draw(location, destinationLat, destinationLong, parks);
   }
 
-  private void draw() {
+  private void draw(String location, Double destinationLat, Double destinationLong, List<Park> parks) {
     pWidget.clear();
     pWidget.add(new HTML("<br/>"));
 
@@ -84,12 +86,12 @@ public class DirectionsServiceMapWidget extends Composite {
     hp.add(new HTML("Directions Service&nbsp;&nbsp;&nbsp;&nbsp;"));
     hp.add(htmlDistanceMatrixService);
 
-    drawMap();
-    drawDirectionsWithMidPoint();
+    drawMap(destinationLat, destinationLong);
+    drawDirectionsWithMidPoint(location, destinationLat, destinationLong, parks);
   }
 
-  private void drawMap() {
-    LatLng center = LatLng.newInstance(48.11, -123.24);
+  private void drawMap(Double latitude, Double longitude) {
+    LatLng center = LatLng.newInstance(latitude, longitude);
     MapOptions opts = MapOptions.newInstance();
     opts.setZoom(8);
     opts.setCenter(center);
@@ -105,29 +107,36 @@ public class DirectionsServiceMapWidget extends Composite {
     });
   }
 
-  private void drawDirectionsWithMidPoint() {
+  private void drawDirectionsWithMidPoint(String location, Double destinationLat, Double destinationLong, List<Park> parks) {
     DirectionsRendererOptions options = DirectionsRendererOptions.newInstance();
     final DirectionsRenderer directionsDisplay = DirectionsRenderer.newInstance(options);
     directionsDisplay.setMap(mapWidget);
 
-    String origin = "Arlington, WA";
-    String destination = "Seattle, WA";
+    //String origin = "Arlington, WA";
+    //String destination = "Seattle, WA";
+    
+    LatLng destination = LatLng.newInstance(destinationLat, destinationLong);
+    
 
     DirectionsRequest request = DirectionsRequest.newInstance();
-    request.setOrigin(origin);
+    request.setOrigin(location);
     request.setDestination(destination);
     request.setTravelMode(TravelMode.DRIVING);
     request.setOptimizeWaypoints(true);
 
     // Stop over
-    LatLng stopOverWayPoint = LatLng.newInstance(47.8587, -121.9697);
-    DirectionsWaypoint waypoint = DirectionsWaypoint.newInstance();
-    waypoint.setStopOver(true);
-    waypoint.setLocation(stopOverWayPoint);
+    /*if (!parks.isEmpty() && !(parks == null)) {
+    	for(Park p : parks) {
+    		LatLng stopOverWayPoint = LatLng.newInstance(p.getLatitude(), p.getLongitude());
+    		DirectionsWaypoint waypoint = DirectionsWaypoint.newInstance();
+    		waypoint.setStopOver(true);
+    		waypoint.setLocation(stopOverWayPoint);
 
-    JsArray<DirectionsWaypoint> waypoints = JsArray.createArray().cast();
-    waypoints.push(waypoint);
-    request.setWaypoints(waypoints);
+    		JsArray<DirectionsWaypoint> waypoints = JsArray.createArray().cast();
+    		waypoints.push(waypoint);
+    		request.setWaypoints(waypoints);
+    	}
+    }*/
 
     DirectionsService o = DirectionsService.newInstance();
     o.route(request, new DirectionsResultHandler() {
