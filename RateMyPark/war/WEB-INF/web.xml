@@ -66,6 +66,16 @@
     <url-pattern>/ratemypark/review</url-pattern>
   </servlet-mapping>
   
+  <servlet>
+  	<servlet-name>ratingServiceImpl</servlet-name>
+  	<servlet-class>com.ratemypark.server.RatingServiceImpl</servlet-class>	
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>ratingServiceImpl</servlet-name>
+  	<url-pattern>/ratemypark/rating</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>RateMyPark.html</welcome-file>

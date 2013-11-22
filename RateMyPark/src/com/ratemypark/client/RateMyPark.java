@@ -38,6 +38,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
@@ -62,7 +63,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	private final LogoutServiceAsync logoutSvc = GWT.create(LogoutService.class);
 
 	private final LoadParksServiceAsync loadParksSvc = GWT.create(LoadParksService.class);
-	
+
 	private LoginInfo loginInfo = null;
 
 	/**
@@ -137,7 +138,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 				System.out.println("Client side cookie login: " + Cookies.getCookie("sid"));
 				toggleLoginButtons();
-				
+
 				// Reload page if user was on a park page
 				if (!History.getToken().isEmpty() && !History.getToken().equals("profile")) {
 					RootPanel.get("body").clear();
@@ -199,7 +200,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						// Clear username text
 						RootPanel.get("username").getElement().setInnerText("");
 						toggleLoginButtons();
-						
+
 						History.newItem("");
 					}
 
@@ -263,6 +264,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					loadMapApi(park);
 					loadFacebookButtons(park);
 					loadParkReviews(park);
+					loadParkRatings(park);
 				} else {
 					System.out.println("Park is null");
 				}
@@ -270,7 +272,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		});
 
 	}
-
 
 	private void loadParksTextandButton() {
 		final Button loadParksButton = new Button("Load Parks with PID:");
@@ -305,7 +306,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			}
 		});
 	}
-	
+
 	private void loadDirectionsButton() {
 		final Button loadDirectionsButton = new Button("Map directions");
 		final TextBox loadLatitudeTextBox = new TextBox();
@@ -356,7 +357,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		RootPanel.get("fb-footer").getElement().setAttribute("style", "");
 		String pageURL = Window.Location.getHref();
 		System.out.println("Website URL: " + pageURL);
-		HTMLPanel likeButton = new HTMLPanel("<input type= 'button' value='Like this Park: " + park.getPname() + "!' onclick='postLike();'>");
+		HTMLPanel likeButton = new HTMLPanel("<input type= 'button' value='Like this Park: " + park.getPname()
+				+ "!' onclick='postLike();'>");
 		RootPanel.get("fb-footer").add(likeButton);
 	}
 
@@ -496,14 +498,13 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		else
 			System.out.println("Park is null");
 	}
-	
+
 	
 	private void loadParkReviews(Park park) {
 		final ReviewServiceAsync reviewSvc = GWT.create(ReviewService.class);
 		final Long pid = park.getPid();
-		
-		HTMLPanel header = new HTMLPanel("<div class='contentHeader'>" + "Reviews for "
-				+ park.getPname() + "</div>");
+
+		HTMLPanel header = new HTMLPanel("<div class='contentHeader'>" + "Reviews for " + park.getPname() + "</div>");
 		RootPanel.get("body").add(header);
 
 		final VerticalPanel reviewsPanel = new VerticalPanel();
@@ -512,51 +513,183 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		newReviewsPanel.setStyleName("reviewsPanel");
 		RootPanel.get("body").add(reviewsPanel);
 		RootPanel.get("body").add(newReviewsPanel);
-		
+
 		reviewSvc.getReviews(pid, new AsyncCallback<List<Review>>() {
 			public void onFailure(Throwable caught) {
 				Window.alert("Failed to get reviews");
 			}
+
 			public void onSuccess(List<Review> result) {
 				for (Review r : result) {
-					reviewsPanel.add(new HTML("<b>" + "Review by: " + r.getUsername() + "</b> " + r.getDateCreated().toString()));
+					reviewsPanel.add(new HTML("<b>" + "Review by: " + r.getUsername() + "</b> "
+							+ r.getDateCreated().toString()));
 					reviewsPanel.add(new HTML(r.getReviewText()));
 				}
 			}
 		});
-		
+
 		// If user is logged in, allow the user to write a review
 		newReviewsPanel.getElement().setId("newReviewsPanel");
 		if (loginInfo != null) {
 			newReviewsPanel.add(new HTML("<b>Write a new review:</b>"));
-			
-		    final TextArea reviewTextArea = new TextArea();
-		    reviewTextArea.setCharacterWidth(100);
-		    reviewTextArea.setVisibleLines(5);
-		    newReviewsPanel.add(reviewTextArea);
-		    
-		    final Button submitReview = new Button("Submit Review");
-		    submitReview.addClickHandler(new ClickHandler() {
+
+			final TextArea reviewTextArea = new TextArea();
+			reviewTextArea.setCharacterWidth(100);
+			reviewTextArea.setVisibleLines(5);
+			newReviewsPanel.add(reviewTextArea);
+
+			final Button submitReview = new Button("Submit Review");
+			submitReview.addClickHandler(new ClickHandler() {
 				public void onClick(ClickEvent event) {
-			    	String reviewText = reviewTextArea.getText();
-			    	if (reviewText.length() > 500) {
-			    		Window.alert("Your review is too long.");
-			    	} else {
-				    	// Only logged in users be able to see this, so loginInfo should not be null
+					String reviewText = reviewTextArea.getText();
+					if (reviewText.length() > 500) {
+						Window.alert("Your review is too long.");
+					} else {
+						// Only logged in users be able to see this, so loginInfo should not be null
 						reviewSvc.newReview(loginInfo.getUsername(), pid, reviewText, new AsyncCallback<Review>() {
 							public void onFailure(Throwable caught) {
 								Window.alert("Could not create your review!");
 							}
-							
+
 							public void onSuccess(Review newReview) {
-								reviewsPanel.add(new HTML("<b>" + "Review by: " + newReview.getUsername() + "</b> " + newReview.getDateCreated().toString()));
+								reviewsPanel.add(new HTML("<b>" + "Review by: " + newReview.getUsername() + "</b> "
+										+ newReview.getDateCreated().toString()));
 								reviewsPanel.add(new HTML(newReview.getReviewText()));
 							}
 						});
-			    	}
+					}
 				}
-		    });
-		    newReviewsPanel.add(submitReview);
+			});
+			newReviewsPanel.add(submitReview);
+		}
+	}
+
+	private void loadParkRatings(Park park) {
+		final RatingServiceAsync ratingSvc = GWT.create(RatingService.class);
+		final Long pid = park.getPid();
+
+		HTMLPanel header = new HTMLPanel("<div class='contentHeader'>" + "Ratings for " + park.getPname() + "</div>");
+		RootPanel.get("body").add(header);
+
+		final VerticalPanel ratingsPanel = new VerticalPanel();
+		final VerticalPanel addRatingPanel = new VerticalPanel();
+
+		// TODO: change style name later, to rating something
+		ratingsPanel.setStyleName("reviewsPanel");
+
+		RootPanel.get("body").add(ratingsPanel);
+		RootPanel.get("body").add(addRatingPanel);
+
+		ratingSvc.totalNumRatings(pid, new AsyncCallback<Integer>() {
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to get number of ratings for the park");
+			}
+
+			public void onSuccess(Integer result) {
+				// do something with the average
+				if (result == 0) {
+					ratingsPanel.add(new HTML("<b>" + "No one has rated this park yet. Be the first to rate it!"
+							+ "</b> "));
+				} else {
+					ratingSvc.averageRating(pid, new AsyncCallback<Float>() {
+						public void onFailure(Throwable caught) {
+							Window.alert("Failed to get average rating for the park");
+						}
+
+						public void onSuccess(Float result) {
+							// do something with the average
+							if (result == null) {
+							} else {
+								ratingsPanel.add(new HTML("<b>" + "Average rating: " + result + "</b> "));
+							}
+						}
+					});
+					ratingsPanel.add(new HTML("<b>" + "Number of ratings: " + result + "</b>"));
+				}
+			}
+		});
+
+		// If user is logged in, allow the user to rate the park
+		addRatingPanel.getElement().setId("addRatingPanel");
+		if (loginInfo != null) {
+			addRatingPanel.add(new HTML("<b>Rate this park:</b>"));
+
+			final RadioButton rb0 = new RadioButton("NewRating", "0");
+			final RadioButton rb1 = new RadioButton("NewRating", "1");
+			final RadioButton rb2 = new RadioButton("NewRating", "2");
+			final RadioButton rb3 = new RadioButton("NewRating", "3");
+			final RadioButton rb4 = new RadioButton("NewRating", "4");
+			final RadioButton rb5 = new RadioButton("NewRating", "5");
+
+			addRatingPanel.add(rb0);
+			addRatingPanel.add(rb1);
+			addRatingPanel.add(rb2);
+			addRatingPanel.add(rb3);
+			addRatingPanel.add(rb4);
+			addRatingPanel.add(rb5);
+
+			final ArrayList<RadioButton> rbList = new ArrayList<RadioButton>();
+			rbList.add(rb0);
+			rbList.add(rb1);
+			rbList.add(rb2);
+			rbList.add(rb3);
+			rbList.add(rb4);
+			rbList.add(rb5);
+
+			// Get the index that is selected
+
+			final Button submitRating = new Button("Submit Rating");
+			submitRating.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					int ratingNum = getSelectedIndex(rbList);
+					
+					if (ratingNum == -1) {
+						Window.alert("Please select a rating before submitting!");
+					} else {
+
+						// Only logged in users be able to see this, so loginInfo should not be null
+						ratingSvc.createRating(pid, loginInfo.getUsername(), ratingNum, new AsyncCallback<Void>() {
+							public void onFailure(Throwable caught) {
+								Window.alert("Could not submit your rating!");
+							}
+
+							public void onSuccess(Void ignore) {
+								ratingsPanel.clear();
+								ratingSvc.totalNumRatings(pid, new AsyncCallback<Integer>() {
+									public void onFailure(Throwable caught) {
+										Window.alert("Failed to get number of ratings for the park");
+									}
+
+									public void onSuccess(Integer result) {
+										// do something with the average
+										if (result == 0) {
+											ratingsPanel.add(new HTML("<b>" + "No one has rated this park yet. Be the first to rate it!"
+													+ "</b> "));
+										} else {
+											ratingSvc.averageRating(pid, new AsyncCallback<Float>() {
+												public void onFailure(Throwable caught) {
+													Window.alert("Failed to get average rating for the park");
+												}
+
+												public void onSuccess(Float result) {
+													// do something with the average
+													if (result == null) {
+													} else {
+														ratingsPanel.add(new HTML("<b>" + "Average rating: " + result + "</b> "));
+													}
+												}
+											});
+											ratingsPanel.add(new HTML("<b>" + "Number of ratings: " + result + "</b>"));
+										}
+									}
+								});
+
+							}
+						});
+					}
+				}
+			});
+			addRatingPanel.add(submitRating);
 		}
 	}
 
@@ -701,6 +834,16 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	private void drawStreetViewSideBySide(Double latitude, Double longitude) {
 		StreetViewSideBySideMapWidget wMap = new StreetViewSideBySideMapWidget(latitude, longitude);
 		addMapWidget(wMap);
+	}
+
+	private int getSelectedIndex(List<RadioButton> rbList) {
+		int ret = -1;
+		for (int i = 0; i < rbList.size(); i++) {
+			if (rbList.get(i).getValue()) {
+				ret = i;
+			}
+		}
+		return ret;
 	}
 
 	private static class LoginDialog extends DialogBox {
@@ -876,7 +1019,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_LEFT);
 			dialogVPanel.add(table);
-			
+
 			// Directions map setup
 			for (Park p : parks) {
 				if (p != null) {
