@@ -13,7 +13,9 @@ import com.ratemypark.shared.BCrypt;
 import com.ratemypark.shared.FieldVerifier;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -226,18 +228,16 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 	// This method is used to clear the body only once, then add the 'body' after, using the methods
 	private void loadParksBody() {
-		RootPanel.get("body").clear();
+		clearBodyAndFooter();
 		loadDirectionsButton();
 		loadParksTable();
 		loadParksTextandButton();
-		
 	}
 
 	public void onValueChange(ValueChangeEvent<String> event) {
 		// This method is called whenever the application's history changes. Set
 		// the label to reflect the current history token.
 		if (!event.getValue().isEmpty()) {
-			RootPanel.get("body").clear();
 			if (event.getValue().equals("profile")) {
 				// RootPanel.get("body").clear();
 				loadProfilePage();
@@ -250,8 +250,13 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		}
 	}
 
-	private void loadSpecificParkPage(final String parkID) {
+	private void clearBodyAndFooter() {
+		RootPanel.get("body").clear();
+		RootPanel.get("fb-footer").clear();
+		RootPanel.get("fb-footer").getElement().setAttribute("style", "display:none");
+	}
 
+	private void loadSpecificParkPage(final String parkID) {
 		loadParksSvc.getPark(Long.parseLong(parkID), new AsyncCallback<Park>() {
 			public void onFailure(Throwable caught) {
 				System.out.println("Park did not get properly");
@@ -259,6 +264,13 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 			public void onSuccess(Park park) {
 				if (park != null) {
+					clearBodyAndFooter();
+					NodeList<Element> tags = Document.get().getElementsByTagName("meta");
+					for (int i = 0; i < tags.getLength(); i++) {
+				        if (tags.getItem(i).getAttribute("property").equals("og:title")) {
+				        	tags.getItem(i).setAttribute("content",park.getPname());
+				        }
+				    }
 					// Create table of data related to this specific park
 					loadSpecificParkTable(park);
 					loadMapApi(park);
@@ -354,8 +366,10 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	}
 	
 	private void loadFacebookButtons(Park park) {
+		RootPanel.get("fb-footer").clear();
 		RootPanel.get("fb-footer").getElement().setAttribute("style", "");
 		String pageURL = Window.Location.getHref();
+	
 		System.out.println("Website URL: " + pageURL);
 		HTMLPanel likeButton = new HTMLPanel("<input type= 'button' value='Like this Park: " + park.getPname()
 				+ "!' onclick='postLike();'>");
@@ -737,6 +751,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	}
 
 	private void loadProfilePage() {
+				clearBodyAndFooter();
 		final EditProfileServiceAsync profileSvc = GWT.create(EditProfileService.class);
 
 		profileSvc.getCurrentProfile(new AsyncCallback<LoginInfo>() {
