@@ -395,7 +395,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				table.setText(0, 2, "Park Name");
 				table.setText(0, 3, "Address");
 				table.setText(0, 4, "Neighbourhood Name");
-				table.setText(0, 5, "Neighbourhood URL");
 				table.getRowFormatter().setStyleName(0, "tableheader");
 				int index = 1;
 				for (Park p : parkList) {
@@ -408,7 +407,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					table.setWidget(index, 2, link);
 					table.setText(index, 3, String.valueOf(p.getStreetNumber()) + " " + p.getStreetName());
 					table.setText(index, 4, p.getNeighbourhoodName());
-					table.setText(index, 5, p.getNeighbourhoodURL());
 					index++;
 					// System.out.println("Adding index" + index);
 				}
