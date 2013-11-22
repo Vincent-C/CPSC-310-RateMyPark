@@ -332,8 +332,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				String s1 = loadLatitudeTextBox.getText();
 				String s2 = loadLongitudeTextBox.getText();
 				String s3 = loadParkTextBox.getText();
-				Double latitude = Double.valueOf(s1);
-				Double longitude = Double.valueOf(s2);
+				final Double latitude = Double.valueOf(s1);
+				final Double longitude = Double.valueOf(s2);
 				Long parkID = Long.valueOf(s3);
 
 				loadParksSvc.getPark(parkID, new AsyncCallback<Park>() {
@@ -343,7 +343,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					}
 
 					public void onSuccess(Park result) {
-						DirectionsDialog dd = new DirectionsDialog(result);
+						DirectionsDialog dd = new DirectionsDialog(latitude, longitude, result);
 						dd.showRelativeTo(loadDirectionsButton);
 						
 					}
@@ -901,7 +901,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					Runnable onLoad = new Runnable() {
 						@Override
 						public void run() {
-							DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget();
+							// Temporary replacement
+							DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget(1.1, 2.2, 3.3, 4.4, null);
 							dialogVPanel.add(wMap);
 						}
 					};
@@ -945,7 +946,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	}
 	
 	private static class DirectionsDialog extends DecoratedPopupPanel {
-		public DirectionsDialog(Park park) {
+		public DirectionsDialog(final Double originLat, final Double originLong, Park park) {
 			
 			setAnimationEnabled(true);
 			final VerticalPanel dialogVPanel = new VerticalPanel();
@@ -969,7 +970,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				Runnable onLoad = new Runnable() {
 					@Override
 					public void run() {
-						DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget();
+						DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget(originLat, originLong, latitude, longitude, null);
 						dialogVPanel.add(wMap);
 					}
 				};
