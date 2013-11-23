@@ -69,15 +69,25 @@ public class DirectionsServiceMapWidget extends Composite {
   private VerticalPanel pWidget;
   private MapWidget mapWidget;
   private HTML htmlDistanceMatrixService = new HTML("&nbsp;");
+  
+  private String location;
+  private Double destinationLat;
+  private Double destinationLong;
+  private List<Park> parks;
 
   public DirectionsServiceMapWidget(String location, Double destinationLat, Double destinationLong, List<Park> parks) {
-    pWidget = new VerticalPanel();
+    this.location = location;
+    this.destinationLat = destinationLat;
+    this.destinationLong = destinationLong;
+    this.parks = parks;
+	
+	pWidget = new VerticalPanel();
     initWidget(pWidget);
 
-    draw(location, destinationLat, destinationLong, parks);
+    draw();
   }
 
-  private void draw(String location, Double destinationLat, Double destinationLong, List<Park> parks) {
+  private void draw() {
     pWidget.clear();
     pWidget.add(new HTML("<br/>"));
 
@@ -86,12 +96,12 @@ public class DirectionsServiceMapWidget extends Composite {
     hp.add(new HTML("Directions Service&nbsp;&nbsp;&nbsp;&nbsp;"));
     hp.add(htmlDistanceMatrixService);
 
-    drawMap(destinationLat, destinationLong);
-    drawDirectionsWithMidPoint(location, destinationLat, destinationLong, parks);
+    drawMap();
+    drawDirectionsWithMidPoint();
   }
 
-  private void drawMap(Double latitude, Double longitude) {
-    LatLng center = LatLng.newInstance(latitude, longitude);
+  private void drawMap() {
+    LatLng center = LatLng.newInstance(destinationLat, destinationLong);
     MapOptions opts = MapOptions.newInstance();
     opts.setZoom(8);
     opts.setCenter(center);
@@ -107,7 +117,7 @@ public class DirectionsServiceMapWidget extends Composite {
     });
   }
 
-  private void drawDirectionsWithMidPoint(String location, Double destinationLat, Double destinationLong, List<Park> parks) {
+  private void drawDirectionsWithMidPoint() {
     DirectionsRendererOptions options = DirectionsRendererOptions.newInstance();
     final DirectionsRenderer directionsDisplay = DirectionsRenderer.newInstance(options);
     directionsDisplay.setMap(mapWidget);
