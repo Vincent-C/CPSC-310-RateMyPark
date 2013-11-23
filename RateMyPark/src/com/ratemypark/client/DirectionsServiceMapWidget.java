@@ -67,7 +67,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class DirectionsServiceMapWidget extends Composite {
 
   private VerticalPanel pWidget;
-  private MapWidget mapWidget;
+  MapWidget mapWidget;
   private HTML htmlDistanceMatrixService = new HTML("&nbsp;");
   
   private String origin;
@@ -154,13 +154,10 @@ public class DirectionsServiceMapWidget extends Composite {
     	LatLng actualOrigin = LatLng.newInstance(parkOrigin.getLatitude(), parkOrigin.getLongitude());
         LatLng destination = LatLng.newInstance(parkDest.getLatitude(), parkDest.getLongitude());
         
-        request.setOrigin(actualOrigin);
-        request.setDestination(destination);
-        request.setTravelMode(TravelMode.DRIVING);
-        request.setOptimizeWaypoints(true);
-        
         // Stop over
         for(int i = 2; i < parks.size(); i++ ) {
+        	System.out.println(parks.size());
+        	System.out.println(parks.get(i).getPname());
         	LatLng stopOverWayPoint = LatLng.newInstance(parks.get(i).getLatitude(), parks.get(i).getLongitude());
         	DirectionsWaypoint waypoint = DirectionsWaypoint.newInstance();
         	waypoint.setStopOver(true);
@@ -170,6 +167,12 @@ public class DirectionsServiceMapWidget extends Composite {
         	waypoints.push(waypoint);
         	request.setWaypoints(waypoints);
         }
+        
+        request.setOrigin(actualOrigin);
+        request.setDestination(destination);
+        request.setTravelMode(TravelMode.DRIVING);
+        request.setOptimizeWaypoints(true);
+        
     }
     else {
         LatLng destination = LatLng.newInstance(destinationLat, destinationLong);

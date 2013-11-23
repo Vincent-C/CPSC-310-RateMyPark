@@ -49,6 +49,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.maps.client.LoadApi;
 import com.google.gwt.maps.client.LoadApi.LoadLibrary;
+import com.google.gwt.maps.client.MapWidget;
+import com.google.gwt.maps.client.MapImpl;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -851,6 +853,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	private void drawStreetViewSideBySide(Double latitude, Double longitude) {
 		StreetViewSideBySideMapWidget wMap = new StreetViewSideBySideMapWidget(latitude, longitude);
 		addMapWidget(wMap);
+		wMap.mapWidget.triggerResize();
 	}
 
 	private int getSelectedIndex(List<RadioButton> rbList) {
@@ -1064,6 +1067,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					// Temporary replacement
 					DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget(parks);
 					dialogVPanel.add(wMap);
+					wMap.mapWidget.triggerResize();
 				}
 			};
 
@@ -1127,6 +1131,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					public void run() {
 						DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget(location, latitude, longitude);
 						dialogVPanel.add(wMap);
+						wMap.mapWidget.triggerResize();
 					}
 				};
 

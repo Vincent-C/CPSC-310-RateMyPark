@@ -58,7 +58,7 @@ public class StreetViewSideBySideMapWidget extends Composite {
 
   private HorizontalPanel hp;
 
-  private MapWidget mapWidget;
+  MapWidget mapWidget;
 
   private StreetViewPanoramaWidget wStreetPano;
 
