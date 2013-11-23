@@ -139,6 +139,7 @@ public class DirectionsServiceMapWidget extends Composite {
     final DirectionsRenderer directionsDisplay = DirectionsRenderer.newInstance(options);
     directionsDisplay.setMap(mapWidget);
 
+    // Hardcoded locations provided by example code
     //String origin = "Arlington, WA";
     //String destination = "Seattle, WA";
     
@@ -154,16 +155,19 @@ public class DirectionsServiceMapWidget extends Composite {
     	LatLng actualOrigin = LatLng.newInstance(parkOrigin.getLatitude(), parkOrigin.getLongitude());
         LatLng destination = LatLng.newInstance(parkDest.getLatitude(), parkDest.getLongitude());
         
-        // Stop over
+    	JsArray<DirectionsWaypoint> waypoints = JsArray.createArray().cast();
+
+        // Stop over these waypoints
+    	// i = 2 because the first 2 parks are already accounted for,
+    	// as "origin" and "destination"
         for(int i = 2; i < parks.size(); i++ ) {
-        	System.out.println(parks.size());
-        	System.out.println(parks.get(i).getPname());
+        	//System.out.println(parks.size());
+        	//System.out.println(parks.get(i).getPname());
         	LatLng stopOverWayPoint = LatLng.newInstance(parks.get(i).getLatitude(), parks.get(i).getLongitude());
         	DirectionsWaypoint waypoint = DirectionsWaypoint.newInstance();
         	waypoint.setStopOver(true);
         	waypoint.setLocation(stopOverWayPoint);
 
-        	JsArray<DirectionsWaypoint> waypoints = JsArray.createArray().cast();
         	waypoints.push(waypoint);
         	request.setWaypoints(waypoints);
         }
