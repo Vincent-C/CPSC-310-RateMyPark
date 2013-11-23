@@ -70,16 +70,31 @@ public class DirectionsServiceMapWidget extends Composite {
   private MapWidget mapWidget;
   private HTML htmlDistanceMatrixService = new HTML("&nbsp;");
   
-  private String location;
+  private String origin;
   private Double destinationLat;
   private Double destinationLong;
   private List<Park> parks;
+  
+  // used to differentiate between code paths for compare dialog vs mapping directions
+  private boolean isCompareDialog;
 
-  public DirectionsServiceMapWidget(String location, Double destinationLat, Double destinationLong, List<Park> parks) {
-    this.location = location;
+  // Constructor used in compare dialog
+  public DirectionsServiceMapWidget(List<Park> parks) {
+	this.parks = parks;
+	this.isCompareDialog = true;
+	
+	pWidget = new VerticalPanel();
+	initWidget(pWidget);
+	
+	draw();
+  }
+  
+  // Constructor used for mapping directions (with user input)
+  public DirectionsServiceMapWidget(String origin, Double destinationLat, Double destinationLong) {
+    this.origin = origin;
     this.destinationLat = destinationLat;
     this.destinationLong = destinationLong;
-    this.parks = parks;
+    this.isCompareDialog = false;
 	
 	pWidget = new VerticalPanel();
     initWidget(pWidget);
@@ -101,7 +116,9 @@ public class DirectionsServiceMapWidget extends Composite {
   }
 
   private void drawMap() {
-    LatLng center = LatLng.newInstance(destinationLat, destinationLong);
+	// Let the center of the map be an arbitrary pair of coords
+	// in the middle of Vancouver, BC
+    LatLng center = LatLng.newInstance(49.23, -123.08);
     MapOptions opts = MapOptions.newInstance();
     opts.setZoom(8);
     opts.setCenter(center);
@@ -125,28 +142,44 @@ public class DirectionsServiceMapWidget extends Composite {
     //String origin = "Arlington, WA";
     //String destination = "Seattle, WA";
     
-    LatLng destination = LatLng.newInstance(destinationLat, destinationLong);
-    
-
     DirectionsRequest request = DirectionsRequest.newInstance();
-    request.setOrigin(location);
-    request.setDestination(destination);
-    request.setTravelMode(TravelMode.DRIVING);
-    request.setOptimizeWaypoints(true);
+    
+    if (isCompareDialog) {
+    	// Arbitrarily pick 1st park to be origin, 2nd park to be destination,
+    	// and other selected parks, if any, to be waypoints
+    	
+    	Park parkOrigin = parks.get(0);
+    	Park parkDest = parks.get(1);
+    	
+    	LatLng actualOrigin = LatLng.newInstance(parkOrigin.getLatitude(), parkOrigin.getLongitude());
+        LatLng destination = LatLng.newInstance(parkDest.getLatitude(), parkDest.getLongitude());
+        
+        request.setOrigin(actualOrigin);
+        request.setDestination(destination);
+        request.setTravelMode(TravelMode.DRIVING);
+        request.setOptimizeWaypoints(true);
+        
+        // Stop over
+        for(int i = 2; i < parks.size(); i++ ) {
+        	LatLng stopOverWayPoint = LatLng.newInstance(parks.get(i).getLatitude(), parks.get(i).getLongitude());
+        	DirectionsWaypoint waypoint = DirectionsWaypoint.newInstance();
+        	waypoint.setStopOver(true);
+        	waypoint.setLocation(stopOverWayPoint);
 
-    // Stop over
-    /*if (!parks.isEmpty() && !(parks == null)) {
-    	for(Park p : parks) {
-    		LatLng stopOverWayPoint = LatLng.newInstance(p.getLatitude(), p.getLongitude());
-    		DirectionsWaypoint waypoint = DirectionsWaypoint.newInstance();
-    		waypoint.setStopOver(true);
-    		waypoint.setLocation(stopOverWayPoint);
-
-    		JsArray<DirectionsWaypoint> waypoints = JsArray.createArray().cast();
-    		waypoints.push(waypoint);
-    		request.setWaypoints(waypoints);
-    	}
-    }*/
+        	JsArray<DirectionsWaypoint> waypoints = JsArray.createArray().cast();
+        	waypoints.push(waypoint);
+        	request.setWaypoints(waypoints);
+        }
+    }
+    else {
+        LatLng destination = LatLng.newInstance(destinationLat, destinationLong);
+        
+        request.setOrigin(origin);
+        request.setDestination(destination);
+        request.setTravelMode(TravelMode.DRIVING);
+        request.setOptimizeWaypoints(true);
+    }
+ 
 
     DirectionsService o = DirectionsService.newInstance();
     o.route(request, new DirectionsResultHandler() {

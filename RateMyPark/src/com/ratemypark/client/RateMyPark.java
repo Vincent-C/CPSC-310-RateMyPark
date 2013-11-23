@@ -996,7 +996,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 	private static class CompareDialog extends DecoratedPopupPanel {
 
-		public CompareDialog(List<Park> parks) {
+		public CompareDialog(final List<Park> parks) {
 			setAnimationEnabled(true);
 			final VerticalPanel dialogVPanel = new VerticalPanel();
 
@@ -1038,41 +1038,36 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			dialogVPanel.add(table);
 
 			// Directions map setup
-			for (Park p : parks) {
-				if (p != null) {
-					boolean sensor = true;
+			
+			boolean sensor = true;
 
-					// Testing:
-					System.out.println(p.getPname());
-					final Double latitude = p.getLatitude();
-					System.out.println(latitude);
-					final Double longitude = p.getLongitude();
+			// Testing:
+			System.out.println(parks.get(0).getPname());
+			final Double latitude = parks.get(0).getLatitude();
+			System.out.println(latitude);
+			final Double longitude = parks.get(0).getLongitude();
+			System.out.println(longitude);
 
-					// load all the libs for use in the maps
-					ArrayList<LoadLibrary> loadLibraries = new ArrayList<LoadApi.LoadLibrary>();
-					loadLibraries.add(LoadLibrary.ADSENSE);
-					loadLibraries.add(LoadLibrary.DRAWING);
-					loadLibraries.add(LoadLibrary.GEOMETRY);
-					loadLibraries.add(LoadLibrary.PANORAMIO);
-					loadLibraries.add(LoadLibrary.PLACES);
-					loadLibraries.add(LoadLibrary.WEATHER);
-					loadLibraries.add(LoadLibrary.VISUALIZATION);
+			// load all the libs for use in the maps
+			ArrayList<LoadLibrary> loadLibraries = new ArrayList<LoadApi.LoadLibrary>();
+			loadLibraries.add(LoadLibrary.ADSENSE);
+			loadLibraries.add(LoadLibrary.DRAWING);
+			loadLibraries.add(LoadLibrary.GEOMETRY);
+			loadLibraries.add(LoadLibrary.PANORAMIO);
+			loadLibraries.add(LoadLibrary.PLACES);
+			loadLibraries.add(LoadLibrary.WEATHER);
+			loadLibraries.add(LoadLibrary.VISUALIZATION);
 
-					Runnable onLoad = new Runnable() {
-						@Override
-						public void run() {
-							// Temporary replacement
-							DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget("", 3.3, 4.4, null);
-							dialogVPanel.add(wMap);
-						}
-					};
-
-					LoadApi.go(onLoad, loadLibraries, sensor);
+			Runnable onLoad = new Runnable() {
+				@Override
+				public void run() {
+					// Temporary replacement
+					DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget(parks);
+					dialogVPanel.add(wMap);
 				}
+			};
 
-				else
-					System.out.println("Park is null");
-			}
+			LoadApi.go(onLoad, loadLibraries, sensor);
 
 			// Close button setup
 			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
@@ -1130,7 +1125,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				Runnable onLoad = new Runnable() {
 					@Override
 					public void run() {
-						DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget(location, latitude, longitude, null);
+						DirectionsServiceMapWidget wMap = new DirectionsServiceMapWidget(location, latitude, longitude);
 						dialogVPanel.add(wMap);
 					}
 				};
