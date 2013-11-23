@@ -193,7 +193,6 @@ public class DirectionsServiceMapWidget extends Composite {
       public void onCallback(DirectionsResult result, DirectionsStatus status) {
         if (status == DirectionsStatus.OK) {
           directionsDisplay.setDirections(result);
-          getDistance();
         } else if (status == DirectionsStatus.INVALID_REQUEST) {
 
         } else if (status == DirectionsStatus.MAX_WAYPOINTS_EXCEEDED) {
@@ -214,70 +213,5 @@ public class DirectionsServiceMapWidget extends Composite {
     });
   }
 
-  private void getDistance() {
-    String origin = "Arlington, WA";
-    String destination = "Seattle, WA";
-
-    String[] ao = new String[1];
-    ao[0] = origin;
-    JsArrayString origins = ArrayHelper.toJsArrayString(ao);
-
-    String[] ad = new String[1];
-    ad[0] = destination;
-    JsArrayString destinations = ArrayHelper.toJsArrayString(ad);
-
-    DistanceMatrixRequest request = DistanceMatrixRequest.newInstance();
-    request.setOrigins(origins);
-    request.setDestinations(destinations);
-    request.setTravelMode(TravelMode.DRIVING);
-
-    DistanceMatrixService o = DistanceMatrixService.newInstance();
-    o.getDistanceMatrix(request, new DistanceMatrixRequestHandler() {
-      public void onCallback(DistanceMatrixResponse response, DistanceMatrixStatus status) {
-        GWT.log("status=" + status.value());
-
-        if (status == DistanceMatrixStatus.INVALID_REQUEST) {
-
-        } else if (status == DistanceMatrixStatus.MAX_DIMENSIONS_EXCEEDED) {
-
-        } else if (status == DistanceMatrixStatus.MAX_ELEMENTS_EXCEEDED) {
-
-        } else if (status == DistanceMatrixStatus.OK) {
-
-          @SuppressWarnings("unused")
-          JsArrayString dest = response.getDestinationAddresses();
-          @SuppressWarnings("unused")
-          JsArrayString org = response.getOriginAddresses();
-          JsArray<DistanceMatrixResponseRow> rows = response.getRows();
-
-          GWT.log("rows.length=" + rows.length());
-          DistanceMatrixResponseRow d = rows.get(0);
-          JsArray<DistanceMatrixResponseElement> elements = d.getElements();
-          for (int i = 0; i < elements.length(); i++) {
-            DistanceMatrixResponseElement e = elements.get(i);
-            Distance distance = e.getDistance();
-            Duration duration = e.getDuration();
-
-            @SuppressWarnings("unused")
-            DistanceMatrixElementStatus st = e.getStatus();
-            GWT.log("distance=" + distance.getText() + " value=" + distance.getValue());
-            GWT.log("duration=" + duration.getText() + " value=" + duration.getValue());
-
-            String html = "&nbsp;&nbsp;Distance=" + distance.getText() + " Duration=" + duration.getText() + " ";
-            htmlDistanceMatrixService.setHTML(html);
-          }
-
-        } else if (status == DistanceMatrixStatus.OVER_QUERY_LIMIT) {
-
-        } else if (status == DistanceMatrixStatus.REQUEST_DENIED) {
-
-        } else if (status == DistanceMatrixStatus.UNKNOWN_ERROR) {
-
-        }
-
-      }
-    });
-
-  }
-
+ 
 }
