@@ -14,6 +14,7 @@ import com.ratemypark.exception.UserNameException;
  */
 @RemoteServiceRelativePath("review")
 public interface ReviewService extends RemoteService {
-	Review newReview(String username, Long pid, String reviewText) throws DatabaseException;
+	Review newReview(String username, Long pid, String parkName, String reviewText) throws DatabaseException;
 	List<Review> getReviews(Long pid) throws DatabaseException;
+	List<Review> getReviewsForUser(String username) throws DatabaseException;
 }

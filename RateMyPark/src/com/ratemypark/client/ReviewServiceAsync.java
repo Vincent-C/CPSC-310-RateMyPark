@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
  */
 public interface ReviewServiceAsync {
 	
-	void newReview(String username, Long pid, String reviewText, AsyncCallback<Review> callback);
+	void newReview(String username, Long pid, String parkName, String reviewText, AsyncCallback<Review> callback);
 	void getReviews(Long pid, AsyncCallback<List<Review>> callback);
+	void getReviewsForUser(String username, AsyncCallback<List<Review>> callback);
 }

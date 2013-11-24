@@ -521,6 +521,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	private void loadParkReviews(Park park) {
 		final ReviewServiceAsync reviewSvc = GWT.create(ReviewService.class);
 		final Long pid = park.getPid();
+		final String parkName = park.getPname();
 
 		HTMLPanel header = new HTMLPanel("<div class='contentHeader'>" + "Reviews for " + park.getPname() + "</div>");
 		RootPanel.get("body").add(header);
@@ -564,7 +565,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						Window.alert("Your review is too long.");
 					} else {
 						// Only logged in users be able to see this, so loginInfo should not be null
-						reviewSvc.newReview(loginInfo.getUsername(), pid, reviewText, new AsyncCallback<Review>() {
+						reviewSvc.newReview(loginInfo.getUsername(), pid, parkName, reviewText, new AsyncCallback<Review>() {
 							public void onFailure(Throwable caught) {
 								Window.alert("Could not create your review!");
 							}
@@ -809,6 +810,25 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					}
 				});
 				vPanel.add(editProfile);
+				
+				final ReviewServiceAsync reviewSvc = GWT.create(ReviewService.class);
+				vPanel.add(new HTMLPanel("<div class='contentHeader'>" + "Reviews by " + profile.getDisplayName() + "</div>"));
+				final VerticalPanel reviewsPanel = new VerticalPanel();
+				reviewsPanel.setStyleName("reviewsPanel");
+				reviewSvc.getReviewsForUser(profile.getUsername(), new AsyncCallback<List<Review>>() {
+					public void onFailure(Throwable caught) {
+						Window.alert("Failed to get reviews");
+					}
+
+					public void onSuccess(List<Review> result) {
+						for (Review r : result) {
+							reviewsPanel.add(new HTML("<b>" + "Review for " + r.getParkName() + "</b> "
+									+ r.getDateCreated().toString()));
+							reviewsPanel.add(new HTML(r.getReviewText()));
+						}
+					}
+				});
+				vPanel.add(reviewsPanel);
 
 				final Button back = new Button("Back to Main Page");
 				back.addClickHandler(new ClickHandler() {

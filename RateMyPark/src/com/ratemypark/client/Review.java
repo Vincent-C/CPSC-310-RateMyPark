@@ -21,6 +21,8 @@ public class Review implements Serializable {
 	@Persistent
 	private String username;
 	@Persistent
+	private String parkName;
+	@Persistent
 	private String reviewText; // This should be type Text, otherwise we are limited to 500 character reviews. Too bad Text causes bugs..
 	@Persistent
 	private Date dateCreated;
@@ -29,9 +31,10 @@ public class Review implements Serializable {
 		this.dateCreated = new Date();
 	}
 	
-	public Review(String username, Long pid, String reviewText) {
+	public Review(String username, Long pid, String parkName, String reviewText) {
 		this();
 		this.username = username;
+		this.parkName = parkName;
 		this.pid  = pid;
 		this.reviewText = reviewText;
 	}
@@ -50,6 +53,13 @@ public class Review implements Serializable {
 
 	public String getUsername() {
 		return this.username;
+	}
+	
+	public String getParkName() {
+		if (this.parkName == null) {
+			return "a park";
+		}
+		return this.parkName;
 	}
 
 	public Date getDateCreated() {
