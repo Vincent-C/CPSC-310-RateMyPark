@@ -539,10 +539,14 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			}
 
 			public void onSuccess(List<Review> result) {
-				for (Review r : result) {
-					reviewsPanel.add(new HTML("<b>" + "Review by: " + r.getUsername() + "</b> "
-							+ r.getDateCreated().toString()));
-					reviewsPanel.add(new HTML(r.getReviewText()));
+				if (result.isEmpty()) {
+					reviewsPanel.add(new HTMLPanel("<div id='noReviews'>" + "There are no reviews for this park yet."+ "</div>"));
+				} else {
+					for (Review r : result) {
+						reviewsPanel.add(new HTML("<b>" + "Review by: " + r.getUsername() + "</b> "
+								+ r.getDateCreated().toString()));
+						reviewsPanel.add(new HTML(r.getReviewText()));
+					}
 				}
 			}
 		});
@@ -571,6 +575,11 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 							}
 
 							public void onSuccess(Review newReview) {
+								Element noReviews = Document.get().getElementById("noReviews");
+								if (noReviews != null) {
+									noReviews.setAttribute("style", "display:none");
+								}
+								reviewTextArea.setText("");
 								reviewsPanel.add(new HTML("<b>" + "Review by: " + newReview.getUsername() + "</b> "
 										+ newReview.getDateCreated().toString()));
 								reviewsPanel.add(new HTML(newReview.getReviewText()));
@@ -821,6 +830,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					}
 
 					public void onSuccess(List<Review> result) {
+						if (result.isEmpty()) {
+							reviewsPanel.add(new HTMLPanel("<div>" + "You have not yet reviewed any parks."+ "</div>"));
+						}
 						for (Review r : result) {
 							reviewsPanel.add(new HTML("<b>" + "Review for " + r.getParkName() + "</b> "
 									+ r.getDateCreated().toString()));
