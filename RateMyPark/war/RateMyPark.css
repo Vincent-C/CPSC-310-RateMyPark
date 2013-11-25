@@ -49,6 +49,14 @@ h1 {
 	left: 750px;
 }
 
+.loadDirectionsButton {
+	margin-right: 20px;
+}
+
+.loadSearchButton {
+	margin-right: 20px;
+}
+
 /** Set ids using widget.getElement().setId("idOfElement") */
 #closeButton {
   margin: 15px 6px 6px;

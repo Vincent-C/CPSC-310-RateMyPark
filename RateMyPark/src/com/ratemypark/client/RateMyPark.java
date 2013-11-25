@@ -39,6 +39,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -232,6 +233,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	private void loadParksBody() {
 		clearBodyAndFooter();
 		loadDirectionsButton();
+		loadSearchButton();
 		loadParksTable();
 		loadSuggestedPark();
 		loadParksTextandButton();
@@ -330,7 +332,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		final TextBox loadParkTextBox = new TextBox();
 
 		// We can add style names to widgets
-		loadDirectionsButton.addStyleName("loadDirectionButton");
+		loadDirectionsButton.setStyleName("loadDirectionsButton");
 		//loadLatitudeTextBox.setWidth("55px");
 		//loadLongitudeTextBox.setWidth("55px");
 		loadLocationBox.setWidth("110px");
@@ -371,6 +373,70 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			}
 		});
 	}
+	
+	private void loadSearchButton() {
+		final Button loadSearchButton = new Button("Search");
+		//final TextBox loadLatitudeTextBox = new TextBox();
+		//final TextBox loadLongitudeTextBox = new TextBox();
+		final TextBox loadSearchBox = new TextBox();
+		final ListBox listOfParkAttributes = new ListBox();
+		
+		listOfParkAttributes.addItem("Park ID");
+		listOfParkAttributes.addItem("Park Name");
+		listOfParkAttributes.addItem("Official");
+		listOfParkAttributes.addItem("Street Number");
+		listOfParkAttributes.addItem("Street Name");
+		listOfParkAttributes.addItem("East-West Street Name");
+		listOfParkAttributes.addItem("North-South Street Name");
+		listOfParkAttributes.addItem("Coordinates");
+		listOfParkAttributes.addItem("Size in Hectares");
+		listOfParkAttributes.addItem("Neighbourhood Name");
+		listOfParkAttributes.addItem("Neighbourhood URL");
+		
+		listOfParkAttributes.setVisibleItemCount(1);
+		
+		// We can add style names to widgets
+		loadSearchButton.setStyleName("loadSearchButton");
+		//loadLatitudeTextBox.setWidth("55px");
+		//loadLongitudeTextBox.setWidth("55px");
+		loadSearchBox.setWidth("110px");
+		//loadLatitudeTextBox.setText("Latitude");
+		//loadLongitudeTextBox.setText("Longitude");
+		loadSearchBox.setText("Enter search term");
+		//RootPanel.get("body").add(loadLatitudeTextBox);
+		//RootPanel.get("body").add(loadLongitudeTextBox);
+		RootPanel.get("body").add(loadSearchBox);
+		RootPanel.get("body").add(listOfParkAttributes);
+		RootPanel.get("body").add(loadSearchButton);
+
+		loadSearchButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				// Assume input is valid
+				//String s1 = loadLatitudeTextBox.getText();
+				//String s2 = loadLongitudeTextBox.getText();
+				final String searchTerm = loadSearchBox.getText();
+				//String s3 = loadParkTextBox.getText();
+				//final Double latitude = Double.valueOf(s1);
+				//final Double longitude = Double.valueOf(s2);
+				//Long parkID = Long.valueOf(s3);
+				Long parkID = Long.valueOf(1);
+
+				loadParksSvc.getPark(parkID, new AsyncCallback<Park>() {
+					public void onFailure(Throwable caught) {
+						System.out.println("Error occured: " + caught.getMessage());
+						handleError(caught);
+					}
+
+					public void onSuccess(Park result) {
+						DirectionsDialog dd = new DirectionsDialog(searchTerm, result);
+						dd.showRelativeTo(loadSearchButton);
+						
+					}
+				});
+			}
+		});
+	}
+
 	
 	private void loadFacebookButtons(Park park) {
 		RootPanel.get("fb-footer").clear();
