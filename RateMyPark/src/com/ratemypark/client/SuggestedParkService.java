@@ -12,4 +12,5 @@ import com.ratemypark.exception.DatabaseException;
 @RemoteServiceRelativePath("suggested-park")
 public interface SuggestedParkService extends RemoteService {
 	Park getRandomPark() throws DatabaseException;
+	SuggestedPark getHighestRated() throws DatabaseException;
 }

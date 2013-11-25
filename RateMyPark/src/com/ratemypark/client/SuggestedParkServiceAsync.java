@@ -7,4 +7,5 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public interface SuggestedParkServiceAsync {
 	void getRandomPark(AsyncCallback<Park> callback);
+	void getHighestRated(AsyncCallback<SuggestedPark> callback);
 }

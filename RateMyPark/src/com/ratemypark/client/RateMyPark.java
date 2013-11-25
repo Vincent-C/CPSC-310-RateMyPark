@@ -455,15 +455,18 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		final VerticalPanel suggestedParkPanel = new VerticalPanel();
 		suggestedParkPanel.setStyleName("suggestedParkPanel");
 		
-		suggestedParkSvc.getRandomPark(new AsyncCallback<Park>() {
+		suggestedParkSvc.getHighestRated(new AsyncCallback<SuggestedPark>() {
 			public void onFailure(Throwable caught) {
 				Window.alert("Failed to get a suggested park");
 			}
 
-			public void onSuccess(Park result) {
-				suggestedParkPanel.add(new HTML("<b>" + "Our users suggest you should visit:" +"</b>"));
-				Hyperlink link = new Hyperlink(result.getPname(), String.valueOf(result.getPid()));
+			public void onSuccess(SuggestedPark result) {
+				Park park = result.getPark();
+				suggestedParkPanel.add(new HTML("<b>" + "You should visit our highest rated park:" +"</b>"));
+				Hyperlink link = new Hyperlink(park.getPname(), String.valueOf(park.getPid()));
 				suggestedParkPanel.add(link);
+				suggestedParkPanel.add(new HTML("Rating: " + result.getRating() + " out of 5"));
+				suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
 				RootPanel.get("body").add(suggestedParkPanel);
 			}
 		});
