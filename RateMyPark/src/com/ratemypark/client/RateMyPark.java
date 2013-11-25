@@ -1311,7 +1311,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			if (!parks.isEmpty()) {
 				for (Park p : parks) {
 					if (attribute.equals("Park Name")) {
-						if (p.getPname().contains(searchTerm)) {
+						if (p.getPname().toLowerCase().contains(searchTerm.toLowerCase())) {
 							table.insertRow(index);
 							addParkData(index, p);
 							index++;
@@ -1325,14 +1325,14 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						}
 					}
 					if (attribute.equals("Official")) {
-						if (searchTerm.equals("Yes")) {
+						if (searchTerm.toLowerCase().equals("yes")) {
 							if (p.isOfficial()) {
 								table.insertRow(index);
 								addParkData(index,p);
 								index++;
 							}
 						}
-						if (searchTerm.equals("No")) {
+						if (searchTerm.toLowerCase().equals("no")) {
 							if (!p.isOfficial()) {
 								table.insertRow(index);
 								addParkData(index, p);
@@ -1348,21 +1348,21 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						}
 					}
 					if(attribute.equals("Street Name")) {
-						if (p.getStreetName().contains(searchTerm)) {
+						if (p.getStreetName().toLowerCase().contains(searchTerm.toLowerCase())) {
 							table.insertRow(index);
 							addParkData(index, p);
 							index++;
 						}
 					}
 					if (attribute.equals("East-West Street Name")) {
-						if (p.getEwStreet().contains(searchTerm)) {
+						if (p.getEwStreet().toLowerCase().contains(searchTerm.toLowerCase())) {
 							table.insertRow(index);
 							addParkData(index, p);
 							index++;
 						}
 					}
 					if (attribute.equals("North-South Street Name")) {
-						if (p.getNsStreet().contains(searchTerm)) {
+						if (p.getNsStreet().toLowerCase().contains(searchTerm.toLowerCase())) {
 							table.insertRow(index);
 							addParkData(index, p);
 							index++;
@@ -1390,14 +1390,14 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						}
 					}
 					if (attribute.equals("Neighbourhood Name")) {
-						if (p.getNeighbourhoodName().contains(searchTerm)) {
+						if (p.getNeighbourhoodName().toLowerCase().contains(searchTerm.toLowerCase())) {
 							table.insertRow(index);
 							addParkData(index, p);
 							index++;
 						}
 					}
 					if (attribute.equals("Neighbourhood URL")) {
-						if (searchTerm.equals(p.getNeighbourhoodURL())) {
+						if (searchTerm.toLowerCase().equals(p.getNeighbourhoodURL().toLowerCase())) {
 							table.insertRow(index);
 							addParkData(index, p);
 							index++;
@@ -1409,7 +1409,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			}
 			
 			if (table.getRowCount() > 1) {
-				dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_LEFT);
+				//dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_LEFT);
 				dialogVPanel.add(table);
 			}
 			else {
