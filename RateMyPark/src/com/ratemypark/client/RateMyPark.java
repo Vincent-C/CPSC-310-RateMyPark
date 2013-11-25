@@ -388,7 +388,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		listOfParkAttributes.addItem("Street Name");
 		listOfParkAttributes.addItem("East-West Street Name");
 		listOfParkAttributes.addItem("North-South Street Name");
-		listOfParkAttributes.addItem("Coordinates");
+		listOfParkAttributes.addItem("Latitude");
+		listOfParkAttributes.addItem("Longitude");
 		listOfParkAttributes.addItem("Size in Hectares");
 		listOfParkAttributes.addItem("Neighbourhood Name");
 		listOfParkAttributes.addItem("Neighbourhood URL");
@@ -421,7 +422,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				//final Double longitude = Double.valueOf(s2);
 				//Long parkID = Long.valueOf(s3);
 				int selectedIndex = listOfParkAttributes.getSelectedIndex();
-				String chosenAttribute = listOfParkAttributes.getValue(selectedIndex);
+				final String chosenAttribute = listOfParkAttributes.getValue(selectedIndex);
 
 				loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
 					public void onFailure(Throwable caught) {
@@ -1282,5 +1283,181 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		setWidget(dialogVPanel);
 		}
 	}
+	
+	private static class SearchDialog extends DecoratedPopupPanel {
+		
+		FlexTable table = new FlexTable();
+		public SearchDialog(String searchTerm, String attribute, List<Park> parks) {
+			setAnimationEnabled(true);
+			final VerticalPanel dialogVPanel = new VerticalPanel();
+			
+
+			table.setBorderWidth(12);
+			table.setText(0, 0, "");
+			table.setText(0, 1, "Park ID");
+			table.setText(0, 2, "Park Name");
+			table.setText(0, 3, "Official");
+			table.setText(0, 4, "Street Number");
+			table.setText(0, 5, "Street Name");
+			table.setText(0, 6, "East-West Street Name");
+			table.setText(0, 7, "North-South Street Name");
+			table.setText(0, 8, "Coordinates");
+			table.setText(0, 9, "Size in Hectares");
+			table.setText(0, 10, "Neighbourhood Name");
+			table.setText(0, 11, "Neighbourhood URL");
+			table.getRowFormatter().setStyleName(0, "tableheader");
+			
+			int index = 1;
+			if (!parks.isEmpty()) {
+				for (Park p : parks) {
+					if (attribute.equals("Park Name")) {
+						if (p.getPname().contains(searchTerm)) {
+							table.insertRow(index);
+							addParkData(index, p);
+							index++;
+						}
+					}
+					if (attribute.equals("Park ID")) {
+						if (searchTerm.equals(String.valueOf(p.getPid()))) {
+							table.insertRow(index);
+							addParkData(index, p);
+							index++;
+						}
+					}
+					if (attribute.equals("Official")) {
+						if (searchTerm.equals("Yes")) {
+							if (p.isOfficial()) {
+								table.insertRow(index);
+								addParkData(index,p);
+								index++;
+							}
+						}
+						if (searchTerm.equals("No")) {
+							if (!p.isOfficial()) {
+								table.insertRow(index);
+								addParkData(index, p);
+								index++;
+							}
+						}
+					}
+					if (attribute.equals("Street Number")) {
+						if ((String.valueOf(p.getStreetNumber()).contains(searchTerm))) {
+							table.insertRow(index);
+							addParkData(index, p);
+							index++;
+						}
+					}
+					if(attribute.equals("Street Name")) {
+						if (p.getStreetName().contains(searchTerm)) {
+							table.insertRow(index);
+							addParkData(index, p);
+							index++;
+						}
+					}
+					if (attribute.equals("East-West Street Name")) {
+						if (p.getEwStreet().contains(searchTerm)) {
+							table.insertRow(index);
+							addParkData(index, p);
+							index++;
+						}
+					}
+					if (attribute.equals("North-South Street Name")) {
+						if (p.getNsStreet().contains(searchTerm)) {
+							table.insertRow(index);
+							addParkData(index, p);
+							index++;
+						}
+					}
+					if (attribute.equals("Latitude")) {
+						if (searchTerm.equals(String.valueOf(p.getLatitude())) || searchTerm.equals(String.valueOf(p.getLatitude().intValue()))) {
+							table.insertRow(index);
+							addParkData(index, p);
+							index++;
+						}
+					}
+					if (attribute.equals("Longitude")) {
+						if (searchTerm.equals(String.valueOf(p.getLongitude())) || searchTerm.equals(String.valueOf(p.getLongitude().intValue()))) {
+							table.insertRow(index);
+							addParkData(index, p);
+							index++;
+						}
+					}
+					if (attribute.equals("Size in Hectares")) {
+						if (searchTerm.equals(String.valueOf(p.getHectare()))) {
+							table.insertRow(index);
+							addParkData(index, p);
+							index++;
+						}
+					}
+					if (attribute.equals("Neighbourhood Name")) {
+						if (p.getNeighbourhoodName().contains(searchTerm)) {
+							table.insertRow(index);
+							addParkData(index, p);
+							index++;
+						}
+					}
+					if (attribute.equals("Neighbourhood URL")) {
+						if (searchTerm.equals(p.getNeighbourhoodURL())) {
+							table.insertRow(index);
+							addParkData(index, p);
+							index++;
+						}
+					}
+					
+				} 
+				
+			}
+			
+			if (table.getRowCount() > 1) {
+				dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_LEFT);
+				dialogVPanel.add(table);
+			}
+			else {
+				Label label = new Label();
+				label.setText("No Parks matched query");
+				dialogVPanel.add(label);
+			}
+			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
+			final Button closeButton = new Button("Close");
+			closeButton.getElement().setId("closeButton");
+			dialogVPanel.add(closeButton);
+
+			closeButton.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					SearchDialog.this.hide();
+				}
+			});
+			setGlassEnabled(true);
+			setWidget(dialogVPanel);
+			
+		}
+		private String isOfficialString(Park p) {
+			if (p.isOfficial())
+				return "Yes";
+			else
+				return "No";
+		}
+
+		private String getCoordinateString(Park p) {
+			double latitude = p.getLatitude();
+			double longitude = p.getLongitude();
+			return String.valueOf(latitude) + ", " + String.valueOf(longitude);
+		}
+		
+		private void addParkData(int index, Park p) {
+			table.setText(index, 1, String.valueOf(p.getPid()));
+			table.setText(index, 2, p.getPname());
+			table.setText(index, 3, isOfficialString(p));
+			table.setText(index, 4, String.valueOf(p.getStreetNumber()));
+			table.setText(index, 5, p.getStreetName());
+			table.setText(index, 6, p.getEwStreet());
+			table.setText(index, 7, p.getNsStreet());
+			table.setText(index, 8, getCoordinateString(p));
+			table.setText(index, 9, String.valueOf(p.getHectare()));
+			table.setText(index, 10, p.getNeighbourhoodName());
+			table.setText(index, 11, p.getNeighbourhoodURL());
+		}
+	}
+	
 
 }
