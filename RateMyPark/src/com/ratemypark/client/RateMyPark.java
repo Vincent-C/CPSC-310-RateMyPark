@@ -420,17 +420,18 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				//final Double latitude = Double.valueOf(s1);
 				//final Double longitude = Double.valueOf(s2);
 				//Long parkID = Long.valueOf(s3);
-				Long parkID = Long.valueOf(1);
+				int selectedIndex = listOfParkAttributes.getSelectedIndex();
+				String chosenAttribute = listOfParkAttributes.getValue(selectedIndex);
 
-				loadParksSvc.getPark(parkID, new AsyncCallback<Park>() {
+				loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
 					public void onFailure(Throwable caught) {
 						System.out.println("Error occured: " + caught.getMessage());
 						handleError(caught);
 					}
 
-					public void onSuccess(Park result) {
-						DirectionsDialog dd = new DirectionsDialog(searchTerm, result);
-						dd.showRelativeTo(loadSearchButton);
+					public void onSuccess(List<Park> result) {
+						SearchDialog sd = new SearchDialog(searchTerm, chosenAttribute, result);
+						sd.showRelativeTo(loadSearchButton);
 						
 					}
 				});
