@@ -233,6 +233,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		clearBodyAndFooter();
 		loadDirectionsButton();
 		loadParksTable();
+		loadSuggestedPark();
 		loadParksTextandButton();
 	}
 
@@ -444,6 +445,26 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				RootPanel.get("body").add(new FlexTable());
 				RootPanel.get("body").add(compareButton);
 				RootPanel.get("body").add(table);
+			}
+		});
+	}
+	
+	private void loadSuggestedPark() {
+		final SuggestedParkServiceAsync suggestedParkSvc = GWT.create(SuggestedParkService.class);
+		
+		final VerticalPanel suggestedParkPanel = new VerticalPanel();
+		suggestedParkPanel.setStyleName("suggestedParkPanel");
+		
+		suggestedParkSvc.getRandomPark(new AsyncCallback<Park>() {
+			public void onFailure(Throwable caught) {
+				Window.alert("Failed to get a suggested park");
+			}
+
+			public void onSuccess(Park result) {
+				suggestedParkPanel.add(new HTML("<b>" + "Our users suggest you should visit:" +"</b>"));
+				Hyperlink link = new Hyperlink(result.getPname(), String.valueOf(result.getPid()));
+				suggestedParkPanel.add(link);
+				RootPanel.get("body").add(suggestedParkPanel);
 			}
 		});
 	}
@@ -832,11 +853,12 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					public void onSuccess(List<Review> result) {
 						if (result.isEmpty()) {
 							reviewsPanel.add(new HTMLPanel("<div>" + "You have not yet reviewed any parks."+ "</div>"));
-						}
-						for (Review r : result) {
-							reviewsPanel.add(new HTML("<b>" + "Review for " + r.getParkName() + "</b> "
-									+ r.getDateCreated().toString()));
-							reviewsPanel.add(new HTML(r.getReviewText()));
+						} else {
+							for (Review r : result) {
+								reviewsPanel.add(new HTML("<b>" + "Review for " + r.getParkName() + "</b> "
+										+ r.getDateCreated().toString()));
+								reviewsPanel.add(new HTML(r.getReviewText()));
+							}
 						}
 					}
 				});
