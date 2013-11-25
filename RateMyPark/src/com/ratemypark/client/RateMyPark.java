@@ -394,6 +394,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		listOfParkAttributes.addItem("Neighbourhood URL");
 		
 		listOfParkAttributes.setVisibleItemCount(1);
+		listOfParkAttributes.setSelectedIndex(1);
 		
 		// We can add style names to widgets
 		loadSearchButton.setStyleName("loadSearchButton");
