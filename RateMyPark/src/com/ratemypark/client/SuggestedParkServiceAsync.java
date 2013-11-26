@@ -6,6 +6,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * The async counterpart of <code>SuggestedParkService</code>.
  */
 public interface SuggestedParkServiceAsync {
-	void getRandomPark(AsyncCallback<Park> callback);
+	void getRandomPark(AsyncCallback<SuggestedPark> callback);
 	void getHighestRated(AsyncCallback<SuggestedPark> callback);
+	void getMostRated(AsyncCallback<SuggestedPark> callback);
 }

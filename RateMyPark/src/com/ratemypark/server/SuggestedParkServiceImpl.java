@@ -29,22 +29,39 @@ public class SuggestedParkServiceImpl extends RemoteServiceServlet implements Su
 			.getPersistenceManagerFactory("transactions-optional");
 
 	@Override
-	public Park getRandomPark() throws DatabaseException {
+	public SuggestedPark getRandomPark() throws DatabaseException {
 		rng = new java.util.Random();
 		int maxPid = getMaxParkId();
 		int randomParkId = rng.nextInt(maxPid) + 1;
-		System.out.println("Random park: " + randomParkId);
 
+		SuggestedPark suggestedPark;
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Park park = pm.getObjectById(Park.class, randomParkId);
 			pm.refresh(park);
-			return park;
+			Query q = pm.newQuery(Rating.class, "pid == parkID");
+			q.declareParameters("Long parkID");
+			List<Rating> result = (List<Rating>) q.execute(park.getPid());
+
+			int avgRating = 0, numRatings = 0;
+
+			for (Rating r : result) {
+				if (r.getPid() == park.getPid()) { // if statement just to ensure we have the right park
+					avgRating += r.getRating();
+					numRatings++;
+				} else {
+					System.out.println("SHOULDNT RUN IN ELSE CLAUSE");
+				}
+			}
+			suggestedPark = new SuggestedPark(park, avgRating, numRatings);
+
 		} catch (JDOObjectNotFoundException e) {
-			return getRandomPark();
+			suggestedPark = getRandomPark();
 		} finally {
 			pm.close();
 		}
+
+		return suggestedPark;
 	}
 
 	@Override
@@ -62,8 +79,6 @@ public class SuggestedParkServiceImpl extends RemoteServiceServlet implements Su
 				numRatings[id]++;
 				ratingsTotal[id] = ratingsTotal[id] + r.getRating();
 			}
-		} catch (JDOObjectNotFoundException e) {
-			throw new DatabaseException();
 		} finally {
 			pm.close();
 		}
@@ -83,17 +98,63 @@ public class SuggestedParkServiceImpl extends RemoteServiceServlet implements Su
 		}
 
 		Park park;
+		SuggestedPark suggestedPark;
 		pm = getPersistenceManager();
 		try {
 			park = pm.getObjectById(Park.class, maxParkId);
+			suggestedPark = new SuggestedPark(park, maxRating, maxNumRatings);
 		} catch (JDOObjectNotFoundException e) {
-			park = getRandomPark();
-			maxRating = 0;
-			maxNumRatings = 0;
+			suggestedPark = getRandomPark();
 		} finally {
 			pm.close();
 		}
-		SuggestedPark suggestedPark = new SuggestedPark(park, maxRating, maxNumRatings);
+		return suggestedPark;
+	}
+
+	@Override
+	public SuggestedPark getMostRated() throws DatabaseException {
+		int maxPid = getMaxParkId();
+		int[] numRatings = new int[maxPid + 1];
+		long[] ratingsTotal = new long[maxPid + 1];
+
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(Rating.class);
+			List<Rating> result = (List<Rating>) q.execute();
+			for (Rating r : result) {
+				int id = r.getPid().intValue();
+				numRatings[id]++;
+				ratingsTotal[id] = ratingsTotal[id] + r.getRating();
+			}
+		} finally {
+			pm.close();
+		}
+
+		long maxRating = 0;
+		int maxNumRatings = 0;
+		int maxParkId = 1;
+		for (int i = 1; i < numRatings.length; i++) {
+			if (numRatings[i] != 0) {
+				ratingsTotal[i] = ratingsTotal[i] / numRatings[i];
+				if (numRatings[i] >= maxNumRatings) {
+					maxParkId = i;
+					maxRating = ratingsTotal[i];
+					maxNumRatings = numRatings[i];
+				}
+			}
+		}
+
+		Park park;
+		SuggestedPark suggestedPark;
+		pm = getPersistenceManager();
+		try {
+			park = pm.getObjectById(Park.class, maxParkId);
+			suggestedPark = new SuggestedPark(park, maxRating, maxNumRatings);
+		} catch (JDOObjectNotFoundException e) {
+			suggestedPark = getRandomPark();
+		} finally {
+			pm.close();
+		}
 		return suggestedPark;
 	}
 

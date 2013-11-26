@@ -234,9 +234,10 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		clearBodyAndFooter();
 		loadDirectionsButton();
 		loadSearchButton();
-		loadParksTable();
 		loadSuggestedPark();
-		loadParksTextandButton();
+		loadParksTable();
+
+//		loadParksTextandButton(); // commenting this out, because we dont need it
 	}
 
 	public void onValueChange(ValueChangeEvent<String> event) {
@@ -272,10 +273,10 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					clearBodyAndFooter();
 					NodeList<Element> tags = Document.get().getElementsByTagName("meta");
 					for (int i = 0; i < tags.getLength(); i++) {
-				        if (tags.getItem(i).getAttribute("property").equals("og:title")) {
-				        	tags.getItem(i).setAttribute("content",park.getPname());
-				        }
-				    }
+						if (tags.getItem(i).getAttribute("property").equals("og:title")) {
+							tags.getItem(i).setAttribute("content", park.getPname());
+						}
+					}
 					// Create table of data related to this specific park
 					loadSpecificParkTable(park);
 					loadMapApi(park);
@@ -326,23 +327,23 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 	private void loadDirectionsButton() {
 		final Button loadDirectionsButton = new Button("Map directions");
-		//final TextBox loadLatitudeTextBox = new TextBox();
-		//final TextBox loadLongitudeTextBox = new TextBox();
+		// final TextBox loadLatitudeTextBox = new TextBox();
+		// final TextBox loadLongitudeTextBox = new TextBox();
 		final TextBox loadLocationBox = new TextBox();
 		final TextBox loadParkTextBox = new TextBox();
 
 		// We can add style names to widgets
 		loadDirectionsButton.setStyleName("loadDirectionsButton");
-		//loadLatitudeTextBox.setWidth("55px");
-		//loadLongitudeTextBox.setWidth("55px");
+		// loadLatitudeTextBox.setWidth("55px");
+		// loadLongitudeTextBox.setWidth("55px");
 		loadLocationBox.setWidth("110px");
 		loadParkTextBox.setWidth("50px");
-		//loadLatitudeTextBox.setText("Latitude");
-		//loadLongitudeTextBox.setText("Longitude");
+		// loadLatitudeTextBox.setText("Latitude");
+		// loadLongitudeTextBox.setText("Longitude");
 		loadLocationBox.setText("Insert your address here");
 		loadParkTextBox.setText("Park ID");
-		//RootPanel.get("body").add(loadLatitudeTextBox);
-		//RootPanel.get("body").add(loadLongitudeTextBox);
+		// RootPanel.get("body").add(loadLatitudeTextBox);
+		// RootPanel.get("body").add(loadLongitudeTextBox);
 		RootPanel.get("body").add(loadLocationBox);
 		RootPanel.get("body").add(loadParkTextBox);
 		RootPanel.get("body").add(loadDirectionsButton);
@@ -350,12 +351,12 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		loadDirectionsButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				// Assume input is valid
-				//String s1 = loadLatitudeTextBox.getText();
-				//String s2 = loadLongitudeTextBox.getText();
+				// String s1 = loadLatitudeTextBox.getText();
+				// String s2 = loadLongitudeTextBox.getText();
 				final String location = loadLocationBox.getText();
 				String s3 = loadParkTextBox.getText();
-				//final Double latitude = Double.valueOf(s1);
-				//final Double longitude = Double.valueOf(s2);
+				// final Double latitude = Double.valueOf(s1);
+				// final Double longitude = Double.valueOf(s2);
 				Long parkID = Long.valueOf(s3);
 
 				loadParksSvc.getPark(parkID, new AsyncCallback<Park>() {
@@ -367,20 +368,20 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					public void onSuccess(Park result) {
 						DirectionsDialog dd = new DirectionsDialog(location, result);
 						dd.showRelativeTo(loadDirectionsButton);
-						
+
 					}
 				});
 			}
 		});
 	}
-	
+
 	private void loadSearchButton() {
 		final Button loadSearchButton = new Button("Search");
-		//final TextBox loadLatitudeTextBox = new TextBox();
-		//final TextBox loadLongitudeTextBox = new TextBox();
+		// final TextBox loadLatitudeTextBox = new TextBox();
+		// final TextBox loadLongitudeTextBox = new TextBox();
 		final TextBox loadSearchBox = new TextBox();
 		final ListBox listOfParkAttributes = new ListBox();
-		
+
 		listOfParkAttributes.addItem("Park ID");
 		listOfParkAttributes.addItem("Park Name");
 		listOfParkAttributes.addItem("Official");
@@ -392,19 +393,19 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		listOfParkAttributes.addItem("Size in Hectares");
 		listOfParkAttributes.addItem("Neighbourhood Name");
 		listOfParkAttributes.addItem("Neighbourhood URL");
-		
+
 		listOfParkAttributes.setVisibleItemCount(1);
-		
+
 		// We can add style names to widgets
 		loadSearchButton.setStyleName("loadSearchButton");
-		//loadLatitudeTextBox.setWidth("55px");
-		//loadLongitudeTextBox.setWidth("55px");
+		// loadLatitudeTextBox.setWidth("55px");
+		// loadLongitudeTextBox.setWidth("55px");
 		loadSearchBox.setWidth("110px");
-		//loadLatitudeTextBox.setText("Latitude");
-		//loadLongitudeTextBox.setText("Longitude");
+		// loadLatitudeTextBox.setText("Latitude");
+		// loadLongitudeTextBox.setText("Longitude");
 		loadSearchBox.setText("Enter search term");
-		//RootPanel.get("body").add(loadLatitudeTextBox);
-		//RootPanel.get("body").add(loadLongitudeTextBox);
+		// RootPanel.get("body").add(loadLatitudeTextBox);
+		// RootPanel.get("body").add(loadLongitudeTextBox);
 		RootPanel.get("body").add(loadSearchBox);
 		RootPanel.get("body").add(listOfParkAttributes);
 		RootPanel.get("body").add(loadSearchButton);
@@ -412,13 +413,13 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		loadSearchButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				// Assume input is valid
-				//String s1 = loadLatitudeTextBox.getText();
-				//String s2 = loadLongitudeTextBox.getText();
+				// String s1 = loadLatitudeTextBox.getText();
+				// String s2 = loadLongitudeTextBox.getText();
 				final String searchTerm = loadSearchBox.getText();
-				//String s3 = loadParkTextBox.getText();
-				//final Double latitude = Double.valueOf(s1);
-				//final Double longitude = Double.valueOf(s2);
-				//Long parkID = Long.valueOf(s3);
+				// String s3 = loadParkTextBox.getText();
+				// final Double latitude = Double.valueOf(s1);
+				// final Double longitude = Double.valueOf(s2);
+				// Long parkID = Long.valueOf(s3);
 				Long parkID = Long.valueOf(1);
 
 				loadParksSvc.getPark(parkID, new AsyncCallback<Park>() {
@@ -430,19 +431,18 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					public void onSuccess(Park result) {
 						DirectionsDialog dd = new DirectionsDialog(searchTerm, result);
 						dd.showRelativeTo(loadSearchButton);
-						
+
 					}
 				});
 			}
 		});
 	}
 
-	
 	private void loadFacebookButtons(Park park) {
 		RootPanel.get("fb-footer").clear();
 		RootPanel.get("fb-footer").getElement().setAttribute("style", "");
 		String pageURL = Window.Location.getHref();
-	
+
 		System.out.println("Website URL: " + pageURL);
 		HTMLPanel likeButton = new HTMLPanel("<input type= 'button' value='Like this Park: " + park.getPname()
 				+ "!' onclick='postLike();'>");
@@ -514,28 +514,96 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			}
 		});
 	}
-	
+
 	private void loadSuggestedPark() {
 		final SuggestedParkServiceAsync suggestedParkSvc = GWT.create(SuggestedParkService.class);
-		
+
 		final VerticalPanel suggestedParkPanel = new VerticalPanel();
 		suggestedParkPanel.setStyleName("suggestedParkPanel");
-		
-		suggestedParkSvc.getHighestRated(new AsyncCallback<SuggestedPark>() {
-			public void onFailure(Throwable caught) {
-				Window.alert("Failed to get a suggested park");
+
+		// if not logged in, pick a random method to suggest the park
+		if (loginInfo == null) {
+			java.util.Random rng = new java.util.Random();
+			int methodNum = rng.nextInt(3);
+			switch (methodNum) {
+			case 0: // Show random park
+				suggestedParkSvc.getRandomPark(new AsyncCallback<SuggestedPark>() {
+					public void onFailure(Throwable caught) {
+						Window.alert("Failed to get a random suggested park");
+					}
+
+					public void onSuccess(SuggestedPark result) {
+						Park park = result.getPark();
+						suggestedParkPanel.add(new HTML("<b>" + "You should visit this park:" + "</b>"));
+						Hyperlink link = new Hyperlink(park.getPname(), String.valueOf(park.getPid()));
+						suggestedParkPanel.add(link);
+						if (result.getNumRatings() == 0) {
+							suggestedParkPanel.add(new HTML("This park has yet to be rated."));
+						} else {
+							suggestedParkPanel.add(new HTML("Average Rating: " + result.getRating() + " out of 5"));
+							suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
+						}
+						RootPanel.get("body").add(suggestedParkPanel);
+					}
+				});
+				break;
+			case 1: // Show highest rated park
+				suggestedParkSvc.getHighestRated(new AsyncCallback<SuggestedPark>() {
+					public void onFailure(Throwable caught) {
+						Window.alert("Failed to get a highest suggested park");
+					}
+
+					public void onSuccess(SuggestedPark result) {
+						Park park = result.getPark();
+						suggestedParkPanel.add(new HTML("<b>" + "You should visit our highest rated park:" + "</b>"));
+						Hyperlink link = new Hyperlink(park.getPname(), String.valueOf(park.getPid()));
+						suggestedParkPanel.add(link);
+						suggestedParkPanel.add(new HTML("Average Rating: " + result.getRating() + " out of 5"));
+						suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
+						RootPanel.get("body").add(suggestedParkPanel);
+					}
+				});
+				break;
+			case 2: // Show most rated park
+				suggestedParkSvc.getMostRated(new AsyncCallback<SuggestedPark>() {
+					public void onFailure(Throwable caught) {
+						Window.alert("Failed to get a most rated suggested park");
+					}
+
+					public void onSuccess(SuggestedPark result) {
+						Park park = result.getPark();
+						suggestedParkPanel.add(new HTML("<b>" + "You should visit our most rated park:" + "</b>"));
+						Hyperlink link = new Hyperlink(park.getPname(), String.valueOf(park.getPid()));
+						suggestedParkPanel.add(link);
+						suggestedParkPanel.add(new HTML("Average Rating: " + result.getRating() + " out of 5"));
+						suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
+						RootPanel.get("body").add(suggestedParkPanel);
+					}
+				});
+				break;
+			default:
+				// shouldnt run
 			}
 
-			public void onSuccess(SuggestedPark result) {
-				Park park = result.getPark();
-				suggestedParkPanel.add(new HTML("<b>" + "You should visit our highest rated park:" +"</b>"));
-				Hyperlink link = new Hyperlink(park.getPname(), String.valueOf(park.getPid()));
-				suggestedParkPanel.add(link);
-				suggestedParkPanel.add(new HTML("Rating: " + result.getRating() + " out of 5"));
-				suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
-				RootPanel.get("body").add(suggestedParkPanel);
-			}
-		});
+		} else {
+
+			// Check user preferences, to see what suggestion we want to show
+			suggestedParkSvc.getHighestRated(new AsyncCallback<SuggestedPark>() {
+				public void onFailure(Throwable caught) {
+					Window.alert("Failed to get a suggested park");
+				}
+
+				public void onSuccess(SuggestedPark result) {
+					Park park = result.getPark();
+					suggestedParkPanel.add(new HTML("<b>" + "You should visit our highest rated park:" + "</b>"));
+					Hyperlink link = new Hyperlink(park.getPname(), String.valueOf(park.getPid()));
+					suggestedParkPanel.add(link);
+					suggestedParkPanel.add(new HTML("Average Rating: " + result.getRating() + " out of 5"));
+					suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
+					RootPanel.get("body").add(suggestedParkPanel);
+				}
+			});
+		}
 	}
 
 	private void loadSpecificParkTable(Park park) {
@@ -607,7 +675,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			System.out.println("Park is null");
 	}
 
-	
 	private void loadParkReviews(Park park) {
 		final ReviewServiceAsync reviewSvc = GWT.create(ReviewService.class);
 		final Long pid = park.getPid();
@@ -630,7 +697,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 			public void onSuccess(List<Review> result) {
 				if (result.isEmpty()) {
-					reviewsPanel.add(new HTMLPanel("<div id='noReviews'>" + "There are no reviews for this park yet."+ "</div>"));
+					reviewsPanel.add(new HTMLPanel("<div id='noReviews'>" + "There are no reviews for this park yet."
+							+ "</div>"));
 				} else {
 					for (Review r : result) {
 						reviewsPanel.add(new HTML("<b>" + "Review by: " + r.getUsername() + "</b> "
@@ -659,22 +727,23 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						Window.alert("Your review is too long.");
 					} else {
 						// Only logged in users be able to see this, so loginInfo should not be null
-						reviewSvc.newReview(loginInfo.getUsername(), pid, parkName, reviewText, new AsyncCallback<Review>() {
-							public void onFailure(Throwable caught) {
-								Window.alert("Could not create your review!");
-							}
+						reviewSvc.newReview(loginInfo.getUsername(), pid, parkName, reviewText,
+								new AsyncCallback<Review>() {
+									public void onFailure(Throwable caught) {
+										Window.alert("Could not create your review!");
+									}
 
-							public void onSuccess(Review newReview) {
-								Element noReviews = Document.get().getElementById("noReviews");
-								if (noReviews != null) {
-									noReviews.setAttribute("style", "display:none");
-								}
-								reviewTextArea.setText("");
-								reviewsPanel.add(new HTML("<b>" + "Review by: " + newReview.getUsername() + "</b> "
-										+ newReview.getDateCreated().toString()));
-								reviewsPanel.add(new HTML(newReview.getReviewText()));
-							}
-						});
+									public void onSuccess(Review newReview) {
+										Element noReviews = Document.get().getElementById("noReviews");
+										if (noReviews != null) {
+											noReviews.setAttribute("style", "display:none");
+										}
+										reviewTextArea.setText("");
+										reviewsPanel.add(new HTML("<b>" + "Review by: " + newReview.getUsername()
+												+ "</b> " + newReview.getDateCreated().toString()));
+										reviewsPanel.add(new HTML(newReview.getReviewText()));
+									}
+								});
 					}
 				}
 			});
@@ -706,8 +775,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			public void onSuccess(Integer result) {
 				// do something with the average
 				if (result == 0) {
-					ratingsPanel.add(new HTML("<b>" + "No one has rated this park yet. Be the first to rate it!"
-							+ "</b> "));
+					ratingsPanel.add(new HTML("No one has rated this park yet. Be the first to rate it!"));
 				} else {
 					ratingSvc.averageRating(pid, new AsyncCallback<Float>() {
 						public void onFailure(Throwable caught) {
@@ -760,7 +828,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			submitRating.addClickHandler(new ClickHandler() {
 				public void onClick(ClickEvent event) {
 					int ratingNum = getSelectedIndex(rbList);
-					
+
 					if (ratingNum == -1) {
 						Window.alert("Please select a rating before submitting!");
 					} else {
@@ -781,7 +849,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 									public void onSuccess(Integer result) {
 										// do something with the average
 										if (result == 0) {
-											ratingsPanel.add(new HTML("<b>" + "No one has rated this park yet. Be the first to rate it!"
+											ratingsPanel.add(new HTML("<b>"
+													+ "No one has rated this park yet. Be the first to rate it!"
 													+ "</b> "));
 										} else {
 											ratingSvc.averageRating(pid, new AsyncCallback<Float>() {
@@ -793,7 +862,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 													// do something with the average
 													if (result == null) {
 													} else {
-														ratingsPanel.add(new HTML("<b>" + "Average rating: " + result + "</b> "));
+														ratingsPanel.add(new HTML("<b>" + "Average rating: " + result
+																+ "</b> "));
 													}
 												}
 											});
@@ -855,7 +925,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	}
 
 	private void loadProfilePage() {
-				clearBodyAndFooter();
+		clearBodyAndFooter();
 		final EditProfileServiceAsync profileSvc = GWT.create(EditProfileService.class);
 
 		profileSvc.getCurrentProfile(new AsyncCallback<LoginInfo>() {
@@ -909,9 +979,10 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					}
 				});
 				vPanel.add(editProfile);
-				
+
 				final ReviewServiceAsync reviewSvc = GWT.create(ReviewService.class);
-				vPanel.add(new HTMLPanel("<div class='contentHeader'>" + "Reviews by " + profile.getDisplayName() + "</div>"));
+				vPanel.add(new HTMLPanel("<div class='contentHeader'>" + "Reviews by " + profile.getDisplayName()
+						+ "</div>"));
 				final VerticalPanel reviewsPanel = new VerticalPanel();
 				reviewsPanel.setStyleName("reviewsPanel");
 				reviewSvc.getReviewsForUser(profile.getUsername(), new AsyncCallback<List<Review>>() {
@@ -921,7 +992,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 					public void onSuccess(List<Review> result) {
 						if (result.isEmpty()) {
-							reviewsPanel.add(new HTMLPanel("<div>" + "You have not yet reviewed any parks."+ "</div>"));
+							reviewsPanel
+									.add(new HTMLPanel("<div>" + "You have not yet reviewed any parks." + "</div>"));
 						} else {
 							for (Review r : result) {
 								reviewsPanel.add(new HTML("<b>" + "Review for " + r.getParkName() + "</b> "
@@ -1164,7 +1236,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			dialogVPanel.add(table);
 
 			// Directions map setup
-			
+
 			boolean sensor = true;
 
 			// Testing:
@@ -1226,13 +1298,13 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			return String.valueOf(latitude) + ", " + String.valueOf(longitude);
 		}
 	}
-	
+
 	private static class DirectionsDialog extends DecoratedPopupPanel {
 		public DirectionsDialog(final String location, Park park) {
-			
+
 			setAnimationEnabled(true);
 			final VerticalPanel dialogVPanel = new VerticalPanel();
-			
+
 			if (park != null) {
 				boolean sensor = true;
 
@@ -1265,19 +1337,19 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 			else
 				System.out.println("Park is null");
-		
-		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-		final Button closeButton = new Button("Close");
-		closeButton.getElement().setId("closeButton");
-		dialogVPanel.add(closeButton);
 
-		closeButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				DirectionsDialog.this.hide();
-			}
-		});
-		setGlassEnabled(true);
-		setWidget(dialogVPanel);
+			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
+			final Button closeButton = new Button("Close");
+			closeButton.getElement().setId("closeButton");
+			dialogVPanel.add(closeButton);
+
+			closeButton.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					DirectionsDialog.this.hide();
+				}
+			});
+			setGlassEnabled(true);
+			setWidget(dialogVPanel);
 		}
 	}
 
