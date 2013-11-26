@@ -333,6 +333,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		final TextBox loadParkTextBox = new TextBox();
 
 		// We can add style names to widgets
+		//loadDirectionsButton.setStyleName("loadDirectionsButton");
 		loadDirectionsButton.setStyleName("loadDirectionsButton");
 		// loadLatitudeTextBox.setWidth("55px");
 		// loadLongitudeTextBox.setWidth("55px");
@@ -398,6 +399,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		listOfParkAttributes.setVisibleItemCount(1);
 
 		// We can add style names to widgets
+		//loadSearchButton.setStyleName("loadSearchButton");
 		loadSearchButton.setStyleName("loadSearchButton");
 		// loadLatitudeTextBox.setWidth("55px");
 		// loadLongitudeTextBox.setWidth("55px");
