@@ -284,12 +284,28 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 							tags.getItem(i).setAttribute("content", park.getPname());
 						}
 					}
+					
+					// Create a HorizontalSplitPanel to place map and ratings/reviews widgets
+					@SuppressWarnings("deprecation")
+					HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
+					splitPanel.setSize("1600px", "500px");
+					splitPanel.setSplitPosition("750px");
+
+					// VerticalPanel to hold the reviews and ratings as a single widget
+					// (HorizontalSplitWidget only allows one widget on each side of the split
+					VerticalPanel ratingsAndReviews = new VerticalPanel();
+					
+					
 					// Create table of data related to this specific park
 					loadSpecificParkTable(park);
-					loadMapApi(park);
+					loadMapApi(park, splitPanel);
 					loadFacebookButtons(park);
-					loadParkReviews(park);
-					loadParkRatings(park);
+					loadParkReviews(park, ratingsAndReviews);
+					loadParkRatings(park, ratingsAndReviews);
+					
+					splitPanel.setRightWidget(ratingsAndReviews);
+					RootPanel.get("body").add(splitPanel);
+					
 				} else {
 					System.out.println("Park is null");
 				}
@@ -355,7 +371,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 		// We can add style names to widgets
 		// loadDirectionsButton.setStyleName("loadDirectionsButton");
-		loadDirectionsButton.setStyleName("loadDirectionsButton");
+		loadDirectionsButton.setStyleName("our-gwt-Button");
 		// loadLatitudeTextBox.setWidth("55px");
 		// loadLongitudeTextBox.setWidth("55px");
 		loadLocationBox.setWidth("110px");
@@ -375,8 +391,21 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				// Assume input is valid
 				// String s1 = loadLatitudeTextBox.getText();
 				// String s2 = loadLongitudeTextBox.getText();
+				if (loadLocationBox.getText().isEmpty()) {
+					Window.alert("No address specified");
+					return;
+				}
+				if (loadParkTextBox.getText().isEmpty()) {
+					Window.alert("No park ID specified");
+					return;
+				}
+				
 				final String location = loadLocationBox.getText();
 				String s3 = loadParkTextBox.getText();
+				
+				if (!s3.matches("^[0-9]+")) {
+					Window.alert("Invalid park ID specified");
+				}
 				// final Double latitude = Double.valueOf(s1);
 				// final Double longitude = Double.valueOf(s2);
 				Long parkID = Long.valueOf(s3);
@@ -404,6 +433,13 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		final TextBox loadSearchBox = new TextBox();
 		final ListBox listOfParkAttributes = new ListBox();
 
+		loadSearchBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				loadSearchBox.setText("");
+			}
+		});
+		
 		listOfParkAttributes.addItem("Park ID");
 		listOfParkAttributes.addItem("Park Name");
 		listOfParkAttributes.addItem("Official");
@@ -421,7 +457,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		listOfParkAttributes.setSelectedIndex(1);
 
 		// We can add style names to widgets
-		loadSearchButton.setStyleName("loadSearchButton");
+		loadSearchButton.setStyleName("our-gwt-Button");
 		// loadLatitudeTextBox.setWidth("55px");
 		// loadLongitudeTextBox.setWidth("55px");
 		loadSearchBox.setWidth("110px");
@@ -480,7 +516,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 	private void loadParksTable() {
 		final FlexTable table = new FlexTable();
+		table.setStyleName("flexTable-frontpage");
 		final Button compareButton = new Button("Compare");
+		compareButton.setStyleName("our-gwt-Button");
 		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
 			public void onFailure(Throwable caught) {
 				System.out.println("Parks did not get properly");
@@ -652,7 +690,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		RootPanel.get("body").add(table);
 	}
 
-	private void loadMapApi(Park park) {
+	private void loadMapApi(Park park, final HorizontalSplitPanel splitPanel) {
 		if (park != null) {
 			boolean sensor = true;
 
@@ -675,7 +713,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			Runnable onLoad = new Runnable() {
 				@Override
 				public void run() {
-					drawMap(latitude, longitude);
+					drawMap(latitude, longitude, splitPanel);
 				}
 			};
 
@@ -688,20 +726,24 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			System.out.println("Park is null");
 	}
 
-	private void loadParkReviews(Park park) {
+	private void loadParkReviews(Park park, VerticalPanel vertPanel) {
 		final ReviewServiceAsync reviewSvc = GWT.create(ReviewService.class);
 		final Long pid = park.getPid();
 		final String parkName = park.getPname();
 
+		VerticalPanel contentPanel = new VerticalPanel();
+		
 		HTMLPanel header = new HTMLPanel("<div class='contentHeader'>" + "Reviews for " + park.getPname() + "</div>");
-		RootPanel.get("body").add(header);
+		contentPanel.add(header);
 
 		final VerticalPanel reviewsPanel = new VerticalPanel();
 		reviewsPanel.setStyleName("reviewsPanel");
 		final VerticalPanel newReviewsPanel = new VerticalPanel();
 		newReviewsPanel.setStyleName("reviewsPanel");
-		RootPanel.get("body").add(reviewsPanel);
-		RootPanel.get("body").add(newReviewsPanel);
+		contentPanel.add(reviewsPanel);
+		contentPanel.add(newReviewsPanel);
+		
+		vertPanel.add(contentPanel);
 
 		reviewSvc.getReviews(pid, new AsyncCallback<List<Review>>() {
 			public void onFailure(Throwable caught) {
@@ -764,12 +806,14 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		}
 	}
 
-	private void loadParkRatings(Park park) {
+	private void loadParkRatings(Park park, VerticalPanel vertPanel) {
 		final RatingServiceAsync ratingSvc = GWT.create(RatingService.class);
 		final Long pid = park.getPid();
+		
+		VerticalPanel contentPanel = new VerticalPanel();
 
 		HTMLPanel header = new HTMLPanel("<div class='contentHeader'>" + "Ratings for " + park.getPname() + "</div>");
-		RootPanel.get("body").add(header);
+		contentPanel.add(header);
 
 		final VerticalPanel ratingsPanel = new VerticalPanel();
 		final VerticalPanel addRatingPanel = new VerticalPanel();
@@ -777,9 +821,11 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		// TODO: change style name later, to rating something
 		ratingsPanel.setStyleName("reviewsPanel");
 
-		RootPanel.get("body").add(ratingsPanel);
-		RootPanel.get("body").add(addRatingPanel);
+		contentPanel.add(ratingsPanel);
+		contentPanel.add(addRatingPanel);
 
+		vertPanel.add(contentPanel);
+		
 		ratingSvc.totalNumRatings(pid, new AsyncCallback<Integer>() {
 			public void onFailure(Throwable caught) {
 				Window.alert("Failed to get number of ratings for the park");
@@ -1148,17 +1194,17 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		}
 	}
 
-	private void drawMap(Double latitude, Double longitude) {
-		drawStreetViewSideBySide(latitude, longitude);
+	private void drawMap(Double latitude, Double longitude, HorizontalSplitPanel splitPanel) {
+		drawStreetViewSideBySide(latitude, longitude, splitPanel);
 	}
 
-	private void addMapWidget(Widget widget) {
-		RootPanel.get("body").add(widget);
+	private void addMapWidget(Widget widget, HorizontalSplitPanel splitPanel) {
+		splitPanel.setLeftWidget(widget);
 	}
 
-	private void drawStreetViewSideBySide(Double latitude, Double longitude) {
+	private void drawStreetViewSideBySide(Double latitude, Double longitude, HorizontalSplitPanel splitPanel) {
 		StreetViewSideBySideMapWidget wMap = new StreetViewSideBySideMapWidget(latitude, longitude);
-		addMapWidget(wMap);
+		addMapWidget(wMap, splitPanel);
 		wMap.mapWidget.triggerResize();
 	}
 
