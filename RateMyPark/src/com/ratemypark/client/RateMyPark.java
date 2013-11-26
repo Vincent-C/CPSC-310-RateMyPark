@@ -368,7 +368,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 		// We can add style names to widgets
 		// loadDirectionsButton.setStyleName("loadDirectionsButton");
-		loadDirectionsButton.setStyleName("loadDirectionsButton");
+		loadDirectionsButton.setStyleName("our-gwt-Button");
 		// loadLatitudeTextBox.setWidth("55px");
 		// loadLongitudeTextBox.setWidth("55px");
 		loadLocationBox.setWidth("110px");
@@ -454,7 +454,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		listOfParkAttributes.setSelectedIndex(1);
 
 		// We can add style names to widgets
-		loadSearchButton.setStyleName("loadSearchButton");
+		loadSearchButton.setStyleName("our-gwt-Button");
 		// loadLatitudeTextBox.setWidth("55px");
 		// loadLongitudeTextBox.setWidth("55px");
 		loadSearchBox.setWidth("110px");
@@ -514,6 +514,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	private void loadParksTable() {
 		final FlexTable table = new FlexTable();
 		final Button compareButton = new Button("Compare");
+		compareButton.setStyleName("our-gwt-Button");
 		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
 			public void onFailure(Throwable caught) {
 				System.out.println("Parks did not get properly");

@@ -50,26 +50,7 @@ h1 {
 	padding: 30px 0 0 0;
 }
 
-.loadDirectionsButton {
-	margin: 0;
-	padding: 5px 7px;
-	text-decoration: none;
-	cursor: pointer;
-	cursor: hand;
-	font-size: small;
-	background: url("images/hborder.png") repeat-x 0px -2077px;
-	border: 1px solid #bbb;
-	border-bottom: 1px solid #a0a0a0;
-	border-radius: 3px;
-	-moz-border-radius: 3px;
-	margin-right: 20px;
-	background: rgb(28, 184, 65);
-	color: white;
-	border-radius: 4px;
-	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-}
-
-.loadSearchButton {
+.our-gwt-Button {
 	margin: 0;
 	padding: 5px 7px;
 	text-decoration: none;
