@@ -1,6 +1,7 @@
 package com.ratemypark.client;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -240,7 +241,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		loadSuggestedPark();
 		loadParksTable();
 
-//		loadParksTextandButton(); // commenting this out, because we dont need it
+		// loadParksTextandButton(); // commenting this out, because we dont need it
 	}
 
 	public void onValueChange(ValueChangeEvent<String> event) {
@@ -351,22 +352,22 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		final TextBox loadLocationBox = new TextBox();
 		final TextBox loadParkTextBox = new TextBox();
 
-		loadLocationBox.addClickHandler(new ClickHandler(){
+		loadLocationBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				loadLocationBox.setText("");				
+				loadLocationBox.setText("");
 			}
 		});
-		
-		loadParkTextBox.addClickHandler(new ClickHandler(){
+
+		loadParkTextBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				loadParkTextBox.setText("");				
+				loadParkTextBox.setText("");
 			}
 		});
-		
+
 		// We can add style names to widgets
-		//loadDirectionsButton.setStyleName("loadDirectionsButton");
+		// loadDirectionsButton.setStyleName("loadDirectionsButton");
 		loadDirectionsButton.setStyleName("loadDirectionsButton");
 		// loadLatitudeTextBox.setWidth("55px");
 		// loadLongitudeTextBox.setWidth("55px");
@@ -416,13 +417,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		final TextBox loadSearchBox = new TextBox();
 		final ListBox listOfParkAttributes = new ListBox();
 
-		loadSearchBox.addClickHandler(new ClickHandler(){
-			@Override
-			public void onClick(ClickEvent event) {
-				loadSearchBox.setText("");				
-			}
-		});
-		
 		listOfParkAttributes.addItem("Park ID");
 		listOfParkAttributes.addItem("Park Name");
 		listOfParkAttributes.addItem("Official");
@@ -437,9 +431,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		listOfParkAttributes.addItem("Neighbourhood URL");
 
 		listOfParkAttributes.setVisibleItemCount(1);
+		listOfParkAttributes.setSelectedIndex(1);
 
 		// We can add style names to widgets
-		//loadSearchButton.setStyleName("loadSearchButton");
 		loadSearchButton.setStyleName("loadSearchButton");
 		// loadLatitudeTextBox.setWidth("55px");
 		// loadLongitudeTextBox.setWidth("55px");
@@ -487,10 +481,14 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		RootPanel.get("fb-footer").getElement().setAttribute("style", "");
 		String pageURL = Window.Location.getHref();
 
-		System.out.println("Website URL: " + pageURL);
-		HTMLPanel likeButton = new HTMLPanel("<input type= 'button' value='Like this Park: " + park.getPname()
-				+ "!' onclick='postLike();'>");
-		RootPanel.get("fb-footer").add(likeButton);
+		HTMLPanel newFBLike = new HTMLPanel("<fb:like id='fb-like-button' href=" + pageURL
+				+ " layout='standard' action='like' show_faces='true' share='true'></fb:like>");
+		RootPanel.get("fb-footer").add(newFBLike);
+
+		Button invisButton = new Button("");
+		invisButton.getElement().setAttribute("onclick", "FB.XFBML.parse();");
+		invisButton.click();
+
 	}
 
 	private void loadParksTable() {
@@ -565,7 +563,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		final VerticalPanel suggestedParkPanel = new VerticalPanel();
 		suggestedParkPanel.setStyleName("suggestedParkPanel");
 		java.util.Random rng = new java.util.Random();
-		
+
 		int pref = 1; // 0 = no pref (random 1,2,3), 1 = highest rated, 2 = most rated, 3 = random
 		if (loginInfo == null || (loginInfo != null && loginInfo.getSuggestionPreference() == 0)) {
 			pref = 1 + rng.nextInt(3); // Random number between 1 and 3
@@ -729,7 +727,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 			public void onSuccess(List<Review> result) {
 				if (result.isEmpty()) {
-					reviewsPanel.add(new HTMLPanel("<div id='noReviews'>" + "There are no reviews for this park yet."+ "</div>"));
+					reviewsPanel.add(new HTMLPanel("<div id='noReviews'>" + "There are no reviews for this park yet."
+							+ "</div>"));
 				} else {
 					for (Review r : result) {
 						reviewsPanel.add(new HTML("<b>" + "Review by: " + r.getUsername() + "</b> "
@@ -989,22 +988,30 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				final TextBox lastName = new TextBox();
 				lastName.setText(profile.getLastName());
 				vPanel.add(lastName);
-				
+
 				// Radio button code... ew
-				VerticalPanel preferencePanel = new VerticalPanel(); 
+				VerticalPanel preferencePanel = new VerticalPanel();
 				preferencePanel.add(new HTML("<b>My Park Suggestion Preferences</b>"));
 
 				final RadioButton rb0 = new RadioButton("pref", "No preference.");
 				final RadioButton rb1 = new RadioButton("pref", "Show me the highest rated park.");
 				final RadioButton rb2 = new RadioButton("pref", "Show me the most rated park.");
 				final RadioButton rb3 = new RadioButton("pref", "Show me a random park. #rngesus #permabash4life #yolo");
-				
+
 				int pref = profile.getSuggestionPreference();
 				switch (pref) {
-					case 1: rb1.setValue(true); break;
-					case 2: rb2.setValue(true); break;
-					case 3: rb3.setValue(true); break;
-					default: rb0.setValue(true); break;
+				case 1:
+					rb1.setValue(true);
+					break;
+				case 2:
+					rb2.setValue(true);
+					break;
+				case 3:
+					rb3.setValue(true);
+					break;
+				default:
+					rb0.setValue(true);
+					break;
 				}
 
 				preferencePanel.add(rb0);
@@ -1047,7 +1054,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				vPanel.add(editProfile);
 
 				final ReviewServiceAsync reviewSvc = GWT.create(ReviewService.class);
-				vPanel.add(new HTMLPanel("<div class='contentHeader'>" + "Reviews by " + profile.getDisplayName() + "</div>"));
+				vPanel.add(new HTMLPanel("<div class='contentHeader'>" + "Reviews by " + profile.getDisplayName()
+						+ "</div>"));
 				final VerticalPanel reviewsPanel = new VerticalPanel();
 				reviewsPanel.setStyleName("reviewsPanel");
 				reviewSvc.getReviewsForUser(profile.getUsername(), new AsyncCallback<List<Review>>() {
@@ -1057,7 +1065,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 					public void onSuccess(List<Review> result) {
 						if (result.isEmpty()) {
-							reviewsPanel.add(new HTMLPanel("<div>" + "You have not yet reviewed any parks."+ "</div>"));
+							reviewsPanel
+									.add(new HTMLPanel("<div>" + "You have not yet reviewed any parks." + "</div>"));
 						} else {
 							for (Review r : result) {
 								reviewsPanel.add(new HTML("<b>" + "Review for " + r.getParkName() + "</b> "
@@ -1069,6 +1078,64 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				});
 				vPanel.add(reviewsPanel);
 
+				final SuggestedParkServiceAsync suggestSvc = GWT.create(SuggestedParkService.class);
+				vPanel.add(new HTMLPanel("<div class='contentHeader'>" + "Rated by " + profile.getDisplayName()
+						+ "</div>"));
+				final VerticalPanel ratedParksPanel = new VerticalPanel();
+
+				suggestSvc.getRatedParks(currentUsername, new AsyncCallback<List<SuggestedPark>>() {
+					public void onFailure(Throwable caught) {
+						Window.alert("Failed to get ratings");
+					}
+
+					public void onSuccess(List<SuggestedPark> result) {
+						if (result.isEmpty()) {
+							ratedParksPanel
+									.add(new HTMLPanel("<div>" + "You have not yet rated any parks." + "</div>"));
+						} else {
+							for (SuggestedPark sp : result) {
+								ratedParksPanel
+										.add(new HTML("<b>" + "Rating for " + sp.getPark().getPname() + "</b> "));
+								ratedParksPanel.add(new HTML("   You rated: " + sp.getRating()));
+							}
+						}
+					}
+				});
+				vPanel.add(ratedParksPanel);
+				RootPanel.get("body").add(vPanel);
+
+				final VerticalPanel suggestedParkPanel = new VerticalPanel();
+				suggestedParkPanel.setStyleName("suggestedParkPanel");
+				suggestedParkPanel.add(new HTML("<b>" + "Parks you have not rated yet: " + "</b>"));
+				final Button notYetRatedButton = new Button("Show 10");
+				final VerticalPanel tenParksPanel = new VerticalPanel();
+				notYetRatedButton.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						suggestSvc.getNotYetRatedParks(currentUsername, new AsyncCallback<List<Park>>() {
+							public void onFailure(Throwable caught) {
+								System.out.println("Error occured: " + caught.getMessage());
+								handleError(caught);
+							}
+
+							public void onSuccess(List<Park> parks) {
+								java.util.Random rng = new java.util.Random();
+								tenParksPanel.clear();
+								for (int i = 0; i < 10; i++) {
+									int rn = rng.nextInt(parks.size());
+									Park park = parks.get(rn);
+									tenParksPanel.add(new HTML("<b>" + "You should visit this park:" + "</b>"));
+									Hyperlink link = new Hyperlink(park.getPname(), String.valueOf(park.getPid()));
+									tenParksPanel.add(link);
+								}
+							}
+						});
+					}
+				});
+				suggestedParkPanel.add(notYetRatedButton);
+				suggestedParkPanel.add(tenParksPanel);
+				RootPanel.get("body").add(suggestedParkPanel);
+
 				final Button back = new Button("Back to Main Page");
 				back.addClickHandler(new ClickHandler() {
 					public void onClick(ClickEvent event) {
@@ -1076,7 +1143,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					}
 				});
 				vPanel.add(back);
-				RootPanel.get("body").add(vPanel);
+
 			}
 		});
 
@@ -1416,14 +1483,14 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			setWidget(dialogVPanel);
 		}
 	}
-	
+
 	private static class SearchDialog extends DecoratedPopupPanel {
-		
+
 		FlexTable table = new FlexTable();
+
 		public SearchDialog(String searchTerm, String attribute, List<Park> parks) {
 			setAnimationEnabled(true);
 			final VerticalPanel dialogVPanel = new VerticalPanel();
-			
 
 			table.setBorderWidth(12);
 			table.setText(0, 0, "");
@@ -1439,7 +1506,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			table.setText(0, 10, "Neighbourhood Name");
 			table.setText(0, 11, "Neighbourhood URL");
 			table.getRowFormatter().setStyleName(0, "tableheader");
-			
+
 			int index = 1;
 			if (!parks.isEmpty()) {
 				for (Park p : parks) {
@@ -1461,7 +1528,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						if (searchTerm.toLowerCase().equals("yes")) {
 							if (p.isOfficial()) {
 								table.insertRow(index);
-								addParkData(index,p);
+								addParkData(index, p);
 								index++;
 							}
 						}
@@ -1480,7 +1547,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 							index++;
 						}
 					}
-					if(attribute.equals("Street Name")) {
+					if (attribute.equals("Street Name")) {
 						if (p.getStreetName().toLowerCase().contains(searchTerm.toLowerCase())) {
 							table.insertRow(index);
 							addParkData(index, p);
@@ -1502,14 +1569,16 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						}
 					}
 					if (attribute.equals("Latitude")) {
-						if (searchTerm.equals(String.valueOf(p.getLatitude())) || searchTerm.equals(String.valueOf(p.getLatitude().intValue()))) {
+						if (searchTerm.equals(String.valueOf(p.getLatitude()))
+								|| searchTerm.equals(String.valueOf(p.getLatitude().intValue()))) {
 							table.insertRow(index);
 							addParkData(index, p);
 							index++;
 						}
 					}
 					if (attribute.equals("Longitude")) {
-						if (searchTerm.equals(String.valueOf(p.getLongitude())) || searchTerm.equals(String.valueOf(p.getLongitude().intValue()))) {
+						if (searchTerm.equals(String.valueOf(p.getLongitude()))
+								|| searchTerm.equals(String.valueOf(p.getLongitude().intValue()))) {
 							table.insertRow(index);
 							addParkData(index, p);
 							index++;
@@ -1536,16 +1605,15 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 							index++;
 						}
 					}
-					
-				} 
-				
+
+				}
+
 			}
-			
+
 			if (table.getRowCount() > 1) {
-				//dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_LEFT);
+				// dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_LEFT);
 				dialogVPanel.add(table);
-			}
-			else {
+			} else {
 				Label label = new Label();
 				label.setText("No Parks matched query");
 				dialogVPanel.add(label);
@@ -1562,8 +1630,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			});
 			setGlassEnabled(true);
 			setWidget(dialogVPanel);
-			
+
 		}
+
 		private String isOfficialString(Park p) {
 			if (p.isOfficial())
 				return "Yes";
@@ -1576,7 +1645,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			double longitude = p.getLongitude();
 			return String.valueOf(latitude) + ", " + String.valueOf(longitude);
 		}
-		
+
 		private void addParkData(int index, Park p) {
 			table.setText(index, 1, String.valueOf(p.getPid()));
 			table.setText(index, 2, p.getPname());
@@ -1591,6 +1660,5 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			table.setText(index, 11, p.getNeighbourhoodURL());
 		}
 	}
-	
 
 }
