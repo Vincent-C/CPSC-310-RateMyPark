@@ -417,6 +417,13 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		final TextBox loadSearchBox = new TextBox();
 		final ListBox listOfParkAttributes = new ListBox();
 
+		loadSearchBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				loadSearchBox.setText("");
+			}
+		});
+		
 		listOfParkAttributes.addItem("Park ID");
 		listOfParkAttributes.addItem("Park Name");
 		listOfParkAttributes.addItem("Official");
