@@ -4,11 +4,12 @@
 <!-- "Standards Mode". Replacing this declaration   -->
 <!-- with a "Quirks Mode" doctype is not supported. -->
 
-<html>
+<html xmlns:fb="http://ogp.me/ns/fb#">
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta property="fb:app_id" content="1454990918060855">
 <meta property="og:type" content="ratemypark:park">
+<meta property="og:url" content="http://ratemypark.appspot.com">
 <meta property="og:title" content="Rate My Park">
 
 <!--                                                               -->
@@ -77,64 +78,10 @@
      fjs.parentNode.insertBefore(js, fjs);
    }(document, 'script', 'facebook-jssdk'));
 
-  /*
-   * This function makes a call to the og.likes API.  The
-   * object argument is the object you like.  Other types
-   * of APIs may take other arguments. (i.e. the book.reads
-   * API takes a book= argument.)
-   *
-   * Because it's a sample, it also sets the privacy
-   * parameter so that it will create a story that only you
-   * can see.  Remove the privacy parameter and the story
-   * will be visible to whatever the default privacy was when
-   * you added the app.
-   *
-   * Also note that you can view any story with the id, as
-   * demonstrated with the code below.
-   *
-   * APIs used in postLike():
-   * Call the Graph API from JS:
-   *   https://developers.facebook.com/docs/reference/javascript/FB.api
-   * The Open Graph og.likes API:
-   *   https://developers.facebook.com/docs/reference/opengraph/action-type/og.likes
-   * Privacy argument:
-   *   https://developers.facebook.com/docs/reference/api/privacy-parameter
-   */
-
   function postLike() {
-  	console.log("anything");
-    FB.api(
-       'https://graph.facebook.com/me/og.likes',
-       'post',
-       { object: window.location.href,
-         privacy: {'value': 'SELF'} },
-       function(response) {
-         if (!response) {
-           alert('Error occurred.');
-         } else if (response.error) {
-           document.getElementById('result').innerHTML =
-             'Error: ' + response.error.message;
-         } else {
-           document.getElementById('result').innerHTML =
-             '<a href=\"https://www.facebook.com/me/activity/' +
-             response.id + '\">' +
-             'Story created.  ID is ' +
-             response.id + '</a>';
-         }
-       }
-    );
-  }
+  
+   }
 </script>
-
-	<!--
-  Login Button
-
-  https://developers.facebook.com/docs/reference/plugins/login
-
-  This example needs the 'publish_actions' permission in
-  order to publish an action.  The scope parameter below
-  is what prompts the user for that permission.
--->
 
 	<!-- OPTIONAL: include this if you want history support -->
 	<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1'
@@ -161,7 +108,6 @@
 	<div id="fb-footer" style="display:none"> 
 		<div class="fb-login-button" data-show-faces="true" data-width="200"
 		data-max-rows="1" data-scope="publish_actions"></div>
-		<div id="fb-like-button" class="fb-like" data-href="http://ratemypark.appspot.com" data-width="100" data-layout="button_count" data-action="like" data-show-faces="true" data-share="true"></div>
 		<div id="result"></div>
 	</div>
 </body>

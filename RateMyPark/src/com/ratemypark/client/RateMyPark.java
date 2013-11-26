@@ -1,6 +1,7 @@
 package com.ratemypark.client;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -275,7 +276,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					for (int i = 0; i < tags.getLength(); i++) {
 						if (tags.getItem(i).getAttribute("property").equals("og:title")) {
 							tags.getItem(i).setAttribute("content", park.getPname());
-						}
+						} 
 					}
 					// Create table of data related to this specific park
 					loadSpecificParkTable(park);
@@ -376,78 +377,84 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	}
 
 	private void loadSearchButton() {
-		final Button loadSearchButton = new Button("Search");
-		// final TextBox loadLatitudeTextBox = new TextBox();
-		// final TextBox loadLongitudeTextBox = new TextBox();
-		final TextBox loadSearchBox = new TextBox();
-		final ListBox listOfParkAttributes = new ListBox();
+        final Button loadSearchButton = new Button("Search");
+        //final TextBox loadLatitudeTextBox = new TextBox();
+        //final TextBox loadLongitudeTextBox = new TextBox();
+        final TextBox loadSearchBox = new TextBox();
+        final ListBox listOfParkAttributes = new ListBox();
+        
+        listOfParkAttributes.addItem("Park ID");
+        listOfParkAttributes.addItem("Park Name");
+        listOfParkAttributes.addItem("Official");
+        listOfParkAttributes.addItem("Street Number");
+        listOfParkAttributes.addItem("Street Name");
+        listOfParkAttributes.addItem("East-West Street Name");
+        listOfParkAttributes.addItem("North-South Street Name");
+        listOfParkAttributes.addItem("Latitude");
+        listOfParkAttributes.addItem("Longitude");
+        listOfParkAttributes.addItem("Size in Hectares");
+        listOfParkAttributes.addItem("Neighbourhood Name");
+        listOfParkAttributes.addItem("Neighbourhood URL");
+        
+        listOfParkAttributes.setVisibleItemCount(1);
+        listOfParkAttributes.setSelectedIndex(1);
+        
+        // We can add style names to widgets
+        loadSearchButton.setStyleName("loadSearchButton");
+        //loadLatitudeTextBox.setWidth("55px");
+        //loadLongitudeTextBox.setWidth("55px");
+        loadSearchBox.setWidth("110px");
+        //loadLatitudeTextBox.setText("Latitude");
+        //loadLongitudeTextBox.setText("Longitude");
+        loadSearchBox.setText("Enter search term");
+        //RootPanel.get("body").add(loadLatitudeTextBox);
+        //RootPanel.get("body").add(loadLongitudeTextBox);
+        RootPanel.get("body").add(loadSearchBox);
+        RootPanel.get("body").add(listOfParkAttributes);
+        RootPanel.get("body").add(loadSearchButton);
 
-		listOfParkAttributes.addItem("Park ID");
-		listOfParkAttributes.addItem("Park Name");
-		listOfParkAttributes.addItem("Official");
-		listOfParkAttributes.addItem("Street Number");
-		listOfParkAttributes.addItem("Street Name");
-		listOfParkAttributes.addItem("East-West Street Name");
-		listOfParkAttributes.addItem("North-South Street Name");
-		listOfParkAttributes.addItem("Coordinates");
-		listOfParkAttributes.addItem("Size in Hectares");
-		listOfParkAttributes.addItem("Neighbourhood Name");
-		listOfParkAttributes.addItem("Neighbourhood URL");
+        loadSearchButton.addClickHandler(new ClickHandler() {
+                public void onClick(ClickEvent event) {
+                        // Assume input is valid
+                        //String s1 = loadLatitudeTextBox.getText();
+                        //String s2 = loadLongitudeTextBox.getText();
+                        final String searchTerm = loadSearchBox.getText();
+                        //String s3 = loadParkTextBox.getText();
+                        //final Double latitude = Double.valueOf(s1);
+                        //final Double longitude = Double.valueOf(s2);
+                        //Long parkID = Long.valueOf(s3);
+                        int selectedIndex = listOfParkAttributes.getSelectedIndex();
+                        final String chosenAttribute = listOfParkAttributes.getValue(selectedIndex);
 
-		listOfParkAttributes.setVisibleItemCount(1);
+                        loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
+                                public void onFailure(Throwable caught) {
+                                        System.out.println("Error occured: " + caught.getMessage());
+                                        handleError(caught);
+                                }
 
-		// We can add style names to widgets
-		loadSearchButton.setStyleName("loadSearchButton");
-		// loadLatitudeTextBox.setWidth("55px");
-		// loadLongitudeTextBox.setWidth("55px");
-		loadSearchBox.setWidth("110px");
-		// loadLatitudeTextBox.setText("Latitude");
-		// loadLongitudeTextBox.setText("Longitude");
-		loadSearchBox.setText("Enter search term");
-		// RootPanel.get("body").add(loadLatitudeTextBox);
-		// RootPanel.get("body").add(loadLongitudeTextBox);
-		RootPanel.get("body").add(loadSearchBox);
-		RootPanel.get("body").add(listOfParkAttributes);
-		RootPanel.get("body").add(loadSearchButton);
-
-		loadSearchButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				// Assume input is valid
-				// String s1 = loadLatitudeTextBox.getText();
-				// String s2 = loadLongitudeTextBox.getText();
-				final String searchTerm = loadSearchBox.getText();
-				// String s3 = loadParkTextBox.getText();
-				// final Double latitude = Double.valueOf(s1);
-				// final Double longitude = Double.valueOf(s2);
-				// Long parkID = Long.valueOf(s3);
-				int selectedIndex = listOfParkAttributes.getSelectedIndex();
-				final String chosenAttribute = listOfParkAttributes.getValue(selectedIndex);
-
-				loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
-					public void onFailure(Throwable caught) {
-						System.out.println("Error occured: " + caught.getMessage());
-						handleError(caught);
-					}
-
-					public void onSuccess(List<Park> result) {
-						SearchDialog sd = new SearchDialog(searchTerm, chosenAttribute, result);
-						sd.showRelativeTo(loadSearchButton);
-
-					}
-				});
-			}
-		});
-	}
+                                public void onSuccess(List<Park> result) {
+                                        SearchDialog sd = new SearchDialog(searchTerm, chosenAttribute, result);
+                                        sd.showRelativeTo(loadSearchButton);
+                                        
+                                }
+                        });
+                }
+        });
+}
 
 	private void loadFacebookButtons(Park park) {
 		RootPanel.get("fb-footer").clear();
 		RootPanel.get("fb-footer").getElement().setAttribute("style", "");
 		String pageURL = Window.Location.getHref();
 
-		System.out.println("Website URL: " + pageURL);
-		HTMLPanel likeButton = new HTMLPanel("<input type= 'button' value='Like this Park: " + park.getPname()
-				+ "!' onclick='postLike();'>");
-		RootPanel.get("fb-footer").add(likeButton);
+		
+		HTMLPanel newFBLike = new HTMLPanel("<fb:like id='fb-like-button' href=" + pageURL + " layout='standard' action='like' show_faces='true' share='true'></fb:like>");
+		RootPanel.get("fb-footer").add(newFBLike);		
+		
+		Button invisButton = new Button("");
+		invisButton.getElement().setAttribute("onclick", "FB.XFBML.parse();");
+		invisButton.click();
+		
 	}
 
 	private void loadParksTable() {
@@ -1003,6 +1010,62 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				});
 				vPanel.add(reviewsPanel);
 
+				
+				final SuggestedParkServiceAsync suggestSvc = GWT.create(SuggestedParkService.class);
+				vPanel.add(new HTMLPanel("<div class='contentHeader'>" + "Rated by " + profile.getDisplayName() + "</div>"));
+				final VerticalPanel ratedParksPanel = new VerticalPanel();
+				
+				suggestSvc.getRatedParks(currentUsername, new AsyncCallback<List<SuggestedPark>>() {
+					public void onFailure(Throwable caught) {
+						Window.alert("Failed to get ratings");
+					}
+
+					public void onSuccess(List<SuggestedPark> result) {
+						if (result.isEmpty()) {
+							ratedParksPanel.add(new HTMLPanel("<div>" + "You have not yet rated any parks."+ "</div>"));
+						} else {
+							for (SuggestedPark sp : result) {
+								ratedParksPanel.add(new HTML("<b>" + "Rating for " + sp.getPark().getPname() + "</b> "));
+								ratedParksPanel.add(new HTML("   You rated: " + sp.getRating()));
+							}
+						}
+					}
+				});
+				vPanel.add(ratedParksPanel);
+				RootPanel.get("body").add(vPanel);
+				
+				final VerticalPanel suggestedParkPanel = new VerticalPanel();
+				suggestedParkPanel.setStyleName("suggestedParkPanel");
+				suggestedParkPanel.add(new HTML("<b>" + "Parks you have not rated yet: " + "</b>"));
+				final Button notYetRatedButton = new Button("Show 10");
+				final VerticalPanel tenParksPanel = new VerticalPanel();
+				notYetRatedButton.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						suggestSvc.getNotYetRatedParks(currentUsername, new AsyncCallback<List<Park>>() {
+							public void onFailure(Throwable caught) {
+								System.out.println("Error occured: " + caught.getMessage());
+								handleError(caught);
+							}
+
+							public void onSuccess(List<Park> parks) {
+								java.util.Random rng = new java.util.Random();
+								tenParksPanel.clear();
+								for(int i=0; i < 10; i++){
+									int rn = rng.nextInt(parks.size());
+									Park park = parks.get(rn);
+									tenParksPanel.add(new HTML("<b>" + "You should visit this park:" + "</b>"));
+									Hyperlink link = new Hyperlink(park.getPname(), String.valueOf(park.getPid()));
+									tenParksPanel.add(link);
+								}
+							}
+						});
+					}
+				});
+				suggestedParkPanel.add(notYetRatedButton);
+				suggestedParkPanel.add(tenParksPanel);
+				RootPanel.get("body").add(suggestedParkPanel);
+				
 				final Button back = new Button("Back to Main Page");
 				back.addClickHandler(new ClickHandler() {
 					public void onClick(ClickEvent event) {
@@ -1010,7 +1073,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					}
 				});
 				vPanel.add(back);
-				RootPanel.get("body").add(vPanel);
+				
 			}
 		});
 
