@@ -388,8 +388,21 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				// Assume input is valid
 				// String s1 = loadLatitudeTextBox.getText();
 				// String s2 = loadLongitudeTextBox.getText();
+				if (loadLocationBox.getText().isEmpty()) {
+					Window.alert("No address specified");
+					return;
+				}
+				if (loadParkTextBox.getText().isEmpty()) {
+					Window.alert("No park ID specified");
+					return;
+				}
+				
 				final String location = loadLocationBox.getText();
 				String s3 = loadParkTextBox.getText();
+				
+				if (!s3.matches("^[0-9]+")) {
+					Window.alert("Invalid park ID specified");
+				}
 				// final Double latitude = Double.valueOf(s1);
 				// final Double longitude = Double.valueOf(s2);
 				Long parkID = Long.valueOf(s3);
