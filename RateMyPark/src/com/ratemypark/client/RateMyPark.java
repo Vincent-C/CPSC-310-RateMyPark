@@ -521,77 +521,20 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 		final VerticalPanel suggestedParkPanel = new VerticalPanel();
 		suggestedParkPanel.setStyleName("suggestedParkPanel");
-
-		// if not logged in, pick a random method to suggest the park
-		if (loginInfo == null) {
-			java.util.Random rng = new java.util.Random();
-			int methodNum = rng.nextInt(3);
-			switch (methodNum) {
-			case 0: // Show random park
-				suggestedParkSvc.getRandomPark(new AsyncCallback<SuggestedPark>() {
-					public void onFailure(Throwable caught) {
-						Window.alert("Failed to get a random suggested park");
-					}
-
-					public void onSuccess(SuggestedPark result) {
-						Park park = result.getPark();
-						suggestedParkPanel.add(new HTML("<b>" + "You should visit this park:" + "</b>"));
-						Hyperlink link = new Hyperlink(park.getPname(), String.valueOf(park.getPid()));
-						suggestedParkPanel.add(link);
-						if (result.getNumRatings() == 0) {
-							suggestedParkPanel.add(new HTML("This park has yet to be rated."));
-						} else {
-							suggestedParkPanel.add(new HTML("Average Rating: " + result.getRating() + " out of 5"));
-							suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
-						}
-						RootPanel.get("body").add(suggestedParkPanel);
-					}
-				});
-				break;
-			case 1: // Show highest rated park
-				suggestedParkSvc.getHighestRated(new AsyncCallback<SuggestedPark>() {
-					public void onFailure(Throwable caught) {
-						Window.alert("Failed to get a highest suggested park");
-					}
-
-					public void onSuccess(SuggestedPark result) {
-						Park park = result.getPark();
-						suggestedParkPanel.add(new HTML("<b>" + "You should visit our highest rated park:" + "</b>"));
-						Hyperlink link = new Hyperlink(park.getPname(), String.valueOf(park.getPid()));
-						suggestedParkPanel.add(link);
-						suggestedParkPanel.add(new HTML("Average Rating: " + result.getRating() + " out of 5"));
-						suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
-						RootPanel.get("body").add(suggestedParkPanel);
-					}
-				});
-				break;
-			case 2: // Show most rated park
-				suggestedParkSvc.getMostRated(new AsyncCallback<SuggestedPark>() {
-					public void onFailure(Throwable caught) {
-						Window.alert("Failed to get a most rated suggested park");
-					}
-
-					public void onSuccess(SuggestedPark result) {
-						Park park = result.getPark();
-						suggestedParkPanel.add(new HTML("<b>" + "You should visit our most rated park:" + "</b>"));
-						Hyperlink link = new Hyperlink(park.getPname(), String.valueOf(park.getPid()));
-						suggestedParkPanel.add(link);
-						suggestedParkPanel.add(new HTML("Average Rating: " + result.getRating() + " out of 5"));
-						suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
-						RootPanel.get("body").add(suggestedParkPanel);
-					}
-				});
-				break;
-			default:
-				// shouldnt run
-			}
-
+		java.util.Random rng = new java.util.Random();
+		
+		int pref = 1; // 0 = no pref (random 1,2,3), 1 = highest rated, 2 = most rated, 3 = random
+		if (loginInfo == null || (loginInfo != null && loginInfo.getSuggestionPreference() == 0)) {
+			pref = 1 + rng.nextInt(3); // Random number between 1 and 3
 		} else {
+			pref = loginInfo.getSuggestionPreference();
+		}
 
-			// Check user preferences, to see what suggestion we want to show
+		switch (pref) {
+		case 1: // Show highest rated park
 			suggestedParkSvc.getHighestRated(new AsyncCallback<SuggestedPark>() {
 				public void onFailure(Throwable caught) {
-					Window.alert("Failed to get a suggested park");
+					Window.alert("Failed to get a highest suggested park");
 				}
 
 				public void onSuccess(SuggestedPark result) {
@@ -604,6 +547,47 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					RootPanel.get("body").add(suggestedParkPanel);
 				}
 			});
+			break;
+		case 2: // Show most rated park
+			suggestedParkSvc.getMostRated(new AsyncCallback<SuggestedPark>() {
+				public void onFailure(Throwable caught) {
+					Window.alert("Failed to get a most rated suggested park");
+				}
+
+				public void onSuccess(SuggestedPark result) {
+					Park park = result.getPark();
+					suggestedParkPanel.add(new HTML("<b>" + "You should visit our most rated park:" + "</b>"));
+					Hyperlink link = new Hyperlink(park.getPname(), String.valueOf(park.getPid()));
+					suggestedParkPanel.add(link);
+					suggestedParkPanel.add(new HTML("Average Rating: " + result.getRating() + " out of 5"));
+					suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
+					RootPanel.get("body").add(suggestedParkPanel);
+				}
+			});
+			break;
+		case 3: // Show random park
+			suggestedParkSvc.getRandomPark(new AsyncCallback<SuggestedPark>() {
+				public void onFailure(Throwable caught) {
+					Window.alert("Failed to get a random suggested park");
+				}
+
+				public void onSuccess(SuggestedPark result) {
+					Park park = result.getPark();
+					suggestedParkPanel.add(new HTML("<b>" + "You should visit this park:" + "</b>"));
+					Hyperlink link = new Hyperlink(park.getPname(), String.valueOf(park.getPid()));
+					suggestedParkPanel.add(link);
+					if (result.getNumRatings() == 0) {
+						suggestedParkPanel.add(new HTML("This park has yet to be rated."));
+					} else {
+						suggestedParkPanel.add(new HTML("Average Rating: " + result.getRating() + " out of 5"));
+						suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
+					}
+					RootPanel.get("body").add(suggestedParkPanel);
+				}
+			});
+			break;
+		default:
+			// shouldnt run
 		}
 	}
 
@@ -954,6 +938,35 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				final TextBox lastName = new TextBox();
 				lastName.setText(profile.getLastName());
 				vPanel.add(lastName);
+				
+				// Radio button code... ew
+				VerticalPanel preferencePanel = new VerticalPanel(); 
+				preferencePanel.add(new HTML("<b>My Park Suggestion Preferences</b>"));
+
+				final RadioButton rb0 = new RadioButton("pref", "No preference.");
+				final RadioButton rb1 = new RadioButton("pref", "Show me the highest rated park.");
+				final RadioButton rb2 = new RadioButton("pref", "Show me the most rated park.");
+				final RadioButton rb3 = new RadioButton("pref", "Show me a random park. #rngesus #permabash4life #yolo");
+				
+				int pref = profile.getSuggestionPreference();
+				switch (pref) {
+					case 1: rb1.setValue(true); break;
+					case 2: rb2.setValue(true); break;
+					case 3: rb3.setValue(true); break;
+					default: rb0.setValue(true); break;
+				}
+
+				preferencePanel.add(rb0);
+				preferencePanel.add(rb1);
+				preferencePanel.add(rb2);
+				preferencePanel.add(rb3);
+
+				final ArrayList<RadioButton> rbList = new ArrayList<RadioButton>();
+				rbList.add(rb0);
+				rbList.add(rb1);
+				rbList.add(rb2);
+				rbList.add(rb3);
+				vPanel.add(preferencePanel);
 
 				final Button editProfile = new Button("Edit Profile");
 				editProfile.addClickHandler(new ClickHandler() {
@@ -964,6 +977,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						LoginInfo newProfile = new LoginInfo(currentUsername, Cookies.getCookie("sid"));
 						newProfile.setFirstName(first);
 						newProfile.setLastName(last);
+						newProfile.setSuggestionPreference(getSelectedIndex(rbList));
 
 						profileSvc.editProfile(newProfile, new AsyncCallback<LoginInfo>() {
 							public void onFailure(Throwable caught) {
@@ -973,6 +987,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 							public void onSuccess(LoginInfo result) {
 								Window.alert("Profile updated!");
+								loginInfo = result;
 								loadProfilePage();
 							}
 						});

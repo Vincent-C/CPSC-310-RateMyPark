@@ -27,6 +27,8 @@ public class Account implements Serializable {
 	private String lastName;
 	@Persistent
 	private Date dateCreated;
+	@Persistent
+	private int suggestionPreference; // 0 = no pref, 1 = highest rated, 2 = most rated, 3 = random
 	
 	public Account() {
 		this.dateCreated = new Date();
@@ -81,6 +83,13 @@ public class Account implements Serializable {
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
 	}
-	
+
+	public int getSuggestionPreference() {
+		return this.suggestionPreference;
+	}
+
+	public void setSuggestionPreference(int pref) {
+		this.suggestionPreference = pref;
+	}
 	
 }

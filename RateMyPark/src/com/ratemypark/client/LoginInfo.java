@@ -7,6 +7,7 @@ public class LoginInfo implements Serializable {
 	private String sessionID;
 	private String firstName;
 	private String lastName;
+	private int suggestionPreference; // 0 = no pref, 1 = highest rated, 2 = most rated, 3 = random
 	
 	public LoginInfo() {
 		
@@ -42,6 +43,10 @@ public class LoginInfo implements Serializable {
 	public String getLastName() {
 		return this.lastName;
 	}
+	
+	public int getSuggestionPreference() {
+		return this.suggestionPreference;
+	}
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
@@ -49,5 +54,9 @@ public class LoginInfo implements Serializable {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+	
+	public void setSuggestionPreference(int pref) {
+		this.suggestionPreference = pref;
 	}
 }

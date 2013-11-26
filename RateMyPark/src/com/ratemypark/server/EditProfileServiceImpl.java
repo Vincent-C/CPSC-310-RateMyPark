@@ -57,6 +57,7 @@ public class EditProfileServiceImpl extends RemoteServiceServlet implements Edit
 		LoginInfo ret = new LoginInfo(gettedAccount.getUsername(), existingSession.getId());
 		ret.setFirstName(gettedAccount.getFirstName());
 		ret.setLastName(gettedAccount.getLastName());
+		ret.setSuggestionPreference(gettedAccount.getSuggestionPreference());
 		// System.out.println(gettedAccount.getFirstName() + " " +
 		// gettedAccount.getLastName());
 		return ret;
@@ -69,6 +70,7 @@ public class EditProfileServiceImpl extends RemoteServiceServlet implements Edit
 				pm.refresh(acc);
 				acc.setFirstName(newProfile.getFirstName());
 				acc.setLastName(newProfile.getLastName());
+				acc.setSuggestionPreference(newProfile.getSuggestionPreference());
 				// Return the Account entity
 				pm.makePersistent(acc);
 				return acc;
