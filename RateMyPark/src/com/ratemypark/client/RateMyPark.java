@@ -41,6 +41,7 @@ import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HorizontalSplitPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -952,7 +953,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				RootPanel.get("body").clear();
 				// Add title to page
 				HTMLPanel header = new HTMLPanel("<div class='contentHeader'>" + "Profile Page for "
-						+ profile.getUsername() + "</div>");
+						+ profile.getDisplayName() + "</div>");
 				RootPanel.get("body").add(header);
 
 				VerticalPanel vPanel = new VerticalPanel();
@@ -1031,11 +1032,11 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				});
 				vPanel.add(editProfile);
 
-				final ReviewServiceAsync reviewSvc = GWT.create(ReviewService.class);
-				vPanel.add(new HTMLPanel("<div class='contentHeader'>" + "Reviews by " + profile.getDisplayName()
-						+ "</div>"));
 				final VerticalPanel reviewsPanel = new VerticalPanel();
 				reviewsPanel.setStyleName("reviewsPanel");
+				final ReviewServiceAsync reviewSvc = GWT.create(ReviewService.class);
+				reviewsPanel.add(new HTMLPanel("<div class='contentHeader'>" + "Reviews by " + profile.getDisplayName()
+						+ "</div>"));
 				reviewSvc.getReviewsForUser(profile.getUsername(), new AsyncCallback<List<Review>>() {
 					public void onFailure(Throwable caught) {
 						Window.alert("Failed to get reviews");
@@ -1054,12 +1055,11 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						}
 					}
 				});
-				vPanel.add(reviewsPanel);
 
 				final SuggestedParkServiceAsync suggestSvc = GWT.create(SuggestedParkService.class);
-				vPanel.add(new HTMLPanel("<div class='contentHeader'>" + "Rated by " + profile.getDisplayName()
-						+ "</div>"));
 				final VerticalPanel ratedParksPanel = new VerticalPanel();
+				ratedParksPanel.add(new HTMLPanel("<div class='contentHeader'>" + "Rated by " + profile.getDisplayName()
+						+ "</div>"));
 
 				suggestSvc.getRatedParks(currentUsername, new AsyncCallback<List<SuggestedPark>>() {
 					public void onFailure(Throwable caught) {
@@ -1079,11 +1079,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						}
 					}
 				});
-				vPanel.add(ratedParksPanel);
-				RootPanel.get("body").add(vPanel);
 
 				final VerticalPanel suggestedParkPanel = new VerticalPanel();
-				suggestedParkPanel.setStyleName("suggestedParkPanel");
+				//suggestedParkPanel.setStyleName("suggestedParkPanel");
 				suggestedParkPanel.add(new HTML("<b>" + "Parks you have not rated yet: " + "</b>"));
 				final Button notYetRatedButton = new Button("Show 10");
 				final VerticalPanel tenParksPanel = new VerticalPanel();
@@ -1112,19 +1110,23 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				});
 				suggestedParkPanel.add(notYetRatedButton);
 				suggestedParkPanel.add(tenParksPanel);
-				RootPanel.get("body").add(suggestedParkPanel);
-
-				final Button back = new Button("Back to Main Page");
-				back.addClickHandler(new ClickHandler() {
-					public void onClick(ClickEvent event) {
-						loadParksBody();
-					}
-				});
-				vPanel.add(back);
-
+				
+				FlexTable ratedSplitPanel = new FlexTable();
+				ratedSplitPanel.setText(0, 0, "");
+				ratedSplitPanel.setText(0, 1, "");
+				ratedSplitPanel.setWidget(0,0,ratedParksPanel);
+				ratedSplitPanel.setWidget(0,1,suggestedParkPanel);
+				ratedSplitPanel.getFlexCellFormatter().getElement(0, 0).setAttribute("style", "width:500px;vertical-align:top;");
+				ratedSplitPanel.getFlexCellFormatter().getElement(0, 1).setAttribute("style", "vertical-align:top;");
+				
+			    TabLayoutPanel tabLayout = new TabLayoutPanel(32, Unit.PX);
+			    tabLayout.setHeight("1000px");
+			    tabLayout.add(vPanel, "My Profile");
+			    tabLayout.add(reviewsPanel, "My Reviews");
+			    tabLayout.add(ratedSplitPanel, "My Ratings");
+			    RootPanel.get("body").add(tabLayout);
 			}
 		});
-
 	}
 
 	private String isOfficialString(Park p) {
