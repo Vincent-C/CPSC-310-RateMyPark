@@ -389,7 +389,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		listOfParkAttributes.addItem("Street Name");
 		listOfParkAttributes.addItem("East-West Street Name");
 		listOfParkAttributes.addItem("North-South Street Name");
-		listOfParkAttributes.addItem("Coordinates");
+		listOfParkAttributes.addItem("Latitude");
+		listOfParkAttributes.addItem("Longitude");
 		listOfParkAttributes.addItem("Size in Hectares");
 		listOfParkAttributes.addItem("Neighbourhood Name");
 		listOfParkAttributes.addItem("Neighbourhood URL");
