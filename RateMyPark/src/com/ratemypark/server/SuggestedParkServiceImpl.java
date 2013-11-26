@@ -158,9 +158,62 @@ public class SuggestedParkServiceImpl extends RemoteServiceServlet implements Su
 		return suggestedPark;
 	}
 
-	private PersistenceManager getPersistenceManager() {
-		return PMF.getPersistenceManager();
+	// Queries the DB for all the parks the user has not yet rated
+	@Override
+	public List<Park> getNotYetRatedParks(String name){
+		PersistenceManager pm = getPersistenceManager();
+		List<Park> parks = new ArrayList<Park>();
+		try {
+			pm.refreshAll();
+			Query q1 = pm.newQuery(Rating.class, "username == name");
+			q1.declareParameters("String name");
+			List<Rating> ratings = (List<Rating>) q1.execute(name);
+			List<Long> ratedPIDs = new ArrayList<Long>();
+			for (Rating rev : ratings) {
+				ratedPIDs.add(rev.getPid());
+			}
+			Query q2 = pm.newQuery(Park.class);
+			q2.setOrdering("pid desc");
+			List<Park> result = (List<Park>) q2.execute();
+			for (Park p : result) {
+				if (!ratedPIDs.contains(p.getPid())){ // might not work, could use for loop instead
+					parks.add(p);
+				}
+			}
+		} finally {
+			pm.close();
+		}
+		return parks;
 	}
+	
+	@Override
+	public List<SuggestedPark> getRatedParks(String name){
+		PersistenceManager pm = getPersistenceManager();
+		List<SuggestedPark> parks = new ArrayList<SuggestedPark>();
+		try {
+			pm.refreshAll();
+			Query q1 = pm.newQuery(Rating.class, "username == name");
+			q1.declareParameters("String name");
+			List<Rating> ratings = (List<Rating>) q1.execute(name);
+
+			Query q2 = pm.newQuery(Park.class);
+			q2.setOrdering("pid desc");
+			List<Park> result = (List<Park>) q2.execute();
+			for (Park p : result) {
+				for (Rating r : ratings){
+					if (r.getPid().equals(p.getPid())){
+						SuggestedPark sp = new SuggestedPark(p,r.getRating(),1);
+						parks.add(sp);	
+						break;
+					}
+				}
+			}
+		} finally {
+			pm.close();
+		}
+		return parks;
+	}
+	
 
 	private int getMaxParkId() {
 		PersistenceManager pm = getPersistenceManager();
@@ -174,4 +227,7 @@ public class SuggestedParkServiceImpl extends RemoteServiceServlet implements Su
 		}
 	}
 
+	private PersistenceManager getPersistenceManager() {
+		return PMF.getPersistenceManager();
+	}
 }
