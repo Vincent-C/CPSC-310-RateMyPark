@@ -24,12 +24,14 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -332,6 +334,20 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		final TextBox loadLocationBox = new TextBox();
 		final TextBox loadParkTextBox = new TextBox();
 
+		loadLocationBox.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				loadLocationBox.setText("");				
+			}
+		});
+		
+		loadParkTextBox.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				loadParkTextBox.setText("");				
+			}
+		});
+		
 		// We can add style names to widgets
 		//loadDirectionsButton.setStyleName("loadDirectionsButton");
 		loadDirectionsButton.setStyleName("loadDirectionsButton");
@@ -383,6 +399,13 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		final TextBox loadSearchBox = new TextBox();
 		final ListBox listOfParkAttributes = new ListBox();
 
+		loadSearchBox.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				loadSearchBox.setText("");				
+			}
+		});
+		
 		listOfParkAttributes.addItem("Park ID");
 		listOfParkAttributes.addItem("Park Name");
 		listOfParkAttributes.addItem("Official");
