@@ -513,6 +513,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 	private void loadParksTable() {
 		final FlexTable table = new FlexTable();
+		table.setStyleName("flexTable-frontpage");
 		final Button compareButton = new Button("Compare");
 		compareButton.setStyleName("our-gwt-Button");
 		loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
