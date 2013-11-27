@@ -193,7 +193,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				LoginDialog loginDialog = new LoginDialog(loginCallback);
 				loginDialog.setGlassEnabled(true);
 				loginDialog.center();
-				loginDialog.show();
+				loginDialog.showRelativeTo(newAccountButton);
 			}
 		});
 
@@ -230,8 +230,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			public void onClick(ClickEvent event) {
 				NewAccountDialog newAccountDialog = new NewAccountDialog(loginCallback);
 				newAccountDialog.setGlassEnabled(true);
-				newAccountDialog.center();
-				newAccountDialog.show();
+				newAccountDialog.showRelativeTo(newAccountButton);
 			}
 		});
 	}
@@ -496,7 +495,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 					public void onSuccess(List<Park> result) {
 						SearchDialog sd = new SearchDialog(searchTerm, chosenAttribute, result);
-						sd.showRelativeTo(loadSearchButton);
+						sd.center();
 
 					}
 				});
