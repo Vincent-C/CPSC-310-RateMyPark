@@ -1408,7 +1408,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			for (Park p : parks) {
 				table.insertRow(index);
 				table.setText(index, 1, String.valueOf(p.getPid()));
-				table.setText(index, 2, p.getPname());
+				Hyperlink link = new Hyperlink(p.getPname(), String.valueOf(p.getPid()));
+				table.setWidget(index, 2, link);
 				table.setText(index, 3, isOfficialString(p));
 				table.setText(index, 4, String.valueOf(p.getStreetNumber()));
 				table.setText(index, 5, p.getStreetName());
@@ -1703,7 +1704,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 		private void addParkData(int index, Park p) {
 			table.setText(index, 1, String.valueOf(p.getPid()));
-			table.setText(index, 2, p.getPname());
+			Hyperlink link = new Hyperlink(p.getPname(), String.valueOf(p.getPid()));
+			table.setWidget(index, 2, link);
 			table.setText(index, 3, isOfficialString(p));
 			table.setText(index, 4, String.valueOf(p.getStreetNumber()));
 			table.setText(index, 5, p.getStreetName());
