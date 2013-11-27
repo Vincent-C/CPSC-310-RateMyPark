@@ -496,7 +496,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 					public void onSuccess(List<Park> result) {
 						SearchDialog sd = new SearchDialog(searchTerm, chosenAttribute, result);
-						sd.showRelativeTo(loadSearchButton);
+						sd.center();
 
 					}
 				});
