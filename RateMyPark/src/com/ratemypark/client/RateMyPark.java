@@ -294,7 +294,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					// Create a HorizontalSplitPanel to place map and ratings/reviews widgets
 					@SuppressWarnings("deprecation")
 					HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
-					splitPanel.setSize("1600px", "500px");
+					splitPanel.setSize("1500px", "750px");
 					splitPanel.setSplitPosition("750px");
 
 					// VerticalPanel to hold the reviews and ratings as a single widget
@@ -312,6 +312,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					splitPanel.setRightWidget(ratingsAndReviews);
 					RootPanel.get("body").add(splitPanel);
 					
+					Button invisButton = new Button("");
+					invisButton.getElement().setAttribute("onclick", "FB.XFBML.parse();");
+					invisButton.click();
 				} else {
 					System.out.println("Park is null");
 				}
@@ -347,7 +350,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						Window.alert(park.getPname() + " loaded, with coordinates (" + park.getLatitude() + ","
 								+ park.getLongitude() + ").");
 
-						System.out.println(park.getPname() + " loaded.");
+//						System.out.println(park.getPname() + " loaded.");
 					}
 				});
 			}
@@ -513,10 +516,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		HTMLPanel newFBLike = new HTMLPanel("<fb:like id='fb-like-button' href=" + pageURL
 				+ " layout='standard' action='like' show_faces='true' share='true'></fb:like>");
 		RootPanel.get("fb-footer").add(newFBLike);
-
-		Button invisButton = new Button("");
-		invisButton.getElement().setAttribute("onclick", "FB.XFBML.parse();");
-		invisButton.click();
 
 	}
 
@@ -703,9 +702,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			boolean sensor = true;
 
 			// Testing:
-			System.out.println(park.getPname());
+//			System.out.println(park.getPname());
 			final Double latitude = park.getLatitude();
-			System.out.println(latitude);
+//			System.out.println(latitude);
 			final Double longitude = park.getLongitude();
 
 			// load all the libs for use in the maps
