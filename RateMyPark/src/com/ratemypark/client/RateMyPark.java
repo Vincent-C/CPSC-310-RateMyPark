@@ -1414,7 +1414,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			boolean sensor = true;
 
 			// Testing:
-//			System.out.println(parks.get(0).getPname());
+			System.out.println(parks.get(0).getPname());
 			final Double latitude = parks.get(0).getLatitude();
 			System.out.println(latitude);
 			final Double longitude = parks.get(0).getLongitude();
