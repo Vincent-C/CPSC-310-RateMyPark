@@ -663,6 +663,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 	private void loadSpecificParkTable(Park park) {
 		final FlexTable table = new FlexTable();
+		table.setStyleName("flexTable-frontpage");
 		table.setBorderWidth(12);
 		table.setText(0, 0, "");
 		table.setText(0, 1, "Park ID");
@@ -1365,8 +1366,10 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		public CompareDialog(final List<Park> parks) {
 			setAnimationEnabled(true);
 			final VerticalPanel dialogVPanel = new VerticalPanel();
+			dialogVPanel.setStyleName("flexTable-frontpage");
 
 			FlexTable table = new FlexTable();
+			table.setStyleName("flexTable-frontpage");
 
 			table.setBorderWidth(12);
 			table.setText(0, 0, "");
@@ -1472,6 +1475,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 			setAnimationEnabled(true);
 			final VerticalPanel dialogVPanel = new VerticalPanel();
+			dialogVPanel.setStyleName("flexTable-frontpage");
 
 			if (park != null) {
 				boolean sensor = true;
