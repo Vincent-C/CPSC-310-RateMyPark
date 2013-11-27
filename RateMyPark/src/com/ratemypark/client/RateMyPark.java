@@ -1008,20 +1008,24 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				RootPanel.get("body").add(header);
 
 				VerticalPanel vPanel = new VerticalPanel();
+				vPanel.addStyleName("profile-panel");
 
 				vPanel.add(new HTML("<b>First Name:</b>"));
 				final TextBox firstName = new TextBox();
 				firstName.setText(profile.getFirstName());
+				firstName.addStyleName("profile-textbox");
 				vPanel.add(firstName);
 
 				vPanel.add(new HTML("<b>Last Name:</b>"));
 				final TextBox lastName = new TextBox();
 				lastName.setText(profile.getLastName());
+				lastName.addStyleName("profile-textbox");
 				vPanel.add(lastName);
 				
 				vPanel.add(new HTML("<b>Email:</b>"));
 				final TextBox emailBox = new TextBox();
 				emailBox.setText(profile.getEmail());
+				emailBox.addStyleName("profile-textbox");
 				vPanel.add(emailBox);
 
 				// Radio button code... ew
@@ -1180,6 +1184,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			    TabLayoutPanel tabLayout = new TabLayoutPanel(32, Unit.PX);
 			    tabLayout.setHeight("1000px");
 			    tabLayout.add(vPanel, "My Profile");
+			    tabLayout.addStyleName("profile-tabs");
 			    tabLayout.add(reviewsPanel, "My Reviews");
 			    tabLayout.add(ratedSplitPanel, "My Ratings");
 			    RootPanel.get("body").add(tabLayout);
