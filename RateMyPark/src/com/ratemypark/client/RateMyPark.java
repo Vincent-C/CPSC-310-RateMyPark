@@ -509,7 +509,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	}
 	
 	private void loadSuggestedParkButton() {
-		final Button suggestedButton = new Button("Suggested Me a Park!");
+		final Button suggestedButton = new Button("Suggest Me a Park!");
 		suggestedButton.setStyleName("our-gwt-Button");
 		suggestedButton.getElement().setAttribute("style", "float:right; margin-right:85px");
 		
@@ -686,6 +686,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		default:
 			// shouldnt run
 		}
+		
 	}
 
 	private void loadSpecificParkTable(Park park) {
@@ -1337,7 +1338,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		public SuggestionDialog(VerticalPanel suggestionPanel) {
 			// Set the dialog box's caption
 			setText("Suggested Park");
-			setAnimationEnabled(true);
+			setAnimationEnabled(false);
 			setGlassEnabled(true);
 			
 			final Button closeButton = new Button("Close");
