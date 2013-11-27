@@ -683,7 +683,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		table.insertRow(1);
 		// Create table of data related to this specific park
 		table.setText(1, 1, String.valueOf(park.getPid()));
-		table.setText(1, 2, park.getPname());
+		Hyperlink link = new Hyperlink(park.getPname(), String.valueOf(park.getPid()));
+		table.setWidget(1, 2, link);
 		table.setText(1, 3, isOfficialString(park));
 		table.setText(1, 4, String.valueOf(park.getStreetNumber()));
 		table.setText(1, 5, park.getStreetName());
@@ -1410,6 +1411,11 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				table.setText(index, 1, String.valueOf(p.getPid()));
 				Hyperlink link = new Hyperlink(p.getPname(), String.valueOf(p.getPid()));
 				table.setWidget(index, 2, link);
+				link.addClickHandler(new ClickHandler() {
+					public void onClick(ClickEvent event) {
+						CompareDialog.this.hide();
+					}
+				});
 				table.setText(index, 3, isOfficialString(p));
 				table.setText(index, 4, String.valueOf(p.getStreetNumber()));
 				table.setText(index, 5, p.getStreetName());
@@ -1706,6 +1712,11 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			table.setText(index, 1, String.valueOf(p.getPid()));
 			Hyperlink link = new Hyperlink(p.getPname(), String.valueOf(p.getPid()));
 			table.setWidget(index, 2, link);
+			link.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					SearchDialog.this.hide();
+				}
+			});
 			table.setText(index, 3, isOfficialString(p));
 			table.setText(index, 4, String.valueOf(p.getStreetNumber()));
 			table.setText(index, 5, p.getStreetName());
