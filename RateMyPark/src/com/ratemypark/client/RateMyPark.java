@@ -610,7 +610,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		java.util.Random rng = new java.util.Random();
 
 		int pref = 1; // 0 = no pref (random 1,2,3), 1 = highest rated, 2 = most rated, 3 = random
-		System.out.println("The login info " + loginInfo);
 		if (loginInfo == null || (loginInfo != null && loginInfo.getSuggestionPreference() == 0)) {
 			pref = 1 + rng.nextInt(3); // Random number between 1 and 3
 		} else {
@@ -869,8 +868,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		final VerticalPanel ratingsPanel = new VerticalPanel();
 		final VerticalPanel addRatingPanel = new VerticalPanel();
 
-		// TODO: change style name later, to rating something
-		ratingsPanel.setStyleName("reviewsPanel");
+		ratingsPanel.setStyleName("ratingPanel");
+		addRatingPanel.setStyleName("addRatingPanel");
 
 		contentPanel.add(ratingsPanel);
 		contentPanel.add(addRatingPanel);
@@ -1081,7 +1080,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				final RadioButton rb0 = new RadioButton("pref", "No preference.");
 				final RadioButton rb1 = new RadioButton("pref", "Show me the highest rated park.");
 				final RadioButton rb2 = new RadioButton("pref", "Show me the most rated park.");
-				final RadioButton rb3 = new RadioButton("pref", "Show me a random park. #rngesus #permabash4life #yolo");
+				final RadioButton rb3 = new RadioButton("pref", "Show me a random park.");
 
 				int pref = profile.getSuggestionPreference();
 				switch (pref) {
@@ -1434,7 +1433,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				}
 			});
 			setWidget(dialogVPanel);
-
 		}
 	}
 

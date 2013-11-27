@@ -40,8 +40,12 @@ h1 {
 	font-weight: bold;
 }
 
-.reviewsPanel {
+.reviewsPanel, .ratingPanel {
 	padding: 0 30px 30px 20px;
+}
+
+.addRatingPanel {
+	margin-left: 20px;
 }
 
 .profile-panel {
