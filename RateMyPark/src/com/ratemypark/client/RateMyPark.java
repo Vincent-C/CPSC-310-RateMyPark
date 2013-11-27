@@ -606,7 +606,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		
 		final VerticalPanel suggestedParkPanel = new VerticalPanel();
 		
-		//suggestedParkPanel.setStyleName("suggestedParkPanel");
 		suggestedParkPanel.getElement().setId("suggestedParkPanelId");
 		java.util.Random rng = new java.util.Random();
 
@@ -614,12 +613,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		System.out.println("The login info " + loginInfo);
 		if (loginInfo == null || (loginInfo != null && loginInfo.getSuggestionPreference() == 0)) {
 			pref = 1 + rng.nextInt(3); // Random number between 1 and 3
-			System.out.println("asdf 1 " + pref);
 		} else {
 			pref = loginInfo.getSuggestionPreference();
-			System.out.println("asdf 2 " + pref);
 		}
-		//DialogB
 
 		switch (pref) {
 		case 1: // Show highest rated park
@@ -635,9 +631,14 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					suggestedParkPanel.add(link);
 					suggestedParkPanel.add(new HTML("Average Rating: " + result.getRating() + " out of 5"));
 					suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
-					SuggestionDialog suggestionDialog = new SuggestionDialog(suggestedParkPanel);
+					final SuggestionDialog suggestionDialog = new SuggestionDialog(suggestedParkPanel);
 					suggestionDialog.show();
 					suggestionDialog.center();
+					link.addClickHandler(new ClickHandler() {
+						public void onClick(ClickEvent event) {
+							suggestionDialog.hide();
+						}
+					});
 				}
 			});
 			break;
@@ -654,9 +655,14 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					suggestedParkPanel.add(link);
 					suggestedParkPanel.add(new HTML("Average Rating: " + result.getRating() + " out of 5"));
 					suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
-					SuggestionDialog suggestionDialog = new SuggestionDialog(suggestedParkPanel);
+					final SuggestionDialog suggestionDialog = new SuggestionDialog(suggestedParkPanel);
 					suggestionDialog.show();
 					suggestionDialog.center();
+					link.addClickHandler(new ClickHandler() {
+						public void onClick(ClickEvent event) {
+							suggestionDialog.hide();
+						}
+					});
 				}
 			});
 			break;
@@ -677,9 +683,14 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						suggestedParkPanel.add(new HTML("Average Rating: " + result.getRating() + " out of 5"));
 						suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
 					}
-					SuggestionDialog suggestionDialog = new SuggestionDialog(suggestedParkPanel);
+					final SuggestionDialog suggestionDialog = new SuggestionDialog(suggestedParkPanel);
 					suggestionDialog.show();
 					suggestionDialog.center();
+					link.addClickHandler(new ClickHandler() {
+						public void onClick(ClickEvent event) {
+							suggestionDialog.hide();
+						}
+					});
 				}
 			});
 			break;
