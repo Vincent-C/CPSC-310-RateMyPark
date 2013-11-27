@@ -34,7 +34,7 @@ public class LoginInfo implements Serializable {
 		String displayName = this.getUsername();
 		String fn = this.firstName; 
 		String ln = this.lastName;
-		if (ln!=null && ln.isEmpty() && fn!=null && !fn.isEmpty()) {
+		if (ln!=null && !ln.isEmpty() && fn!=null && !fn.isEmpty()) {
 			displayName = fn + " " + ln;
 		} else if (fn != null && !fn.isEmpty() && (ln == null || ln.isEmpty())) {
 			displayName = fn;

@@ -41,6 +41,8 @@ import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.HorizontalSplitPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
@@ -292,7 +294,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					// Create a HorizontalSplitPanel to place map and ratings/reviews widgets
 					@SuppressWarnings("deprecation")
 					HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
-					splitPanel.setSize("1600px", "500px");
+					splitPanel.setSize("1500px", "750px");
 					splitPanel.setSplitPosition("750px");
 
 					// VerticalPanel to hold the reviews and ratings as a single widget
@@ -310,6 +312,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					splitPanel.setRightWidget(ratingsAndReviews);
 					RootPanel.get("body").add(splitPanel);
 					
+					Button invisButton = new Button("");
+					invisButton.getElement().setAttribute("onclick", "FB.XFBML.parse();");
+					invisButton.click();
 				} else {
 					System.out.println("Park is null");
 				}
@@ -345,7 +350,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						Window.alert(park.getPname() + " loaded, with coordinates (" + park.getLatitude() + ","
 								+ park.getLongitude() + ").");
 
-						System.out.println(park.getPname() + " loaded.");
+//						System.out.println(park.getPname() + " loaded.");
 					}
 				});
 			}
@@ -525,10 +530,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		HTMLPanel newFBLike = new HTMLPanel("<fb:like id='fb-like-button' href=" + pageURL
 				+ " layout='standard' action='like' show_faces='true' share='true'></fb:like>");
 		RootPanel.get("fb-footer").add(newFBLike);
-
-		Button invisButton = new Button("");
-		invisButton.getElement().setAttribute("onclick", "FB.XFBML.parse();");
-		invisButton.click();
 
 	}
 
@@ -712,7 +713,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		table.insertRow(1);
 		// Create table of data related to this specific park
 		table.setText(1, 1, String.valueOf(park.getPid()));
-		table.setText(1, 2, park.getPname());
+		Hyperlink link = new Hyperlink(park.getPname(), String.valueOf(park.getPid()));
+		table.setWidget(1, 2, link);
 		table.setText(1, 3, isOfficialString(park));
 		table.setText(1, 4, String.valueOf(park.getStreetNumber()));
 		table.setText(1, 5, park.getStreetName());
@@ -731,9 +733,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			boolean sensor = true;
 
 			// Testing:
-			System.out.println(park.getPname());
+//			System.out.println(park.getPname());
 			final Double latitude = park.getLatitude();
-			System.out.println(latitude);
+//			System.out.println(latitude);
 			final Double longitude = park.getLongitude();
 
 			// load all the libs for use in the maps
@@ -1423,6 +1425,19 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			final VerticalPanel dialogVPanel = new VerticalPanel();
 			dialogVPanel.setStyleName("flexTable-frontpage");
 
+			// Close button setup
+			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
+			dialogVPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_BOTTOM);
+			final Button closeButton = new Button("Close");
+			closeButton.getElement().setId("closeButton");
+			dialogVPanel.add(closeButton);
+
+			closeButton.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					CompareDialog.this.hide();
+				}
+			});
+			
 			FlexTable table = new FlexTable();
 			table.setStyleName("flexTable-frontpage");
 
@@ -1444,7 +1459,13 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			for (Park p : parks) {
 				table.insertRow(index);
 				table.setText(index, 1, String.valueOf(p.getPid()));
-				table.setText(index, 2, p.getPname());
+				Hyperlink link = new Hyperlink(p.getPname(), String.valueOf(p.getPid()));
+				table.setWidget(index, 2, link);
+				link.addClickHandler(new ClickHandler() {
+					public void onClick(ClickEvent event) {
+						CompareDialog.this.hide();
+					}
+				});
 				table.setText(index, 3, isOfficialString(p));
 				table.setText(index, 4, String.valueOf(p.getStreetNumber()));
 				table.setText(index, 5, p.getStreetName());
@@ -1494,17 +1515,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 			LoadApi.go(onLoad, loadLibraries, sensor);
 
-			// Close button setup
-			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-			final Button closeButton = new Button("Close");
-			closeButton.getElement().setId("closeButton");
-			dialogVPanel.add(closeButton);
-
-			closeButton.addClickHandler(new ClickHandler() {
-				public void onClick(ClickEvent event) {
-					CompareDialog.this.hide();
-				}
-			});
 			setGlassEnabled(true);
 			setWidget(dialogVPanel);
 			// setWidget(closeButton);
@@ -1532,6 +1542,18 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			final VerticalPanel dialogVPanel = new VerticalPanel();
 			dialogVPanel.setStyleName("flexTable-frontpage");
 
+			// Close button setup
+			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
+			final Button closeButton = new Button("Close");
+			closeButton.getElement().setId("closeButton");
+			dialogVPanel.add(closeButton);
+
+			closeButton.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					DirectionsDialog.this.hide();
+				}
+			});
+			
 			if (park != null) {
 				boolean sensor = true;
 
@@ -1565,16 +1587,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			else
 				System.out.println("Park is null");
 
-			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-			final Button closeButton = new Button("Close");
-			closeButton.getElement().setId("closeButton");
-			dialogVPanel.add(closeButton);
-
-			closeButton.addClickHandler(new ClickHandler() {
-				public void onClick(ClickEvent event) {
-					DirectionsDialog.this.hide();
-				}
-			});
 			setGlassEnabled(true);
 			setWidget(dialogVPanel);
 		}
@@ -1587,7 +1599,20 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		public SearchDialog(String searchTerm, String attribute, List<Park> parks) {
 			setAnimationEnabled(true);
 			final VerticalPanel dialogVPanel = new VerticalPanel();
+			
+			// Close button setup
+			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
+			final Button closeButton = new Button("Close");
+			closeButton.getElement().setId("closeButton");
+			dialogVPanel.add(closeButton);
 
+			closeButton.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					SearchDialog.this.hide();
+				}
+			});
+
+			table.setStyleName("flexTable-frontpage");
 			table.setBorderWidth(12);
 			table.setText(0, 0, "");
 			table.setText(0, 1, "Park ID");
@@ -1714,16 +1739,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				label.setText("No Parks matched query");
 				dialogVPanel.add(label);
 			}
-			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-			final Button closeButton = new Button("Close");
-			closeButton.getElement().setId("closeButton");
-			dialogVPanel.add(closeButton);
 
-			closeButton.addClickHandler(new ClickHandler() {
-				public void onClick(ClickEvent event) {
-					SearchDialog.this.hide();
-				}
-			});
 			setGlassEnabled(true);
 			setWidget(dialogVPanel);
 
@@ -1744,7 +1760,13 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 		private void addParkData(int index, Park p) {
 			table.setText(index, 1, String.valueOf(p.getPid()));
-			table.setText(index, 2, p.getPname());
+			Hyperlink link = new Hyperlink(p.getPname(), String.valueOf(p.getPid()));
+			table.setWidget(index, 2, link);
+			link.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					SearchDialog.this.hide();
+				}
+			});
 			table.setText(index, 3, isOfficialString(p));
 			table.setText(index, 4, String.valueOf(p.getStreetNumber()));
 			table.setText(index, 5, p.getStreetName());
