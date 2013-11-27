@@ -1154,7 +1154,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 							public void onSuccess(List<Park> parks) {
 								java.util.Random rng = new java.util.Random();
 								tenParksPanel.clear();
-								tenParksPanel.add(new HTML("<b>" + "You should visit these parks:" + "</b>"));
 								for (int i = 0; i < 10; i++) {
 									int rn = rng.nextInt(parks.size());
 									Park park = parks.get(rn);
