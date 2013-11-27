@@ -44,6 +44,33 @@ h1 {
 	padding: 0 30px 30px 20px;
 }
 
+.profile-panel {
+	margin: 10px;
+}
+
+.profile-textbox {
+	margin-bottom: 10px;
+}
+
+input:focus {
+	border-color: #B4E928 !important;
+	box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset, 0 0 8px rgba(102, 255, 100, 0.6) !important;
+	outline: 0 none !important;
+}
+
+.profile-tabs .gwt-TabLayoutPanelTabs {
+	background-color: #cceeaa !important;
+}
+
+.profile-tabs .gwt-TabLayoutPanelTabs .gwt-TabLayoutPanelTab {
+	background-color: #235824;
+}
+
+.profile-tabs .gwt-TabLayoutPanelTabs .gwt-TabLayoutPanelTab-selected {
+	background-color: #83ED31;
+}
+
+
 .suggestedParkPanel {
 	position: absolute;
 	left: 1000px;
