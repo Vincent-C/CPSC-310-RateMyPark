@@ -244,7 +244,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		
 		loadDirectionsButton();
 		loadSearchButton();
-		loadSuggestedPark();
+		loadSuggestedParkButton();
 		loadParksTable();
 
 		// loadParksTextandButton(); // commenting this out, because we dont need it
@@ -502,6 +502,20 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			}
 		});
 	}
+	
+	private void loadSuggestedParkButton() {
+		final Button suggestedButton = new Button("Suggested Me a Park!");
+		suggestedButton.setStyleName("our-gwt-Button");
+		suggestedButton.getElement().setAttribute("style", "float:right; margin-right:85px");
+		
+		suggestedButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				loadSuggestedPark();
+			}
+		});
+		RootPanel.get("body").add(suggestedButton);
+	}
 
 	private void loadFacebookButtons(Park park) {
 		RootPanel.get("fb-footer").clear();
@@ -588,17 +602,28 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 	private void loadSuggestedPark() {
 		final SuggestedParkServiceAsync suggestedParkSvc = GWT.create(SuggestedParkService.class);
-
+		
+//		Element oldPanel = Document.get().getElementById("suggestedParkPanelId");
+//		if (oldPanel != null) {
+//			oldPanel.removeFromParent();
+//		}
+		
 		final VerticalPanel suggestedParkPanel = new VerticalPanel();
-		suggestedParkPanel.setStyleName("suggestedParkPanel");
+		
+		//suggestedParkPanel.setStyleName("suggestedParkPanel");
+		suggestedParkPanel.getElement().setId("suggestedParkPanelId");
 		java.util.Random rng = new java.util.Random();
 
 		int pref = 1; // 0 = no pref (random 1,2,3), 1 = highest rated, 2 = most rated, 3 = random
+		System.out.println("The login info " + loginInfo);
 		if (loginInfo == null || (loginInfo != null && loginInfo.getSuggestionPreference() == 0)) {
 			pref = 1 + rng.nextInt(3); // Random number between 1 and 3
+			System.out.println("asdf 1 " + pref);
 		} else {
 			pref = loginInfo.getSuggestionPreference();
+			System.out.println("asdf 2 " + pref);
 		}
+		//DialogB
 
 		switch (pref) {
 		case 1: // Show highest rated park
@@ -614,7 +639,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					suggestedParkPanel.add(link);
 					suggestedParkPanel.add(new HTML("Average Rating: " + result.getRating() + " out of 5"));
 					suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
-					RootPanel.get("body").add(suggestedParkPanel);
+					SuggestionDialog suggestionDialog = new SuggestionDialog(suggestedParkPanel);
+					suggestionDialog.show();
+					suggestionDialog.center();
 				}
 			});
 			break;
@@ -631,7 +658,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					suggestedParkPanel.add(link);
 					suggestedParkPanel.add(new HTML("Average Rating: " + result.getRating() + " out of 5"));
 					suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
-					RootPanel.get("body").add(suggestedParkPanel);
+					SuggestionDialog suggestionDialog = new SuggestionDialog(suggestedParkPanel);
+					suggestionDialog.show();
+					suggestionDialog.center();
 				}
 			});
 			break;
@@ -652,7 +681,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						suggestedParkPanel.add(new HTML("Average Rating: " + result.getRating() + " out of 5"));
 						suggestedParkPanel.add(new HTML("Number of ratings: " + result.getNumRatings()));
 					}
-					RootPanel.get("body").add(suggestedParkPanel);
+					SuggestionDialog suggestionDialog = new SuggestionDialog(suggestedParkPanel);
+					suggestionDialog.show();
+					suggestionDialog.center();
 				}
 			});
 			break;
@@ -1289,6 +1320,26 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			});
 
 			setWidget(dialogVPanel);
+		}
+	}
+	
+	private static class SuggestionDialog extends DialogBox {
+		public SuggestionDialog(VerticalPanel suggestionPanel) {
+			// Set the dialog box's caption
+			setText("Suggested Park");
+			setAnimationEnabled(true);
+			setGlassEnabled(true);
+			
+			final Button closeButton = new Button("Close");
+			closeButton.getElement().setId("closeButton");
+			suggestionPanel.add(closeButton);
+			closeButton.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					SuggestionDialog.this.hide();
+				}
+			});
+			setWidget(suggestionPanel);
+
 		}
 	}
 
