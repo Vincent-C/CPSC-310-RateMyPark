@@ -294,7 +294,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					// Create a HorizontalSplitPanel to place map and ratings/reviews widgets
 					@SuppressWarnings("deprecation")
 					HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
-					splitPanel.setSize("1600px", "500px");
+					splitPanel.setSize("1500px", "750px");
 					splitPanel.setSplitPosition("750px");
 
 					// VerticalPanel to hold the reviews and ratings as a single widget
