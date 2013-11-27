@@ -94,6 +94,8 @@ public class RatingServiceImpl extends RemoteServiceServlet implements RatingSer
 					ret += r.getRating();
 				}
 				ret = ret / result.size();
+				ret = (float) Math.round(ret * 100);
+				ret = ret/100;
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

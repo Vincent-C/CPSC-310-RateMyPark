@@ -43,16 +43,18 @@ public class SuggestedParkServiceImpl extends RemoteServiceServlet implements Su
 			q.declareParameters("Long parkID");
 			List<Rating> result = (List<Rating>) q.execute(park.getPid());
 
-			int avgRating = 0, numRatings = 0;
+			int totalRating = 0, numRatings = 0;
 
 			for (Rating r : result) {
 				if (r.getPid() == park.getPid()) { // if statement just to ensure we have the right park
-					avgRating += r.getRating();
+					totalRating += r.getRating();
 					numRatings++;
 				} else {
 					System.out.println("SHOULDNT RUN IN ELSE CLAUSE");
 				}
 			}
+			long avgRating = totalRating/numRatings;
+			avgRating = (long) (Math.round(avgRating * 100.0) / 100.0);
 			suggestedPark = new SuggestedPark(park, avgRating, numRatings);
 
 		} catch (JDOObjectNotFoundException e) {
@@ -102,6 +104,7 @@ public class SuggestedParkServiceImpl extends RemoteServiceServlet implements Su
 		pm = getPersistenceManager();
 		try {
 			park = pm.getObjectById(Park.class, maxParkId);
+			maxRating = (long) (Math.round(maxRating * 100.0) / 100.0);
 			suggestedPark = new SuggestedPark(park, maxRating, maxNumRatings);
 		} catch (JDOObjectNotFoundException e) {
 			suggestedPark = getRandomPark();
@@ -149,6 +152,7 @@ public class SuggestedParkServiceImpl extends RemoteServiceServlet implements Su
 		pm = getPersistenceManager();
 		try {
 			park = pm.getObjectById(Park.class, maxParkId);
+			maxRating = (long) (Math.round(maxRating * 100.0) / 100.0);
 			suggestedPark = new SuggestedPark(park, maxRating, maxNumRatings);
 		} catch (JDOObjectNotFoundException e) {
 			suggestedPark = getRandomPark();
