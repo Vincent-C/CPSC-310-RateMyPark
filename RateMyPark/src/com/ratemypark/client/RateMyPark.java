@@ -310,6 +310,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					splitPanel.setRightWidget(ratingsAndReviews);
 					RootPanel.get("body").add(splitPanel);
 					
+					Button invisButton = new Button("");
+					invisButton.getElement().setAttribute("onclick", "FB.XFBML.parse();");
+					invisButton.click();
 				} else {
 					System.out.println("Park is null");
 				}
@@ -345,7 +348,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						Window.alert(park.getPname() + " loaded, with coordinates (" + park.getLatitude() + ","
 								+ park.getLongitude() + ").");
 
-						System.out.println(park.getPname() + " loaded.");
+//						System.out.println(park.getPname() + " loaded.");
 					}
 				});
 			}
@@ -511,10 +514,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		HTMLPanel newFBLike = new HTMLPanel("<fb:like id='fb-like-button' href=" + pageURL
 				+ " layout='standard' action='like' show_faces='true' share='true'></fb:like>");
 		RootPanel.get("fb-footer").add(newFBLike);
-
-		Button invisButton = new Button("");
-		invisButton.getElement().setAttribute("onclick", "FB.XFBML.parse();");
-		invisButton.click();
 
 	}
 
@@ -700,9 +699,9 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			boolean sensor = true;
 
 			// Testing:
-			System.out.println(park.getPname());
+//			System.out.println(park.getPname());
 			final Double latitude = park.getLatitude();
-			System.out.println(latitude);
+//			System.out.println(latitude);
 			final Double longitude = park.getLongitude();
 
 			// load all the libs for use in the maps
@@ -1415,7 +1414,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			boolean sensor = true;
 
 			// Testing:
-			System.out.println(parks.get(0).getPname());
+//			System.out.println(parks.get(0).getPname());
 			final Double latitude = parks.get(0).getLatitude();
 			System.out.println(latitude);
 			final Double longitude = parks.get(0).getLongitude();

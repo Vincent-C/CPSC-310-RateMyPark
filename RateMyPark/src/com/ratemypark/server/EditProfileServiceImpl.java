@@ -87,7 +87,7 @@ public class EditProfileServiceImpl extends RemoteServiceServlet implements Edit
 	}
 	
 	private void checkValidEmail(String email) throws UserNameException {
-		if (!email.matches("^[a-z0-9_.-]*[a-z0-9]@[a-z0-9]+\\.[a-z0-9.]+")) {
+		if (email.isEmpty() || !email.matches("^[a-z0-9_.-]*[a-z0-9]@[a-z0-9]+\\.[a-z0-9.]+")) {
 			throw new UserNameException("Not a valid email address");
 		}
 	}
