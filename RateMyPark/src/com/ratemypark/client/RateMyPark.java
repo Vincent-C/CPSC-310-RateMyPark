@@ -238,7 +238,11 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 	// This method is used to clear the body only once, then add the 'body' after, using the methods
 	private void loadParksBody() {
+			
 		clearBodyAndFooter();
+		
+		RootPanel.get("body").getElement().setAttribute("style", "width:750px;margin: auto;");
+		
 		loadDirectionsButton();
 		loadSearchButton();
 		loadSuggestedPark();
@@ -267,6 +271,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 		RootPanel.get("body").clear();
 		RootPanel.get("fb-footer").clear();
 		RootPanel.get("fb-footer").getElement().setAttribute("style", "display:none");
+		RootPanel.get("body").getElement().setAttribute("style", "");
 	}
 
 	private void loadSpecificParkPage(final String parkID) {
