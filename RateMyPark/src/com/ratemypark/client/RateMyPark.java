@@ -604,11 +604,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 	private void loadSuggestedPark() {
 		final SuggestedParkServiceAsync suggestedParkSvc = GWT.create(SuggestedParkService.class);
 		
-//		Element oldPanel = Document.get().getElementById("suggestedParkPanelId");
-//		if (oldPanel != null) {
-//			oldPanel.removeFromParent();
-//		}
-		
 		final VerticalPanel suggestedParkPanel = new VerticalPanel();
 		
 		//suggestedParkPanel.setStyleName("suggestedParkPanel");
