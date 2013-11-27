@@ -764,7 +764,10 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					for (Review r : result) {
 						reviewsPanel.add(new HTML("<b>" + "Review by: " + r.getUsername() + "</b> "
 								+ r.getDateCreated().toString()));
-						reviewsPanel.add(new HTML(r.getReviewText()));
+						HTML reviewText =  new HTML(r.getReviewText());
+						reviewText.getElement().setAttribute("style","word-wrap: break-word; white-space:pre-line; padding-bottom: 5px");
+						reviewText.setWidth("600px");
+						reviewsPanel.add(reviewText);
 					}
 				}
 			}
@@ -802,7 +805,10 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 										reviewTextArea.setText("");
 										reviewsPanel.add(new HTML("<b>" + "Review by: " + newReview.getUsername()
 												+ "</b> " + newReview.getDateCreated().toString()));
-										reviewsPanel.add(new HTML(newReview.getReviewText()));
+										HTML reviewText =  new HTML(newReview.getReviewText());
+										reviewText.getElement().setAttribute("style","word-wrap: break-word; white-space:pre-line; padding-bottom: 5px");
+										reviewText.setWidth("600px");
+										reviewsPanel.add(reviewText);
 									}
 								});
 					}
@@ -1113,7 +1119,11 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 							for (Review r : result) {
 								reviewsPanel.add(new HTML("<b>" + "Review for " + r.getParkName() + "</b> "
 										+ r.getDateCreated().toString()));
-								reviewsPanel.add(new HTML(r.getReviewText()));
+								HTML reviewText =  new HTML(r.getReviewText());
+								reviewText.getElement().setAttribute("style","word-wrap: break-word; white-space:pre-line; padding-bottom: 5px");
+								int windowWidth = Window.getClientWidth() - 50;
+								reviewText.setWidth(windowWidth + "px");
+								reviewsPanel.add(reviewText);
 							}
 						}
 					}
@@ -1181,8 +1191,11 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				ratedSplitPanel.getFlexCellFormatter().getElement(0, 0).setAttribute("style", "width:500px;vertical-align:top;");
 				ratedSplitPanel.getFlexCellFormatter().getElement(0, 1).setAttribute("style", "vertical-align:top;");
 				
+				int windowWidth = Window.getClientWidth() - 50;
+				
 			    TabLayoutPanel tabLayout = new TabLayoutPanel(32, Unit.PX);
-			    tabLayout.setHeight("1000px");
+			    tabLayout.setHeight("888px");
+			    tabLayout.setWidth(windowWidth + "px");
 			    tabLayout.add(vPanel, "My Profile");
 			    tabLayout.addStyleName("profile-tabs");
 			    tabLayout.add(reviewsPanel, "My Reviews");
