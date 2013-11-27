@@ -57,6 +57,7 @@ public class EditProfileServiceImpl extends RemoteServiceServlet implements Edit
 		LoginInfo ret = new LoginInfo(gettedAccount.getUsername(), existingSession.getId());
 		ret.setFirstName(gettedAccount.getFirstName());
 		ret.setLastName(gettedAccount.getLastName());
+		ret.setEmail(gettedAccount.getEmail());
 		ret.setSuggestionPreference(gettedAccount.getSuggestionPreference());
 		// System.out.println(gettedAccount.getFirstName() + " " +
 		// gettedAccount.getLastName());
@@ -70,6 +71,9 @@ public class EditProfileServiceImpl extends RemoteServiceServlet implements Edit
 				pm.refresh(acc);
 				acc.setFirstName(newProfile.getFirstName());
 				acc.setLastName(newProfile.getLastName());
+				String lowercaseEmail = newProfile.getEmail().toLowerCase();
+				checkValidEmail(lowercaseEmail);
+				acc.setEmail(lowercaseEmail);
 				acc.setSuggestionPreference(newProfile.getSuggestionPreference());
 				// Return the Account entity
 				pm.makePersistent(acc);
@@ -79,6 +83,12 @@ public class EditProfileServiceImpl extends RemoteServiceServlet implements Edit
 		}
 		finally {
 			pm.close();
+		}
+	}
+	
+	private void checkValidEmail(String email) throws UserNameException {
+		if (!email.matches("^[a-z0-9_.-]*[a-z0-9]@[a-z0-9]+\\.[a-z0-9.]+")) {
+			throw new UserNameException("Not a valid email address");
 		}
 	}
 	

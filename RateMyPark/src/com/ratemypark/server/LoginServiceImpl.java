@@ -101,6 +101,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		LoginInfo ret = new LoginInfo(gettedAccount.getUsername(), existingSession);
 		ret.setFirstName(gettedAccount.getFirstName());
 		ret.setLastName(gettedAccount.getLastName());
+		ret.setEmail(gettedAccount.getEmail());
 		ret.setSuggestionPreference(gettedAccount.getSuggestionPreference());
 		// System.out.println(gettedAccount.getFirstName() + " " +
 		// gettedAccount.getLastName());

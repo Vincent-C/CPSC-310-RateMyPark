@@ -1013,6 +1013,11 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				final TextBox lastName = new TextBox();
 				lastName.setText(profile.getLastName());
 				vPanel.add(lastName);
+				
+				vPanel.add(new HTML("<b>Email:</b>"));
+				final TextBox emailBox = new TextBox();
+				emailBox.setText(profile.getEmail());
+				vPanel.add(emailBox);
 
 				// Radio button code... ew
 				VerticalPanel preferencePanel = new VerticalPanel();
@@ -1057,9 +1062,11 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					public void onClick(ClickEvent event) {
 						String first = firstName.getText();
 						String last = lastName.getText();
+						String email = emailBox.getText();
 						LoginInfo newProfile = new LoginInfo(currentUsername, Cookies.getCookie("sid"));
 						newProfile.setFirstName(first);
 						newProfile.setLastName(last);
+						newProfile.setEmail(email);
 						newProfile.setSuggestionPreference(getSelectedIndex(rbList));
 
 						profileSvc.editProfile(newProfile, new AsyncCallback<LoginInfo>() {

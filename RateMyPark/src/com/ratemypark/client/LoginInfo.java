@@ -7,6 +7,7 @@ public class LoginInfo implements Serializable {
 	private String sessionID;
 	private String firstName;
 	private String lastName;
+	private String email;
 	private int suggestionPreference; // 0 = no pref, 1 = highest rated, 2 = most rated, 3 = random
 	
 	public LoginInfo() {
@@ -16,6 +17,9 @@ public class LoginInfo implements Serializable {
 	public LoginInfo(String username, String session) {
 		this.username = username;
 		this.sessionID = session;
+		this.firstName = "";
+		this.lastName = "";
+		this.email = "";
 	}
 	
 	public String getUsername() {
@@ -28,10 +32,12 @@ public class LoginInfo implements Serializable {
 	
 	public String getDisplayName() {
 		String displayName = this.getUsername();
-		if (!this.firstName.isEmpty() && !this.lastName.isEmpty()) {
-			displayName = this.firstName + " " + this.lastName;
-		} else if (!this.firstName.isEmpty() && this.lastName.isEmpty()) {
-			displayName = this.firstName;
+		String fn = this.firstName; 
+		String ln = this.lastName;
+		if (ln!=null && ln.isEmpty() && fn!=null && !fn.isEmpty()) {
+			displayName = fn + " " + ln;
+		} else if (fn != null && !fn.isEmpty() && (ln == null || ln.isEmpty())) {
+			displayName = fn;
 		}
 		return displayName;
 	}
@@ -58,5 +64,13 @@ public class LoginInfo implements Serializable {
 	
 	public void setSuggestionPreference(int pref) {
 		this.suggestionPreference = pref;
+	}
+	
+	public String getEmail() {
+		return this.email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 }
