@@ -241,11 +241,10 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 	// This method is used to clear the body only once, then add the 'body' after, using the methods
 	private void loadParksBody() {
-			
 		clearBodyAndFooter();
 		
 		RootPanel.get("body").getElement().setAttribute("style", "width:750px;margin: auto;");
-		
+		Document.get().setTitle("RateMyPark");
 		loadDirectionsButton();
 		loadSearchButton();
 		loadSuggestedParkButton();
@@ -286,10 +285,11 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			public void onSuccess(Park park) {
 				if (park != null) {
 					clearBodyAndFooter();
+					Document.get().setTitle(park.getPname() + " - RateMyPark");
 					NodeList<Element> tags = Document.get().getElementsByTagName("meta");
 					for (int i = 0; i < tags.getLength(); i++) {
 						if (tags.getItem(i).getAttribute("property").equals("og:url")) {
-							tags.getItem(i).setAttribute("content", Window.Location.getHref());
+							tags.getItem(i).setAttribute("content", "http://ratemypark.appspot.com/#" + park.getPid());
 						}
 						if (tags.getItem(i).getAttribute("property").equals("og:title")) {
 							tags.getItem(i).setAttribute("content", park.getPname());
@@ -1060,6 +1060,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 	private void loadProfilePage() {
 		clearBodyAndFooter();
+		Document.get().setTitle("Profile - RateMyPark");
 		final EditProfileServiceAsync profileSvc = GWT.create(EditProfileService.class);
 
 		profileSvc.getCurrentProfile(new AsyncCallback<LoginInfo>() {
