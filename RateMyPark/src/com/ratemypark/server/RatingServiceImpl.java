@@ -88,14 +88,14 @@ public class RatingServiceImpl extends RemoteServiceServlet implements RatingSer
 			q.declareParameters("Long parkID");
 			List<Rating> result = (List<Rating>) q.execute(pid);
 			if (!result.isEmpty()) {
-				ret = new Float(0);
+				double temp = 0;
 				for (Rating r : result) {
 					pm.refresh(r);
-					ret += r.getRating();
+					temp += r.getRating();
 				}
-				ret = ret / result.size();
-				ret = (float) Math.round(ret * 100);
-				ret = ret/100;
+				temp = temp / result.size();
+				temp = Math.round(temp * 100.00) / 100.00;
+				ret = (float) temp;
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

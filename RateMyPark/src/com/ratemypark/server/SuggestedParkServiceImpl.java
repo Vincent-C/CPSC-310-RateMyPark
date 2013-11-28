@@ -53,8 +53,11 @@ public class SuggestedParkServiceImpl extends RemoteServiceServlet implements Su
 					System.out.println("SHOULDNT RUN IN ELSE CLAUSE");
 				}
 			}
-			long avgRating = totalRating/numRatings;
-			avgRating = (long) (Math.round(avgRating * 100.0) / 100.0);
+			long avgRating = 0;
+			if (numRatings != 0){
+				avgRating = totalRating/numRatings;
+				avgRating = (long) (Math.round(avgRating * 100.0) / 100.0);
+			}
 			suggestedPark = new SuggestedPark(park, avgRating, numRatings);
 
 		} catch (JDOObjectNotFoundException e) {

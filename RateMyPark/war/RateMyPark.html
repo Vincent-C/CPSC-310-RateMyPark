@@ -81,6 +81,13 @@
   function postLike() {
   
    }
+  function share() {
+  	FB.ui({
+  		method: 'send',
+  		link: window.location.href;
+  	});
+  	
+  }
 </script>
 
 	<!-- OPTIONAL: include this if you want history support -->

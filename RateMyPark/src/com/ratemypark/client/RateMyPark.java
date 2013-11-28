@@ -80,6 +80,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 
 	private LoginInfo loginInfo = null;
 
+	private List<Park> loadedParks;
+	
 	/**
 	 * This is the entry point method.
 	 */
@@ -492,18 +494,8 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 				int selectedIndex = listOfParkAttributes.getSelectedIndex();
 				final String chosenAttribute = listOfParkAttributes.getValue(selectedIndex);
 
-				loadParksSvc.getParks(new AsyncCallback<List<Park>>() {
-					public void onFailure(Throwable caught) {
-						System.out.println("Error occured: " + caught.getMessage());
-						handleError(caught);
-					}
-
-					public void onSuccess(List<Park> result) {
-						SearchDialog sd = new SearchDialog(searchTerm, chosenAttribute, result);
-						sd.center();
-
-					}
-				});
+				SearchDialog sd = new SearchDialog(searchTerm, chosenAttribute, loadedParks);
+				sd.center();
 			}
 		});
 	}
@@ -544,6 +536,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			}
 
 			public void onSuccess(List<Park> parkList) {
+				loadedParks = parkList;
 				table.setBorderWidth(6);
 				table.setText(0, 0, "");
 				table.setText(0, 1, "Park ID");
@@ -931,8 +924,27 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			rbList.add(rb4);
 			rbList.add(rb5);
 
-			// Get the index that is selected
+			// Show the index that was previously selected, if it exists
+			ratingSvc.getRating(pid, loginInfo.getUsername(), new AsyncCallback<Rating>() {
+				public void onFailure(Throwable caught) {
+					Window.alert("Could not get the rating for this park!");
+				}
 
+				public void onSuccess(Rating rating) {
+					int num = rating.getRating();
+					switch (num){
+					case 0:
+					case 1:
+					case 2:
+					case 3:
+					case 4:
+					case 5:
+					}
+				}
+			});
+			
+			
+			// Get the index that is selected
 			final Button submitRating = new Button("Submit Rating");
 			submitRating.addClickHandler(new ClickHandler() {
 				public void onClick(ClickEvent event) {
@@ -958,9 +970,7 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 									public void onSuccess(Integer result) {
 										// do something with the average
 										if (result == 0) {
-											ratingsPanel.add(new HTML("<b>"
-													+ "No one has rated this park yet. Be the first to rate it!"
-													+ "</b> "));
+											
 										} else {
 											ratingSvc.averageRating(pid, new AsyncCallback<Float>() {
 												public void onFailure(Throwable caught) {
