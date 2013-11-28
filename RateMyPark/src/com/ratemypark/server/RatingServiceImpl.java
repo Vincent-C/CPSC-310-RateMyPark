@@ -44,16 +44,17 @@ public class RatingServiceImpl extends RemoteServiceServlet implements RatingSer
 	}
 
 	@Override
-	public Rating getRating(Long pid, String username) {
+	public Integer getRating(Long pid, String username) {
 		PersistenceManager pm = getPersistenceManager();
-		Rating ret = null;
+		Integer ret = null;
 		try {
 			Query q = pm.newQuery(Rating.class, "pid == parkID && username == name");
 			q.declareParameters("Long parkID, String name");
 			List<Rating> result = (List<Rating>) q.execute(pid, username);
 			if (!result.isEmpty()) {
-				ret = result.get(0);
-				pm.refresh(ret);
+				Rating rating = result.get(0);
+				pm.refresh(rating);
+				ret = rating.getRating();
 			}
 		} finally {
 			pm.close();

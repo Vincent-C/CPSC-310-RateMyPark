@@ -288,9 +288,12 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 					clearBodyAndFooter();
 					NodeList<Element> tags = Document.get().getElementsByTagName("meta");
 					for (int i = 0; i < tags.getLength(); i++) {
+						if (tags.getItem(i).getAttribute("property").equals("og:url")) {
+							tags.getItem(i).setAttribute("content", Window.Location.getHref());
+						}
 						if (tags.getItem(i).getAttribute("property").equals("og:title")) {
 							tags.getItem(i).setAttribute("content", park.getPname());
-						}
+						}	
 					}
 					
 					// Create a HorizontalSplitPanel to place map and ratings/reviews widgets
@@ -577,9 +580,6 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 								}
 
 								public void onSuccess(List<Park> parks) {
-									for (Park park : parks) {
-										System.out.println(park.getPname() + " loaded.");
-									}
 									CompareDialog cd = new CompareDialog(parks);
 									cd.showRelativeTo(compareButton);
 								}
@@ -925,20 +925,35 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 			rbList.add(rb5);
 
 			// Show the index that was previously selected, if it exists
-			ratingSvc.getRating(pid, loginInfo.getUsername(), new AsyncCallback<Rating>() {
+			ratingSvc.getRating(pid, loginInfo.getUsername(), new AsyncCallback<Integer>() {
 				public void onFailure(Throwable caught) {
-					Window.alert("Could not get the rating for this park!");
+					Window.alert("Could not get the rating of this park for this user!");
 				}
 
-				public void onSuccess(Rating rating) {
-					int num = rating.getRating();
-					switch (num){
-					case 0:
-					case 1:
-					case 2:
-					case 3:
-					case 4:
-					case 5:
+				public void onSuccess(Integer rating) {
+					if (rating != null) {
+						int num = rating.intValue();
+						switch (num){
+						case 0:
+							rb0.setValue(true);
+							break;
+						case 1:
+							rb1.setValue(true);
+							break;
+						case 2:
+							rb2.setValue(true);
+							break;
+						case 3:
+							rb3.setValue(true);
+							break;
+						case 4:
+							rb4.setValue(true);
+							break;
+						case 5:
+							rb5.setValue(true);
+							break;
+						default:
+						}
 					}
 				}
 			});
@@ -957,24 +972,24 @@ public class RateMyPark implements EntryPoint, ValueChangeHandler<String> {
 						// Only logged in users be able to see this, so loginInfo should not be null
 						ratingSvc.createRating(pid, loginInfo.getUsername(), ratingNum, new AsyncCallback<Void>() {
 							public void onFailure(Throwable caught) {
-								Window.alert("Could not submit your rating!");
+								Window.alert("Could not submit your rating! Please try again.");
 							}
 
 							public void onSuccess(Void ignore) {
 								ratingsPanel.clear();
 								ratingSvc.totalNumRatings(pid, new AsyncCallback<Integer>() {
 									public void onFailure(Throwable caught) {
-										Window.alert("Failed to get number of ratings for the park");
+										Window.alert("Failed to get number of ratings for the park after submit");
 									}
 
 									public void onSuccess(Integer result) {
 										// do something with the average
 										if (result == 0) {
-											
+											Window.alert("Please try again.");
 										} else {
 											ratingSvc.averageRating(pid, new AsyncCallback<Float>() {
 												public void onFailure(Throwable caught) {
-													Window.alert("Failed to get average rating for the park");
+													Window.alert("Failed to get average rating for the park after submit");
 												}
 
 												public void onSuccess(Float result) {

@@ -94,10 +94,8 @@ public class RatingServiceImplTest {
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			service.createRating(pid, username, rating);
-			Rating r = service.getRating(pid, username);
-			assertEquals(pid, r.getPid());
-			assertEquals(username, r.getUsername());
-			assertEquals(rating, r.getRating());
+			Integer r = service.getRating(pid, username);
+			assertEquals(rating, r.intValue());
 		} catch (RatingOutOfRangeException e) {
 			fail("Shouldn't throw exception");
 		} finally {

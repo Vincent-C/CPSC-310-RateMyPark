@@ -11,7 +11,7 @@ import com.ratemypark.exception.UserNameException;
 @RemoteServiceRelativePath("rating")
 public interface RatingService extends RemoteService {
 	 void createRating(Long pid, String username, int rating) throws RatingOutOfRangeException;
-	 Rating getRating(Long pid, String username);
+	 Integer getRating(Long pid, String username);
 	 Float averageRating(Long pid);
 	 List<Rating> getRatings(Long pid);
 	 Integer totalNumRatings(Long pid);
