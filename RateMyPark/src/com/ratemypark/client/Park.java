@@ -40,7 +40,7 @@ public class Park implements IsSerializable {
 	private String neighbourhoodURL;
 
 	public Park() {
-
+		// THIS IS A PARK!
 	}
 
 	public Park(Long pid) {
